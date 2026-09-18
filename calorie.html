@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Theerapong Fitness & Macro Tracker V9 (ImgBB + Chart)</title>
-    <!-- เพิ่มไลบรารี Chart.js สำหรับวาดกราฟ -->
+    <title>Theerapong Fitness & Macro Tracker V10.1 (AI Food Scanner)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --border: #cbd5e1; }
@@ -134,6 +133,15 @@
                 </div>
             </div>
 
+            <!-- โซนใหม่: AI Food Scanner -->
+            <div class="card" style="background: #e0f2fe; border: 1px solid #bae6fd;">
+                <h3 style="font-size: 16px; color: #0284c7;">📸 สแกนอาหารด้วย AI</h3>
+                <p style="font-size: 12px; color: #475569; margin-top: -10px;">ถ่ายรูปหรือเลือกรูปอาหาร ให้ AI ประเมินแคลอรีและโปรตีนให้แบบอัตโนมัติ</p>
+                <input type="file" id="aiFoodImage" accept="image/*" capture="environment" style="background: white;">
+                <button id="btnAiScan" onclick="window.analyzeFoodWithAI()" style="background: #0ea5e9; margin-top: 10px;">✨ วิเคราะห์รูปภาพ</button>
+                <p id="aiStatus" style="font-size: 12px; color: #0284c7; display: none; margin-top: 10px; font-weight: bold;">⏳ AI กำลังวิเคราะห์ส่วนผสม รอสักครู่...</p>
+            </div>
+
             <div class="card">
                 <h3 style="font-size: 16px; border-bottom: 2px solid var(--bg); padding-bottom: 10px;">🍽️ เพิ่มรายการอาหาร</h3>
                 <label>มื้ออาหาร:</label>
@@ -158,16 +166,17 @@
 
                 <button class="btn-outline" onclick="window.toggleCustomBox()">✏️ คีย์ข้อมูลอาหารเอง</button>
 
+                <!-- Custom Box ที่ AI จะเอาข้อมูลมากรอกให้ -->
                 <div class="custom-box" id="customFoodBox">
                     <label style="margin-top:0;">ชื่อเมนู:</label>
                     <input type="text" id="c_name">
                     <label>ปริมาณ (เช่น 1 จาน):</label>
-                    <input type="text" id="c_unit">
+                    <input type="text" id="c_unit" value="1 ที่">
                     <div class="two-col">
-                        <div><label>แคลอรี:</label><input type="number" id="c_cal" inputmode="decimal"></div>
+                        <div><label>แคลอรี (kcal):</label><input type="number" id="c_cal" inputmode="decimal"></div>
                         <div><label>โปรตีน (g):</label><input type="number" id="c_pro" inputmode="decimal"></div>
                     </div>
-                    <button onclick="window.addCustomEntry()" style="background: var(--success);">+ บันทึกที่คีย์เอง</button>
+                    <button onclick="window.addCustomEntry()" style="background: var(--success);">+ บันทึกเมนูนี้</button>
                 </div>
             </div>
 
@@ -221,7 +230,6 @@
                 <button id="btnSaveBody" onclick="window.saveBodyMetrics()" style="background: var(--success);">💾 บันทึกสัดส่วน</button>
             </div>
 
-            <!-- โซนกราฟสถิติร่างกาย -->
             <div class="card">
                 <h3 style="font-size: 16px;">📈 กราฟสถิติร่างกาย</h3>
                 <canvas id="bodyChart" style="width: 100%; max-height: 280px;"></canvas>
@@ -256,7 +264,7 @@
         </div>
     </div>
 
-    <!-- โค้ดเชื่อมต่อ Firebase V9 -->
+    <!-- โค้ดเชื่อมต่อ Firebase & Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
@@ -287,7 +295,7 @@
         let userSettings = { targetCal: 2000, targetPro: 140 };
         
         let customRoutines = [];
-        window.bodyChartInstance = null; // ตัวแปรกราฟ
+        window.bodyChartInstance = null;
 
         window.switchTab = (tabId) => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -324,6 +332,63 @@
                 if(unsubscribeBody) unsubscribeBody();
             }
         });
+
+        // 🔴 ระบบ AI Scan อาหาร (แก้ไขให้ทำงานปกติแล้ว) 🔴
+        window.analyzeFoodWithAI = async () => {
+            const fileInput = document.getElementById('aiFoodImage');
+            const file = fileInput.files[0];
+            if (!file) return alert("กรุณาเลือกหรือถ่ายรูปภาพก่อนครับ");
+
+            const geminiApiKey = "AQ.Ab8RN6J9ua1eq1gHwba1Bb4VcraaqgP4fkva8zAanUn2qfk1CA"; 
+
+            document.getElementById('aiStatus').style.display = 'block';
+            document.getElementById('btnAiScan').disabled = true;
+
+            try {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = async () => {
+                    const base64Data = reader.result.split(',')[1];
+                    
+                    const promptText = "วิเคราะห์รูปอาหารนี้ ประเมินชื่ออาหารให้กระชับ (ภาษาไทย), แคลอรี (kcal), และโปรตีน (g) ให้ตอบกลับเป็น JSON Format เท่านั้น รูปแบบ: {\"name\": \"ชื่ออาหาร\", \"cal\": 300, \"pro\": 15} ห้ามมีเครื่องหมาย markdown หรือข้อความอื่นปน";
+
+                    const requestBody = {
+                        contents: [{
+                            parts: [
+                                { text: promptText },
+                                { inline_data: { mime_type: file.type, data: base64Data } }
+                            ]
+                        }]
+                    };
+
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(requestBody)
+                    });
+
+                    const data = await response.json();
+                    let aiText = data.candidates[0].content.parts[0].text;
+                    
+                    aiText = aiText.replace(/```json/g, '').replace(/```/g, '').trim();
+                    const result = JSON.parse(aiText);
+
+                    document.getElementById('customFoodBox').style.display = 'block';
+                    document.getElementById('c_name').value = result.name + " (AI ประเมิน)";
+                    document.getElementById('c_cal').value = result.cal;
+                    document.getElementById('c_pro').value = result.pro;
+
+                    alert("✨ AI วิเคราะห์เสร็จแล้ว! ตรวจสอบความถูกต้องและกดบันทึกเมนูนี้ได้เลยครับ");
+                    fileInput.value = ''; 
+                };
+            } catch (e) {
+                alert("วิเคราะห์ไม่สำเร็จ: " + e.message);
+                console.error(e);
+            } finally {
+                document.getElementById('aiStatus').style.display = 'none';
+                document.getElementById('btnAiScan').disabled = false;
+            }
+        };
 
         async function loadFoodDB() {
             try {
@@ -492,99 +557,39 @@
             } catch (e) { alert("Error: " + e.message); }
         }
 
-        // --- ระบบดึงข้อมูลสำหรับโชว์กราฟและประวัติ ---
         window.changeDate = () => {
             const dateStr = document.getElementById('datePicker').value;
             if(unsubscribeMeals) unsubscribeMeals();
             if(unsubscribeWorkouts) unsubscribeWorkouts();
             if(unsubscribeBody) unsubscribeBody();
             
-            // ดึงข้อมูลอาหารรายวัน
             unsubscribeMeals = onSnapshot(query(collection(db, "users", currentUser.uid, "logs"), where("dateStr", "==", dateStr)), (snap) => {
                 const data = []; snap.forEach(d => data.push({ id: d.id, ...d.data() })); renderDashboard(data);
             });
-
-            // ดึงข้อมูลตารางเวทรายวัน
             unsubscribeWorkouts = onSnapshot(query(collection(db, "users", currentUser.uid, "workouts"), where("dateStr", "==", dateStr)), (snap) => {
                 const data = []; snap.forEach(d => data.push({ id: d.id, ...d.data() })); renderWorkoutLogs(data);
             });
-
-            // ดึงข้อมูลร่างกาย "ทั้งหมด" เพื่อเอามาวาดกราฟสถิติ
             unsubscribeBody = onSnapshot(collection(db, "users", currentUser.uid, "metrics"), (snap) => {
-                const allData = []; 
-                snap.forEach(d => allData.push({ id: d.id, ...d.data() }));
-                
-                // 1. วาดกราฟโดยใช้ข้อมูลทั้งหมดที่มี
+                const allData = []; snap.forEach(d => allData.push({ id: d.id, ...d.data() }));
                 renderBodyChart(allData);
-
-                // 2. คัดกรองโชว์เฉพาะรูปและข้อมูลของวันปัจจุบันที่เลือก
                 const dailyData = allData.filter(d => d.dateStr === dateStr);
                 renderBodyLogs(dailyData);
             });
         }
 
-        // ฟังก์ชันวาดกราฟด้วย Chart.js
         function renderBodyChart(allData) {
-            // เรียงวันที่จากเก่าไปใหม่
             const sortedData = [...allData].sort((a,b) => a.timestamp - b.timestamp);
-            
-            const labels = [];
-            const weightData = [];
-            const fatData = [];
-            
-            sortedData.forEach(d => {
-                labels.push(d.dateStr); 
-                weightData.push(d.weight !== "-" ? parseFloat(d.weight) : null);
-                fatData.push(d.bodyFat !== "-" ? parseFloat(d.bodyFat) : null);
-            });
-
+            const labels = []; const weightData = []; const fatData = [];
+            sortedData.forEach(d => { labels.push(d.dateStr); weightData.push(d.weight !== "-" ? parseFloat(d.weight) : null); fatData.push(d.bodyFat !== "-" ? parseFloat(d.bodyFat) : null); });
             const ctx = document.getElementById('bodyChart').getContext('2d');
-            
-            // ล้างกราฟเก่าก่อนวาดใหม่ (กันกราฟซ้อนกัน)
-            if(window.bodyChartInstance) {
-                window.bodyChartInstance.destroy();
-            }
-
+            if(window.bodyChartInstance) { window.bodyChartInstance.destroy(); }
             window.bodyChartInstance = new Chart(ctx, {
                 type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'น้ำหนัก (Kg)',
-                            data: weightData,
-                            borderColor: '#2563eb',
-                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                            yAxisID: 'y',
-                            tension: 0.3,
-                            spanGaps: true // เส้นเชื่อมกันแม้จะมีวันเว้นว่าง
-                        },
-                        {
-                            label: 'ไขมัน (%)',
-                            data: fatData,
-                            borderColor: '#f59e0b',
-                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                            yAxisID: 'y1',
-                            tension: 0.3,
-                            spanGaps: true
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    interaction: { mode: 'index', intersect: false },
-                    scales: {
-                        y: {
-                            type: 'linear', display: true, position: 'left',
-                            title: { display: true, text: 'น้ำหนัก (Kg)' }
-                        },
-                        y1: {
-                            type: 'linear', display: true, position: 'right',
-                            title: { display: true, text: 'ไขมัน (%)' },
-                            grid: { drawOnChartArea: false } // ไม่ให้เส้นกริดทับกัน
-                        }
-                    }
-                }
+                data: { labels: labels, datasets: [
+                    { label: 'น้ำหนัก (Kg)', data: weightData, borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', yAxisID: 'y', tension: 0.3, spanGaps: true },
+                    { label: 'ไขมัน (%)', data: fatData, borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', yAxisID: 'y1', tension: 0.3, spanGaps: true }
+                ]},
+                options: { responsive: true, interaction: { mode: 'index', intersect: false }, scales: { y: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'น้ำหนัก (Kg)' } }, y1: { type: 'linear', display: true, position: 'right', title: { display: true, text: 'ไขมัน (%)' }, grid: { drawOnChartArea: false } } } }
             });
         }
 
@@ -620,7 +625,7 @@
             const meal = document.getElementById('mealTime').value; const name = document.getElementById('c_name').value; const unit = document.getElementById('c_unit').value || "ที่ทาน"; const cal = parseFloat(document.getElementById('c_cal').value); const pro = parseFloat(document.getElementById('c_pro').value) || 0;
             if (!name || isNaN(cal)) return alert("กรุณาใส่ชื่อเมนูและแคลอรี");
             await addDoc(collection(db, "users", currentUser.uid, "logs"), { dateStr: document.getElementById('datePicker').value, meal: meal, name: name, amount: 1, unit: unit, cal: cal, pro: pro, timestamp: Date.now() });
-            document.getElementById('customFoodBox').style.display = 'none'; document.getElementById('c_name').value = ''; document.getElementById('c_unit').value = ''; document.getElementById('c_cal').value = ''; document.getElementById('c_pro').value = '';
+            document.getElementById('customFoodBox').style.display = 'none'; document.getElementById('c_name').value = ''; document.getElementById('c_unit').value = '1 ที่'; document.getElementById('c_cal').value = ''; document.getElementById('c_pro').value = '';
         }
 
         window.deleteLog = async (docId, type) => { if(confirm("ต้องการลบรายการนี้ใช่ไหม?")) await deleteDoc(doc(db, "users", currentUser.uid, type, docId)); }
@@ -675,39 +680,17 @@
                     formData.append("image", file);
                     const imgbbKey = "234c872cda662b81fffc54fd6d547ea6"; 
                     
-                    const response = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, {
-                        method: "POST",
-                        body: formData
-                    });
-                    
+                    const response = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, { method: "POST", body: formData });
                     const data = await response.json();
-                    if(data.success) {
-                        imageUrl = data.data.url; 
-                    } else {
-                        throw new Error("ImgBB Upload Failed: " + data.error.message);
-                    }
+                    if(data.success) { imageUrl = data.data.url; } else { throw new Error("ImgBB Upload Failed"); }
                 }
 
-                await addDoc(collection(db, "users", currentUser.uid, "metrics"), { 
-                    dateStr: document.getElementById('datePicker').value, 
-                    weight: weight || "-", 
-                    bodyFat: fat || "-", 
-                    imageUrl: imageUrl,
-                    timestamp: Date.now() 
-                });
+                await addDoc(collection(db, "users", currentUser.uid, "metrics"), { dateStr: document.getElementById('datePicker').value, weight: weight || "-", bodyFat: fat || "-", imageUrl: imageUrl, timestamp: Date.now() });
                 
-                document.getElementById('bodyWeight').value = ''; 
-                document.getElementById('bodyFat').value = ''; 
-                fileInput.value = '';
-                alert('✅ บันทึกสัดส่วนและรูปภาพเรียบร้อยครับ!');
+                document.getElementById('bodyWeight').value = ''; document.getElementById('bodyFat').value = ''; fileInput.value = ''; alert('✅ บันทึกสัดส่วนและรูปภาพเรียบร้อยครับ!');
 
-            } catch (e) { 
-                alert("เกิดข้อผิดพลาดในการอัปโหลดรูป: " + e.message); 
-                console.error(e);
-            } finally {
-                document.getElementById('uploadStatus').style.display = 'none';
-                document.getElementById('btnSaveBody').disabled = false;
-            }
+            } catch (e) { alert("เกิดข้อผิดพลาดในการอัปโหลดรูป: " + e.message); } 
+            finally { document.getElementById('uploadStatus').style.display = 'none'; document.getElementById('btnSaveBody').disabled = false; }
         }
 
         function renderBodyLogs(dailyData) {
@@ -715,18 +698,7 @@
             if(dailyData.length === 0) { container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 20px 0; font-size:14px;">ยังไม่มีการบันทึกสัดส่วนวันนี้</div>'; return; }
             dailyData.sort((a,b) => b.timestamp - a.timestamp).forEach(log => {
                 let imgHtml = log.imageUrl ? `<img src="${log.imageUrl}" style="width: 100%; border-radius: 8px; margin-top: 10px; border: 1px solid var(--border);">` : '';
-                
-                container.innerHTML += `
-                    <div class="history-box" style="display:flex; flex-direction:column; gap: 8px;">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                            <div>
-                                <div style="font-weight:bold; font-size:16px; color:var(--primary);">น้ำหนัก: ${log.weight} kg</div>
-                                <div style="font-size:13px; color:#64748b;">ไขมัน (Fat): ${log.bodyFat} %</div>
-                            </div>
-                            <button class="del-btn" onclick="deleteLog('${log.id}', 'metrics')">ลบ</button>
-                        </div>
-                        ${imgHtml}
-                    </div>`;
+                container.innerHTML += `<div class="history-box" style="display:flex; flex-direction:column; gap: 8px;"><div style="display:flex; justify-content:space-between; align-items:flex-start;"><div><div style="font-weight:bold; font-size:16px; color:var(--primary);">น้ำหนัก: ${log.weight} kg</div><div style="font-size:13px; color:#64748b;">ไขมัน (Fat): ${log.bodyFat} %</div></div><button class="del-btn" onclick="deleteLog('${log.id}', 'metrics')">ลบ</button></div>${imgHtml}</div>`;
             });
         }
     </script>
