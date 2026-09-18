@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Theerapong Fitness & Macro Tracker V14 (Net Calories Visual)</title>
+    <title>Theerapong Fitness & Macro Tracker V15 (Treadmill Formula)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --border: #cbd5e1; }
@@ -167,6 +167,8 @@
                 </div>
             </div>
 
+            <!-- โซนสแกนอาหารด้วย AI (ซ่อนไว้/ตัดออกตามคำขอ V12) -->
+
             <div class="card">
                 <h3 style="font-size: 16px; border-bottom: 2px solid var(--bg); padding-bottom: 10px;">🍽️ เพิ่มรายการอาหาร</h3>
                 <label>มื้ออาหาร:</label>
@@ -232,25 +234,38 @@
             </div>
         </div>
 
-        <!-- 3. CARDIO TAB -->
+        <!-- 3. CARDIO TAB (แก้ไขเป็น เดินชัน อัตโนมัติคำนวณตามสูตรลู่วิ่ง) -->
         <div id="tab-cardio" class="tab-content">
             <div class="card">
-                <h2>🏃 บันทึกกิจกรรมคาร์ดิโอ</h2>
-                <label>เลือกคาร์ดิโอที่ต้องการทำ:</label>
-                <select id="cardioSelect" onchange="window.loadCardioForm()">
-                    <option value="">-- กรุณาสร้างคาร์ดิโอในหน้า 'ตั้งค่า' --</option>
-                </select>
+                <h2>🏃 เดินชันบนลู่ (Treadmill)</h2>
+                <p style="font-size: 12px; color: #64748b; margin-top: -10px;">คำนวณการเผาผลาญด้วยสูตรเครื่องวิ่งลู่มาตรฐาน (ACSM Formula)</p>
 
-                <div id="cardioFormContainer" style="margin-top: 15px; display: none; background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid var(--border);">
+                <div style="background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid var(--border);">
                     <div class="two-col">
-                        <div><label style="margin-top:0;">เวลา (นาที):</label><input type="number" id="cd_duration" inputmode="decimal" oninput="window.calcCardioBurn()"></div>
-                        <div><label style="margin-top:0;">ความชัน/ระดับ:</label><input type="number" id="cd_incline" inputmode="decimal"></div>
+                        <div>
+                            <label style="margin-top:0;">เวลา (นาที):</label>
+                            <input type="number" id="cd_duration" value="30" inputmode="decimal" oninput="window.calcCardioBurn()">
+                        </div>
+                        <div>
+                            <label style="margin-top:0;">ความชัน (%):</label>
+                            <input type="number" id="cd_incline" value="5" inputmode="decimal" oninput="window.calcCardioBurn()">
+                        </div>
+                        <div>
+                            <label style="margin-top:0;">ความเร็ว (km/h):</label>
+                            <input type="number" id="cd_speed" value="5.0" inputmode="decimal" oninput="window.calcCardioBurn()">
+                        </div>
+                        <div>
+                            <label style="margin-top:0;">น้ำหนักตัว (kg):</label>
+                            <input type="number" id="cd_weight" value="70" inputmode="decimal" oninput="window.calcCardioBurn()">
+                        </div>
                     </div>
-                    <div style="margin-top: 15px; text-align: center; font-size: 14px;">
-                        🔥 ระบบคำนวณการเผาผลาญ:<br>
-                        <span id="cd_burn_display" style="font-size: 24px; font-weight: bold; color: var(--danger);">0</span> kcal
+                    
+                    <div style="margin-top: 20px; text-align: center; font-size: 14px; background: white; padding: 10px; border-radius: 8px; border: 1px dashed var(--danger);">
+                        🔥 ระบบประเมินการเผาผลาญ:<br>
+                        <span id="cd_burn_display" style="font-size: 28px; font-weight: bold; color: var(--danger);">0</span> kcal
                     </div>
-                    <button onclick="window.saveCardioLog()" style="background: var(--danger);">💾 บันทึกคาร์ดิโอ</button>
+                    
+                    <button onclick="window.saveCardioLog()" style="background: var(--danger); margin-top: 15px;">💾 บันทึกคาร์ดิโอ</button>
                 </div>
             </div>
 
@@ -321,14 +336,6 @@
             </div>
 
             <div class="card">
-                <h2>🏃 สร้างรูปแบบคาร์ดิโอ</h2>
-                <p style="font-size: 12px; color: #64748b; margin-top:-10px;">สร้างชื่อกิจกรรม พร้อมกำหนดอัตราการเผาผลาญแคลอรีต่อนาที</p>
-                <div id="cardioSettingsContainer"></div>
-                <button class="btn-outline" onclick="window.addCardioRoutine()">+ เพิ่มกิจกรรมคาร์ดิโอ</button>
-                <button onclick="window.saveSettings()" style="background: var(--danger); margin-top: 10px;">💾 บันทึกคาร์ดิโอ</button>
-            </div>
-
-            <div class="card">
                 <h2>🛠️ สร้างตารางเวทส่วนตัว</h2>
                 <p style="font-size: 12px; color: #64748b; margin-top:-10px;">สร้างวันเล่นเวท และเพิ่มชื่อท่า พร้อมแนบชื่อไฟล์รูปภาพ (เช่น 1.jpg)</p>
                 <div id="routineBuilderContainer"></div>
@@ -370,7 +377,6 @@
         let userSettings = { targetCal: 2000, targetPro: 140 };
         
         let customRoutines = []; // เวท
-        let customCardio = []; // คาร์ดิโอ
         window.bodyChartInstance = null;
 
         window.switchTab = (tabId) => {
@@ -406,6 +412,7 @@
                 }
                 
                 window.changeDate(); 
+                window.calcCardioBurn(); // อัปเดตค่าคาร์ดิโอเริ่มต้น
             } else {
                 currentUser = null;
                 document.getElementById('loginScreen').style.display = 'flex';
@@ -432,15 +439,12 @@
                 if (docSnap.exists()) {
                     if (docSnap.data().settings) userSettings = docSnap.data().settings;
                     if (docSnap.data().routines) customRoutines = docSnap.data().routines;
-                    if (docSnap.data().cardioRoutines) customCardio = docSnap.data().cardioRoutines;
                 }
                 document.getElementById('setCal').value = userSettings.targetCal;
                 document.getElementById('setPro').value = userSettings.targetPro;
                 updateTargetsUI();
                 renderRoutineBuilder(); 
-                renderCardioBuilder();
                 updateWorkoutDropdown(); 
-                updateCardioDropdown();
             } catch (err) {}
         }
 
@@ -463,32 +467,15 @@
             });
             customRoutines = newRoutines;
 
-            const cardioElements = document.querySelectorAll('.builder-cardio');
-            const newCardio = [];
-            cardioElements.forEach((el) => {
-                const cName = el.querySelector('.c-name').value;
-                if(cName) {
-                    newCardio.push({
-                        name: cName,
-                        duration: parseFloat(el.querySelector('.c-duration').value) || 30,
-                        incline: parseFloat(el.querySelector('.c-incline').value) || 0,
-                        calPerMin: parseFloat(el.querySelector('.c-cal').value) || 5
-                    });
-                }
-            });
-            customCardio = newCardio;
-
             await setDoc(doc(db, "users", currentUser.uid), { 
                 settings: userSettings, 
-                routines: customRoutines,
-                cardioRoutines: customCardio
+                routines: customRoutines
             }, { merge: true });
             
             updateTargetsUI();
             updateWorkoutDropdown();
-            updateCardioDropdown();
             window.changeDate();
-            alert('✅ บันทึกเป้าหมาย และ ตารางข้อมูล ขึ้นคลาวด์สำเร็จ!');
+            alert('✅ บันทึกเป้าหมาย และ ตารางเวท ขึ้นคลาวด์สำเร็จ!');
         }
 
         function updateTargetsUI() {
@@ -496,78 +483,55 @@
             document.getElementById('uiTargetPro').innerText = userSettings.targetPro;
         }
 
-        // --- ส่วน Builder ตารางคาร์ดิโอ ---
-        function renderCardioBuilder() {
-            const container = document.getElementById('cardioSettingsContainer');
-            container.innerHTML = '';
-            customCardio.forEach((c, index) => {
-                container.innerHTML += `
-                    <div class="builder-ex builder-cardio">
-                        <span class="remove-icon" onclick="window.removeCardioRoutine(${index})">✕</span>
-                        <label style="margin-top:0; font-size:12px;">ชื่อคาร์ดิโอ:</label>
-                        <input type="text" class="c-name" value="${c.name}" placeholder="เช่น เดิน Zone 2">
-                        <div class="ex-inputs" style="margin-top:8px;">
-                            <div><label>เวลาตั้งต้น (นาที)</label><input type="number" class="c-duration" value="${c.duration}"></div>
-                            <div><label>ความชันตั้งต้น</label><input type="number" class="c-incline" value="${c.incline}"></div>
-                            <div><label>เผาผลาญ (cal/นาที)</label><input type="number" class="c-cal" value="${c.calPerMin}"></div>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-        window.addCardioRoutine = () => { customCardio.push({ name: "", duration: 30, incline: 0, calPerMin: 5 }); renderCardioBuilder(); }
-        window.removeCardioRoutine = (index) => { if(confirm("ลบคาร์ดิโอนี้ใช่ไหม?")) { customCardio.splice(index, 1); renderCardioBuilder(); } }
-
-        function updateCardioDropdown() {
-            const select = document.getElementById('cardioSelect');
-            select.innerHTML = '<option value="">-- เลือกคาร์ดิโอ --</option>';
-            customCardio.forEach((c, index) => { select.innerHTML += `<option value="${index}">${c.name}</option>`; });
-            document.getElementById('cardioFormContainer').style.display = 'none';
-        }
-
-        window.loadCardioForm = () => {
-            const index = document.getElementById('cardioSelect').value;
-            const container = document.getElementById('cardioFormContainer');
-            if(index === "") { container.style.display = 'none'; return; }
-            
-            const routine = customCardio[index];
-            document.getElementById('cd_duration').value = routine.duration;
-            document.getElementById('cd_incline').value = routine.incline;
-            window.calcCardioBurn();
-            container.style.display = 'block';
-        }
-
+        // --- ส่วนคำนวณคาร์ดิโอ (ACSM Treadmill Formula) ---
         window.calcCardioBurn = () => {
-            const index = document.getElementById('cardioSelect').value;
-            if(index === "") return;
-            const routine = customCardio[index];
             const duration = parseFloat(document.getElementById('cd_duration').value) || 0;
-            const totalBurn = duration * routine.calPerMin;
-            document.getElementById('cd_burn_display').innerText = totalBurn.toFixed(0);
+            const incline = parseFloat(document.getElementById('cd_incline').value) || 0;
+            const speedKmh = parseFloat(document.getElementById('cd_speed').value) || 0;
+            const weight = parseFloat(document.getElementById('cd_weight').value) || 0;
+
+            if(duration > 0 && speedKmh > 0 && weight > 0) {
+                // แปลง km/h เป็น m/min
+                const speedMmin = speedKmh * 16.6667;
+                // เปอร์เซ็นความชันเป็นทศนิยม
+                const grade = incline / 100;
+                
+                // สมการ ACSM Walking Equation (VO2 in ml/kg/min)
+                const vo2 = (0.1 * speedMmin) + (1.8 * speedMmin * grade) + 3.5;
+                
+                // แปลง VO2 เป็นแคลอรีต่อนาที (kcal/min)
+                const calPerMin = (vo2 * weight) / 200;
+                
+                // แคลอรีรวม
+                const totalBurn = calPerMin * duration;
+                
+                document.getElementById('cd_burn_display').innerText = totalBurn.toFixed(0);
+            } else {
+                document.getElementById('cd_burn_display').innerText = "0";
+            }
         }
 
         window.saveCardioLog = async () => {
-            const index = document.getElementById('cardioSelect').value;
-            if(index === "") return alert("กรุณาเลือกคาร์ดิโอ");
-            const routine = customCardio[index];
             const duration = parseFloat(document.getElementById('cd_duration').value) || 0;
             const incline = parseFloat(document.getElementById('cd_incline').value) || 0;
-            const burn = duration * routine.calPerMin;
+            const speedKmh = parseFloat(document.getElementById('cd_speed').value) || 0;
+            const weight = parseFloat(document.getElementById('cd_weight').value) || 0;
+            const burn = parseFloat(document.getElementById('cd_burn_display').innerText) || 0;
 
             if(duration <= 0) return alert("กรุณาใส่เวลาให้ถูกต้อง");
 
             try {
                 await addDoc(collection(db, "users", currentUser.uid, "cardio"), {
                     dateStr: document.getElementById('datePicker').value,
-                    name: routine.name,
+                    name: "เดินชันบนลู่ (Treadmill)",
                     duration: duration,
                     incline: incline,
+                    speed: speedKmh,
+                    weight: weight,
                     burn: burn,
                     timestamp: Date.now()
                 });
                 alert('✅ บันทึกคาร์ดิโอเรียบร้อยครับ!');
-                document.getElementById('cardioSelect').value = '';
-                document.getElementById('cardioFormContainer').style.display = 'none';
             } catch (e) { alert("Error: " + e.message); }
         }
 
@@ -575,11 +539,12 @@
             const container = document.getElementById('cardioLogs'); container.innerHTML = '';
             if(data.length === 0) { container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 20px 0; font-size:14px;">ยังไม่มีประวัติคาร์ดิโอวันนี้</div>'; return; }
             data.sort((a,b) => b.timestamp - a.timestamp).forEach(log => {
+                const speedText = log.speed ? ` | เร็ว ${log.speed}` : '';
                 container.innerHTML += `
                     <div class="history-box" style="display:flex; justify-content:space-between; align-items:center;">
                         <div>
                             <div style="font-weight:bold; font-size:15px; color:var(--primary);">🏃 ${log.name}</div>
-                            <div style="font-size:12px; color:#64748b;">${log.duration} นาที | ความชัน ${log.incline}</div>
+                            <div style="font-size:12px; color:#64748b;">${log.duration} นาที | ชัน ${log.incline}%${speedText}</div>
                         </div>
                         <div style="text-align:right;">
                             <div style="color:var(--danger); font-weight:bold; font-size:16px;">🔥 ${log.burn.toFixed(0)} kcal</div>
@@ -709,11 +674,9 @@
             let totalBurn = 0;
             currentDayCardio.forEach(item => { totalBurn += item.burn; });
 
-            // แคลอรีสุทธิ (Net Calories)
             let netCal = totalCal - totalBurn;
-            if(netCal < 0) netCal = 0; // กันค่าติดลบ
+            if(netCal < 0) netCal = 0;
 
-            // แสดงตัวเลข
             document.getElementById('totalCalUI').innerText = totalCal.toFixed(0); 
             document.getElementById('totalProUI').innerText = totalPro.toFixed(1);
             document.getElementById('totalBurnUI').innerText = totalBurn.toFixed(0);
@@ -730,25 +693,20 @@
             document.getElementById('netCalUI').style.color = color; 
             document.getElementById('calStatus').innerText = statusText;
 
-            // --- อัปเดตกราฟิกคน (SVG) ---
-            // 1. คำนวณเปอร์เซ็นต์เทียบกับเป้าหมาย
             let intakePct = Math.min((totalCal / userSettings.targetCal) * 100, 100);
-            let burnPct = Math.min((totalBurn / userSettings.targetCal) * 100, intakePct); // ไม่ให้แดงเกินน้ำเงิน
+            let burnPct = Math.min((totalBurn / userSettings.targetCal) * 100, intakePct); 
 
-            // 2. คำนวณแกน Y และความสูง (SVG สูง 24px)
-            let yIntake = 24 - (24 * (intakePct / 100)); // เริ่มจากข้างบนลงมา
+            let yIntake = 24 - (24 * (intakePct / 100)); 
             let hIntake = 24 * (intakePct / 100);
             
-            let yBurn = yIntake; // สีแดงเริ่มทับตรงขอบบนสุดของสีน้ำเงินพอดี
+            let yBurn = yIntake; 
             let hBurn = 24 * (burnPct / 100);
 
-            // 3. กำหนดค่าลงใน SVG
             document.getElementById('fillIntake').setAttribute('y', yIntake);
             document.getElementById('fillIntake').setAttribute('height', hIntake);
             document.getElementById('fillBurn').setAttribute('y', yBurn);
             document.getElementById('fillBurn').setAttribute('height', hBurn);
             
-            // --- ลิสต์รายการอาหารด้านล่าง ---
             const container = document.getElementById('mealLogs'); container.innerHTML = ''; let hasData = false;
             for (const [mealName, items] of Object.entries(mealGroups)) {
                 if (items.length > 0) {
@@ -763,9 +721,9 @@
             if(!hasData) container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 30px 0; font-size:14px;">ยังไม่มีข้อมูลอาหารวันนี้</div>';
         }
 
-        // --- DASHBOARD MONTHLY (SVG หักล้าง Net Calories) ---
+        // --- DASHBOARD MONTHLY ---
         window.loadMonthlyData = async () => {
-            const monthStr = document.getElementById('monthPicker').value; // "YYYY-MM"
+            const monthStr = document.getElementById('monthPicker').value; 
             if (!monthStr || !currentUser) return;
             
             const startStr = `${monthStr}-01`;
@@ -812,7 +770,6 @@
                     let netCal = stat.cal - stat.burn;
                     if(netCal < 0) netCal = 0;
 
-                    // การคำนวณ SVG ของ Dashboard
                     let intakePct = Math.min((stat.cal / userSettings.targetCal) * 100, 100);
                     let burnPct = Math.min((stat.burn / userSettings.targetCal) * 100, intakePct);
                     
@@ -856,17 +813,6 @@
                 console.error(e);
                 document.getElementById('dashStatus').innerText = "เกิดข้อผิดพลาดในการโหลดข้อมูล: " + e.message;
             }
-        }
-
-
-        // --- ระบบที่เหลือ (วาดกราฟสัดส่วน, อาหาร JSON ฯลฯ ทำงานเหมือนเดิม) ---
-        function renderWorkoutLogs(data) {
-            const container = document.getElementById('workoutLogs'); container.innerHTML = '';
-            if(data.length === 0) { container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 20px 0; font-size:14px;">ยังไม่มีประวัติเวทเทรนนิ่งวันนี้</div>'; return; }
-            data.sort((a,b) => b.timestamp - a.timestamp).forEach(log => {
-                let exHtml = ''; log.exercises.forEach(ex => { exHtml += `<div style="font-size:13px; margin-bottom:4px; display:flex; justify-content:space-between;"><span>🔹 ${ex.name}</span><span style="color:var(--primary); font-weight:bold;">${ex.sets} เซ็ต / ${ex.reps} ครั้ง / ${ex.kg} kg</span></div>`; });
-                container.innerHTML += `<div class="history-box"><div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 8px;"><div style="font-weight:bold; font-size:14px; color:#334155;">📌 ${log.routine}</div><button class="del-btn" onclick="deleteLog('${log.id}', 'workouts')">ลบ</button></div>${exHtml}</div>`;
-            });
         }
 
         function renderBodyChart(allData) {
