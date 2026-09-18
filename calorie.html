@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Theerapong Fitness & Macro Tracker V15 (Treadmill Formula)</title>
+    <title>Theerapong Fitness & Macro Tracker V16 (Pro Visuals)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --border: #cbd5e1; }
@@ -71,7 +71,7 @@
         .day-date { width: 50px; text-align: center; font-weight: bold; color: var(--text); font-size: 18px; }
         .day-date span { display: block; font-size: 11px; font-weight: normal; color: #64748b; }
         .day-svg { width: 50px; height: 50px; flex-shrink: 0; margin: 0 15px; border: 1px dashed #cbd5e1; border-radius: 4px; padding: 2px; }
-        .day-stats { flex-grow: 1; font-size: 13px; }
+        .day-stats { flex-grow: 1; font-size: 13px; line-height: 1.4; }
         
         /* Login Screen */
         #loginScreen { position: fixed; top:0; left:0; right:0; bottom:0; background: white; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
@@ -132,11 +132,8 @@
                             </clipPath>
                         </defs>
                         <g clip-path="url(#person-shape-main)">
-                            <!-- สีเทา: โควตาที่ยังกินได้ -->
                             <rect x="0" y="0" width="24" height="24" fill="#e2e8f0" />
-                            <!-- สีน้ำเงิน: กินเข้าไป (วาดจากล่างขึ้นบน) -->
                             <rect id="fillIntake" x="0" y="24" width="24" height="0" fill="#2563eb" />
-                            <!-- สีแดง: เผาผลาญทิ้ง (กดทับลงมาจากยอดสีน้ำเงิน) -->
                             <rect id="fillBurn" x="0" y="24" width="24" height="0" fill="#ef4444" />
                         </g>
                     </svg>
@@ -144,7 +141,8 @@
                     <div class="stats-col">
                         <div class="two-col" style="gap: 8px;">
                             <div class="stat-box">
-                                <div style="font-size: 11px; color: #64748b;">กิน (In)</div>
+                                <!-- ย้ายเป้าหมายแคลอรีมาไว้ที่นี่ตามที่ผู้ใช้ต้องการ -->
+                                <div style="font-size: 11px; color: #64748b;">กิน (In) / เป้า <span id="uiTargetCal">2000</span></div>
                                 <div class="stat-val" id="totalCalUI" style="color: var(--primary); font-size:16px;">0</div>
                             </div>
                             <div class="stat-box">
@@ -154,20 +152,18 @@
                         </div>
                         
                         <div class="stat-box" style="background: #e0f2fe; border: 1px solid #bae6fd;">
-                            <div style="font-size: 11px; color: #0284c7; font-weight: bold;">แคลอรีสุทธิ (Net) / เป้า <span id="uiTargetCal">2000</span></div>
+                            <div style="font-size: 11px; color: #0284c7; font-weight: bold;">แคลอรีสุทธิ (Net)</div>
                             <div class="stat-val" id="netCalUI" style="color: #0284c7; font-size:24px;">0</div>
                             <div style="font-size: 11px; color: #64748b; margin-top:2px;" id="calStatus">สถานะ: รอโหลด...</div>
                         </div>
                         
                         <div class="stat-box">
-                            <div style="font-size: 11px; color: #64748b;">โปรตีนที่ได้ (เป้า <span id="uiTargetPro">140</span>g)</div>
+                            <div style="font-size: 11px; color: #64748b;">โปรตีนที่ได้ / เป้า <span id="uiTargetPro">140</span>g</div>
                             <div class="stat-val" id="totalProUI" style="color: var(--success); font-size:16px;">0</div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- โซนสแกนอาหารด้วย AI (ซ่อนไว้/ตัดออกตามคำขอ V12) -->
 
             <div class="card">
                 <h3 style="font-size: 16px; border-bottom: 2px solid var(--bg); padding-bottom: 10px;">🍽️ เพิ่มรายการอาหาร</h3>
@@ -234,7 +230,7 @@
             </div>
         </div>
 
-        <!-- 3. CARDIO TAB (แก้ไขเป็น เดินชัน อัตโนมัติคำนวณตามสูตรลู่วิ่ง) -->
+        <!-- 3. CARDIO TAB -->
         <div id="tab-cardio" class="tab-content">
             <div class="card">
                 <h2>🏃 เดินชันบนลู่ (Treadmill)</h2>
@@ -376,7 +372,7 @@
         let selectedFoodIndex = -1;
         let userSettings = { targetCal: 2000, targetPro: 140 };
         
-        let customRoutines = []; // เวท
+        let customRoutines = []; 
         window.bodyChartInstance = null;
 
         window.switchTab = (tabId) => {
@@ -412,7 +408,7 @@
                 }
                 
                 window.changeDate(); 
-                window.calcCardioBurn(); // อัปเดตค่าคาร์ดิโอเริ่มต้น
+                window.calcCardioBurn(); 
             } else {
                 currentUser = null;
                 document.getElementById('loginScreen').style.display = 'flex';
@@ -491,18 +487,10 @@
             const weight = parseFloat(document.getElementById('cd_weight').value) || 0;
 
             if(duration > 0 && speedKmh > 0 && weight > 0) {
-                // แปลง km/h เป็น m/min
                 const speedMmin = speedKmh * 16.6667;
-                // เปอร์เซ็นความชันเป็นทศนิยม
                 const grade = incline / 100;
-                
-                // สมการ ACSM Walking Equation (VO2 in ml/kg/min)
                 const vo2 = (0.1 * speedMmin) + (1.8 * speedMmin * grade) + 3.5;
-                
-                // แปลง VO2 เป็นแคลอรีต่อนาที (kcal/min)
                 const calPerMin = (vo2 * weight) / 200;
-                
-                // แคลอรีรวม
                 const totalBurn = calPerMin * duration;
                 
                 document.getElementById('cd_burn_display').innerText = totalBurn.toFixed(0);
@@ -605,9 +593,22 @@
             const routine = customRoutines[rIndex];
             document.getElementById('routineTitle').innerText = routine.dayName;
             listDiv.innerHTML = '';
+            
+            // เพิ่มการเก็บ data-img ไว้ดึงตอนเซฟ
             routine.exercises.forEach((ex) => {
                 let imgHtml = ex.img ? `<img src="${ex.img}" class="exercise-img" onerror="this.style.display='none'">` : '';
-                listDiv.innerHTML += `<div class="exercise-item" data-name="${ex.name}"><div class="exercise-name">💪 ${ex.name}</div><div class="exercise-layout">${imgHtml}<div class="ex-inputs"><div><label>เซ็ต</label><input type="number" class="w-sets" placeholder="Set" inputmode="numeric"></div><div><label>ครั้ง</label><input type="number" class="w-reps" placeholder="Reps" inputmode="numeric"></div><div><label>น้ำหนัก</label><input type="number" class="w-kg" placeholder="Kg" inputmode="decimal"></div></div></div></div>`;
+                listDiv.innerHTML += `
+                    <div class="exercise-item" data-name="${ex.name}" data-img="${ex.img || ''}">
+                        <div class="exercise-name">💪 ${ex.name}</div>
+                        <div class="exercise-layout">
+                            ${imgHtml}
+                            <div class="ex-inputs">
+                                <div><label>เซ็ต</label><input type="number" class="w-sets" placeholder="Set" inputmode="numeric"></div>
+                                <div><label>ครั้ง</label><input type="number" class="w-reps" placeholder="Reps" inputmode="numeric"></div>
+                                <div><label>น้ำหนัก</label><input type="number" class="w-kg" placeholder="Kg" inputmode="decimal"></div>
+                            </div>
+                        </div>
+                    </div>`;
             });
             container.style.display = 'block';
         }
@@ -616,12 +617,16 @@
             const rIndex = document.getElementById('routineSelect').value;
             const items = document.querySelectorAll('.exercise-item');
             const workoutData = [];
+            
             items.forEach(item => {
                 const name = item.getAttribute('data-name');
+                const img = item.getAttribute('data-img'); // ดึงรูปลงไปเซฟด้วย
                 const sets = item.querySelector('.w-sets').value;
                 const reps = item.querySelector('.w-reps').value;
                 const kg = item.querySelector('.w-kg').value;
-                if(sets || reps || kg) { workoutData.push({ name, sets: sets||"-", reps: reps||"-", kg: kg||"-" }); }
+                if(sets || reps || kg) { 
+                    workoutData.push({ name, sets: sets||"-", reps: reps||"-", kg: kg||"-", img: img }); 
+                }
             });
             if(workoutData.length === 0) { alert("กรุณากรอกข้อมูลเวทอย่างน้อย 1 ท่าครับ"); return; }
             try {
@@ -721,7 +726,7 @@
             if(!hasData) container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 30px 0; font-size:14px;">ยังไม่มีข้อมูลอาหารวันนี้</div>';
         }
 
-        // --- DASHBOARD MONTHLY ---
+        // --- DASHBOARD MONTHLY (อัปเดตโชว์เป้าหมาย) ---
         window.loadMonthlyData = async () => {
             const monthStr = document.getElementById('monthPicker').value; 
             if (!monthStr || !currentUser) return;
@@ -793,6 +798,7 @@
                         </svg>
                     `;
 
+                    // เพิ่มการโชว์ค่าเป้าหมาย
                     gridHtml += `
                         <div class="day-card">
                             <div class="day-date">${dayNum}<span>วันที่</span></div>
@@ -800,8 +806,8 @@
                             <div class="day-stats">
                                 <div style="color:var(--primary); font-weight:bold; font-size:12px;">กิน: ${stat.cal.toFixed(0)}</div>
                                 <div style="color:var(--danger); font-weight:bold; font-size:12px; margin: 2px 0;">เผา: ${stat.burn.toFixed(0)}</div>
-                                <div style="color:#0284c7; font-weight:bold; font-size:12px; margin: 2px 0;">สุทธิ: ${netCal.toFixed(0)}</div>
-                                <div style="color:var(--success); font-size:11px;">โปรตีน: ${stat.pro.toFixed(1)}g</div>
+                                <div style="color:#0284c7; font-weight:bold; font-size:12px; margin: 2px 0;">สุทธิ: ${netCal.toFixed(0)} / เป้า ${userSettings.targetCal}</div>
+                                <div style="color:var(--success); font-size:11px;">โปรตีน: ${stat.pro.toFixed(1)}g / เป้า ${userSettings.targetPro}g</div>
                             </div>
                         </div>
                     `;
@@ -813,6 +819,29 @@
                 console.error(e);
                 document.getElementById('dashStatus').innerText = "เกิดข้อผิดพลาดในการโหลดข้อมูล: " + e.message;
             }
+        }
+
+        // --- ระบบอัปเดตประวัติเวท (ให้โชว์รูปภาพด้วย) ---
+        function renderWorkoutLogs(data) {
+            const container = document.getElementById('workoutLogs'); container.innerHTML = '';
+            if(data.length === 0) { container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 20px 0; font-size:14px;">ยังไม่มีประวัติเวทเทรนนิ่งวันนี้</div>'; return; }
+            data.sort((a,b) => b.timestamp - a.timestamp).forEach(log => {
+                let exHtml = ''; 
+                log.exercises.forEach(ex => { 
+                    // ตรวจสอบและแทรกรูปภาพถ้ามีการตั้งค่าไว้
+                    let exImgHtml = ex.img ? `<img src="${ex.img}" style="width:35px; height:35px; border-radius:6px; object-fit:contain; border:1px solid var(--border); background:white; margin-right:8px; flex-shrink:0;" onerror="this.style.display='none'">` : '';
+                    
+                    exHtml += `
+                        <div style="font-size:13px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                            <div style="display:flex; align-items:center; flex:1;">
+                                ${exImgHtml}
+                                <span>🔹 ${ex.name}</span>
+                            </div>
+                            <span style="color:var(--primary); font-weight:bold; white-space:nowrap; margin-left:10px;">${ex.sets} เซ็ต / ${ex.reps} ครั้ง / ${ex.kg} kg</span>
+                        </div>`; 
+                });
+                container.innerHTML += `<div class="history-box"><div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 8px;"><div style="font-weight:bold; font-size:14px; color:#334155;">📌 ${log.routine}</div><button class="del-btn" onclick="deleteLog('${log.id}', 'workouts')">ลบ</button></div>${exHtml}</div>`;
+            });
         }
 
         function renderBodyChart(allData) {
