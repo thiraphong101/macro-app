@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Theerapong Fitness & Macro Tracker V16 (Pro Visuals)</title>
+    <title>Theerapong Fitness & Macro Tracker V18 (TDEE Calculator)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --border: #cbd5e1; }
@@ -124,7 +124,6 @@
                 <h2 style="font-size: 18px; margin-bottom: 20px;">📊 สรุปแคลอรีรายวัน (Net)</h2>
                 <div class="visual-container">
                     
-                    <!-- กราฟิกคนแบบใหม่ ใช้ Clip-path -->
                     <svg class="human-svg" viewBox="0 0 24 24" style="background: transparent;">
                         <defs>
                             <clipPath id="person-shape-main">
@@ -141,7 +140,6 @@
                     <div class="stats-col">
                         <div class="two-col" style="gap: 8px;">
                             <div class="stat-box">
-                                <!-- ย้ายเป้าหมายแคลอรีมาไว้ที่นี่ตามที่ผู้ใช้ต้องการ -->
                                 <div style="font-size: 11px; color: #64748b;">กิน (In) / เป้า <span id="uiTargetCal">2000</span></div>
                                 <div class="stat-val" id="totalCalUI" style="color: var(--primary); font-size:16px;">0</div>
                             </div>
@@ -273,8 +271,58 @@
 
         <!-- 4. BODY METRICS TAB -->
         <div id="tab-body" class="tab-content">
+            
+            <!-- โซนใหม่: เครื่องคิดเลข BMR & TDEE -->
             <div class="card">
-                <h2>⚖️ บันทึกสัดส่วนร่างกาย</h2>
+                <h3 style="font-size: 16px;">🧮 คำนวณ BMR & TDEE</h3>
+                <p style="font-size: 12px; color: #64748b; margin-top: -10px;">คำนวณอัตราการเผาผลาญพื้นฐานและพลังงานที่ใช้ต่อวัน</p>
+                
+                <div class="two-col">
+                    <div>
+                        <label style="margin-top:0;">เพศ:</label>
+                        <select id="calcGender">
+                            <option value="male">ชาย</option>
+                            <option value="female">หญิง</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="margin-top:0;">อายุ (ปี):</label>
+                        <input type="number" id="calcAge" inputmode="numeric">
+                    </div>
+                    <div>
+                        <label>ส่วนสูง (cm):</label>
+                        <input type="number" id="calcHeight" inputmode="decimal">
+                    </div>
+                    <div>
+                        <label>น้ำหนัก (kg):</label>
+                        <input type="number" id="calcWeight" inputmode="decimal">
+                    </div>
+                </div>
+                
+                <label>กิจกรรมการออกกำลังกาย:</label>
+                <select id="calcActivity">
+                    <option value="1.2">ไม่ออกกำลังกายเลย (นั่งทำงานเป็นส่วนใหญ่)</option>
+                    <option value="1.375">ออกกำลังกายเบาๆ (1-3 วัน/สัปดาห์)</option>
+                    <option value="1.55">ออกกำลังกายปานกลาง (3-5 วัน/สัปดาห์)</option>
+                    <option value="1.725">ออกกำลังกายหนัก (6-7 วัน/สัปดาห์)</option>
+                    <option value="1.9">ออกกำลังกายอย่างหนัก (นักกีฬา/ใช้แรงงาน)</option>
+                </select>
+
+                <button class="btn-outline" onclick="window.calculateTDEE()" style="margin-top: 15px;">🔄 คำนวณค่าเผาผลาญ</button>
+
+                <div id="calcResultContainer" style="display: none; background: #f8fafc; border: 1px dashed var(--primary); padding: 15px; border-radius: 12px; margin-top: 15px; text-align: center;">
+                    <div style="font-size: 13px; color: #64748b;">ค่าเผาผลาญพื้นฐาน (BMR)</div>
+                    <div style="font-size: 20px; font-weight: bold; color: var(--text);" id="resBMR">0 kcal</div>
+                    
+                    <div style="font-size: 13px; color: #64748b; margin-top: 10px;">พลังงานรวมที่ใช้ต่อวัน (TDEE)</div>
+                    <div style="font-size: 24px; font-weight: bold; color: var(--primary);" id="resTDEE">0 kcal</div>
+                    
+                    <button onclick="window.saveCalculatedTDEE()" style="background: var(--success); margin-top: 15px;">💾 บันทึกค่า TDEE เป็นเป้าหมายหลัก</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>⚖️ บันทึกสัดส่วนร่างกายรายวัน</h2>
                 <div class="two-col">
                     <div>
                         <label>น้ำหนักตัว (Kg):</label>
@@ -374,6 +422,7 @@
         
         let customRoutines = []; 
         window.bodyChartInstance = null;
+        window.tempCalculatedTDEE = 0; // ตัวแปรเก็บค่าชั่วคราวสำหรับเครื่องคิดเลข
 
         window.switchTab = (tabId) => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -479,7 +528,43 @@
             document.getElementById('uiTargetPro').innerText = userSettings.targetPro;
         }
 
-        // --- ส่วนคำนวณคาร์ดิโอ (ACSM Treadmill Formula) ---
+        // 🔴 ระบบเครื่องคิดเลข TDEE / BMR 🔴
+        window.calculateTDEE = () => {
+            const gender = document.getElementById('calcGender').value;
+            const age = parseFloat(document.getElementById('calcAge').value);
+            const height = parseFloat(document.getElementById('calcHeight').value);
+            const weight = parseFloat(document.getElementById('calcWeight').value);
+            const activity = parseFloat(document.getElementById('calcActivity').value);
+
+            if (!age || !height || !weight) {
+                alert("กรุณากรอกข้อมูล อายุ ส่วนสูง และน้ำหนักให้ครบถ้วนครับ");
+                return;
+            }
+
+            // สูตร Mifflin-St Jeor
+            let bmr = (10 * weight) + (6.25 * height) - (5 * age);
+            if (gender === 'male') {
+                bmr += 5;
+            } else {
+                bmr -= 161;
+            }
+
+            const tdee = bmr * activity;
+
+            document.getElementById('resBMR').innerText = Math.round(bmr) + " kcal";
+            document.getElementById('resTDEE').innerText = Math.round(tdee) + " kcal";
+            
+            window.tempCalculatedTDEE = Math.round(tdee);
+            document.getElementById('calcResultContainer').style.display = 'block';
+        };
+
+        window.saveCalculatedTDEE = async () => {
+            if (!window.tempCalculatedTDEE) return;
+            // อัปเดตในช่อง Setting แล้วเรียกฟังก์ชันเซฟปกติ
+            document.getElementById('setCal').value = window.tempCalculatedTDEE;
+            await window.saveSettings();
+        };
+
         window.calcCardioBurn = () => {
             const duration = parseFloat(document.getElementById('cd_duration').value) || 0;
             const incline = parseFloat(document.getElementById('cd_incline').value) || 0;
@@ -542,7 +627,6 @@
             });
         }
 
-        // --- ส่วน Builder ตารางเวท ---
         function renderRoutineBuilder() {
             const container = document.getElementById('routineBuilderContainer');
             container.innerHTML = '';
@@ -594,7 +678,6 @@
             document.getElementById('routineTitle').innerText = routine.dayName;
             listDiv.innerHTML = '';
             
-            // เพิ่มการเก็บ data-img ไว้ดึงตอนเซฟ
             routine.exercises.forEach((ex) => {
                 let imgHtml = ex.img ? `<img src="${ex.img}" class="exercise-img" onerror="this.style.display='none'">` : '';
                 listDiv.innerHTML += `
@@ -620,7 +703,7 @@
             
             items.forEach(item => {
                 const name = item.getAttribute('data-name');
-                const img = item.getAttribute('data-img'); // ดึงรูปลงไปเซฟด้วย
+                const img = item.getAttribute('data-img');
                 const sets = item.querySelector('.w-sets').value;
                 const reps = item.querySelector('.w-reps').value;
                 const kg = item.querySelector('.w-kg').value;
@@ -636,7 +719,6 @@
             } catch (e) { alert("Error: " + e.message); }
         }
 
-        // --- ระบบอัปเดตหน้าจอหลักและการวาด SVG ด้วย Net Calories ---
         let currentDayLogs = [];
         let currentDayCardio = [];
 
@@ -659,7 +741,8 @@
             });
 
             unsubscribeWorkouts = onSnapshot(query(collection(db, "users", currentUser.uid, "workouts"), where("dateStr", "==", dateStr)), (snap) => {
-                const data = []; snap.forEach(d => data.push({ id: d.id, ...d.data() })); renderWorkoutLogs(data);
+                const data = []; snap.forEach(d => data.push({ id: d.id, ...d.data() })); 
+                renderWorkoutLogs(data); 
             });
             
             unsubscribeBody = onSnapshot(collection(db, "users", currentUser.uid, "metrics"), (snap) => {
@@ -667,6 +750,50 @@
                 renderBodyChart(allData);
                 const dailyData = allData.filter(d => d.dateStr === dateStr);
                 renderBodyLogs(dailyData);
+            });
+        }
+
+        function renderWorkoutLogs(data) {
+            const container = document.getElementById('workoutLogs'); container.innerHTML = '';
+            if(data.length === 0) { container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 20px 0; font-size:14px;">ยังไม่มีประวัติเวทเทรนนิ่งวันนี้</div>'; return; }
+            
+            const imgMap = {};
+            customRoutines.forEach(r => {
+                r.exercises.forEach(ex => {
+                    if(ex.name && ex.img) imgMap[ex.name] = ex.img;
+                });
+            });
+
+            data.sort((a,b) => b.timestamp - a.timestamp).forEach(log => {
+                let exHtml = ''; 
+                log.exercises.forEach(ex => { 
+                    let imgUrl = ex.img || imgMap[ex.name] || '';
+                    
+                    let exImgHtml = imgUrl 
+                        ? `<img src="${imgUrl}" style="width:50px; height:50px; border-radius:8px; object-fit:cover; border:1px solid var(--border); background:white; margin-right:12px; flex-shrink:0;" onerror="this.style.display='none'">` 
+                        : `<div style="width:50px; height:50px; border-radius:8px; background:#e2e8f0; color:#64748b; display:flex; align-items:center; justify-content:center; margin-right:12px; font-size:24px; flex-shrink:0;">💪</div>`;
+                    
+                    exHtml += `
+                        <div style="background: white; border: 1px solid var(--border); border-radius: 10px; padding: 10px; margin-bottom: 8px; display:flex; align-items:center; justify-content:space-between; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+                            <div style="display:flex; align-items:center; flex:1; overflow:hidden;">
+                                ${exImgHtml}
+                                <span style="font-weight:600; font-size:15px; color:var(--primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${ex.name}</span>
+                            </div>
+                            <div style="text-align:right; min-width:90px; margin-left:10px;">
+                                <div style="color:var(--text); font-weight:bold; font-size:14px;">${ex.sets} เซ็ต / ${ex.reps} ที</div>
+                                <div style="color:var(--warning); font-weight:bold; font-size:13px; margin-top:2px;">${ex.kg} kg</div>
+                            </div>
+                        </div>`; 
+                });
+                
+                container.innerHTML += `
+                    <div class="history-box" style="background:#f8fafc; border:none; padding:15px; border-radius:12px; margin-bottom:15px; border:1px solid var(--border);">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
+                            <div style="font-weight:bold; font-size:16px; color:#334155;">📌 ${log.routine}</div>
+                            <button class="del-btn" onclick="deleteLog('${log.id}', 'workouts')">ลบ</button>
+                        </div>
+                        ${exHtml}
+                    </div>`;
             });
         }
 
@@ -726,7 +853,6 @@
             if(!hasData) container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 30px 0; font-size:14px;">ยังไม่มีข้อมูลอาหารวันนี้</div>';
         }
 
-        // --- DASHBOARD MONTHLY (อัปเดตโชว์เป้าหมาย) ---
         window.loadMonthlyData = async () => {
             const monthStr = document.getElementById('monthPicker').value; 
             if (!monthStr || !currentUser) return;
@@ -798,7 +924,6 @@
                         </svg>
                     `;
 
-                    // เพิ่มการโชว์ค่าเป้าหมาย
                     gridHtml += `
                         <div class="day-card">
                             <div class="day-date">${dayNum}<span>วันที่</span></div>
@@ -819,29 +944,6 @@
                 console.error(e);
                 document.getElementById('dashStatus').innerText = "เกิดข้อผิดพลาดในการโหลดข้อมูล: " + e.message;
             }
-        }
-
-        // --- ระบบอัปเดตประวัติเวท (ให้โชว์รูปภาพด้วย) ---
-        function renderWorkoutLogs(data) {
-            const container = document.getElementById('workoutLogs'); container.innerHTML = '';
-            if(data.length === 0) { container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 20px 0; font-size:14px;">ยังไม่มีประวัติเวทเทรนนิ่งวันนี้</div>'; return; }
-            data.sort((a,b) => b.timestamp - a.timestamp).forEach(log => {
-                let exHtml = ''; 
-                log.exercises.forEach(ex => { 
-                    // ตรวจสอบและแทรกรูปภาพถ้ามีการตั้งค่าไว้
-                    let exImgHtml = ex.img ? `<img src="${ex.img}" style="width:35px; height:35px; border-radius:6px; object-fit:contain; border:1px solid var(--border); background:white; margin-right:8px; flex-shrink:0;" onerror="this.style.display='none'">` : '';
-                    
-                    exHtml += `
-                        <div style="font-size:13px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-                            <div style="display:flex; align-items:center; flex:1;">
-                                ${exImgHtml}
-                                <span>🔹 ${ex.name}</span>
-                            </div>
-                            <span style="color:var(--primary); font-weight:bold; white-space:nowrap; margin-left:10px;">${ex.sets} เซ็ต / ${ex.reps} ครั้ง / ${ex.kg} kg</span>
-                        </div>`; 
-                });
-                container.innerHTML += `<div class="history-box"><div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 8px;"><div style="font-weight:bold; font-size:14px; color:#334155;">📌 ${log.routine}</div><button class="del-btn" onclick="deleteLog('${log.id}', 'workouts')">ลบ</button></div>${exHtml}</div>`;
-            });
         }
 
         function renderBodyChart(allData) {
