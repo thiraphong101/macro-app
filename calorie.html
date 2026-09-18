@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Theerapong Fitness & Macro Tracker V5</title>
+    <title>Theerapong Fitness & Macro Tracker V6</title>
     <style>
         :root { --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --border: #cbd5e1; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; padding-bottom: 90px; }
@@ -21,8 +21,7 @@
         .header-date { display: flex; justify-content: space-between; align-items: center; background: var(--primary); padding: 15px; border-radius: 12px; color: white; margin-bottom: 15px; }
         .date-input { background: transparent; border: 1px solid rgba(255,255,255,0.4); color: white; padding: 8px 12px; border-radius: 8px; font-size: 16px; font-weight: bold; width: 140px; color-scheme: dark; outline: none; }
         
-        /* Dashboard & Form Inputs */
-        .dashboard { text-align: center; }
+        /* Form Inputs & Visuals */
         .visual-container { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 15px; }
         .human-svg { width: 85px; height: auto; drop-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .stats-col { text-align: left; flex: 1; }
@@ -32,16 +31,23 @@
         select, input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; box-sizing: border-box; background: white; outline: none; }
         button { background: var(--primary); color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; }
         .btn-outline { background: white; color: var(--primary); border: 2px solid var(--primary); margin-top: 10px; }
+        .del-btn { background: #fee2e2; color: var(--danger); border: none; padding: 8px; border-radius: 6px; font-size: 12px; width: auto; margin: 0; }
         
-        /* Workout & Body Metrics Specifics */
-        .exercise-item { background: #f8fafc; border: 1px solid var(--border); padding: 15px; border-radius: 12px; margin-bottom: 15px; }
-        .exercise-name { font-weight: bold; font-size: 15px; color: var(--primary); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        /* Builder UI (Settings) */
+        .builder-day { background: #f8fafc; border: 2px solid var(--primary); border-radius: 12px; padding: 15px; margin-top: 15px; position: relative; }
+        .builder-ex { background: white; border: 1px dashed var(--border); padding: 10px; border-radius: 8px; margin-top: 10px; position: relative; }
+        .remove-icon { position: absolute; right: 10px; top: 10px; color: var(--danger); font-weight: bold; cursor: pointer; font-size: 18px; }
+        
+        /* Workout Form Specifics */
+        .exercise-item { background: #f8fafc; border: 1px solid var(--border); padding: 15px; border-radius: 12px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .exercise-name { font-weight: bold; font-size: 15px; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+        .exercise-img { width: 100%; max-height: 150px; object-fit: contain; border-radius: 8px; background: white; border: 1px solid var(--border); }
         .ex-inputs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         .ex-inputs input { padding: 10px; font-size: 14px; text-align: center; }
         .ex-inputs label { margin: 0 0 5px 0; font-size: 12px; text-align: center; color: #64748b; }
         .history-box { background: #fafafa; border-left: 4px solid var(--primary); padding: 12px; border-radius: 0 8px 8px 0; margin-bottom: 10px; }
 
-        /* Searchable Dropdown & Logs */
+        /* General Layout */
         .search-container { position: relative; }
         .search-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid var(--border); border-top: none; max-height: 220px; overflow-y: auto; z-index: 10; border-radius: 0 0 12px 12px; display: none; }
         .search-item { padding: 12px; border-bottom: 1px solid var(--bg); font-size: 14px; cursor: pointer; }
@@ -53,7 +59,6 @@
         .log-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px dashed var(--border); background: #fafafa; border-radius: 8px; margin-bottom: 8px; }
         .log-name { font-weight: 600; font-size: 15px; color: var(--primary); }
         .log-cal { font-size: 13px; color: #64748b; margin-top: 4px; }
-        .del-btn { background: #fee2e2; color: var(--danger); border: none; padding: 8px; border-radius: 6px; font-size: 12px; width: auto; margin: 0; }
         
         /* Login Screen */
         #loginScreen { position: fixed; top:0; left:0; right:0; bottom:0; background: white; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
@@ -76,7 +81,6 @@
     </div>
 
     <div id="appContent">
-        <!-- Tab Navigation (4 Tabs) -->
         <div class="tab-nav">
             <div class="tab-btn active" onclick="switchTab('tracker')"><span style="font-size:18px">🍽️</span> อาหาร</div>
             <div class="tab-btn" onclick="switchTab('workout')"><span style="font-size:18px">🏋️</span> ตารางเวท</div>
@@ -97,9 +101,9 @@
             <input type="date" id="datePicker" class="date-input" onchange="window.changeDate()">
         </div>
 
-        <!-- 1. TRACKER TAB (อาหาร) -->
+        <!-- 1. TRACKER TAB -->
         <div id="tab-tracker" class="tab-content active">
-            <div class="card dashboard">
+            <div class="card" style="text-align: center;">
                 <h2 style="font-size: 18px;">📊 แคลอรี & โปรตีนวันนี้</h2>
                 <div class="visual-container">
                     <svg class="human-svg" viewBox="0 0 24 24" fill="none">
@@ -168,16 +172,14 @@
             </div>
         </div>
 
-        <!-- 2. WORKOUT TAB (ตารางเวท) -->
+        <!-- 2. WORKOUT TAB -->
         <div id="tab-workout" class="tab-content">
             <div class="card">
                 <h2>🏋️ บันทึกตารางเวทเทรนนิ่ง</h2>
                 <label>เลือกโปรแกรมของวันนี้:</label>
+                <!-- จะถูกสร้างตัวเลือกอัตโนมัติจากข้อมูลที่ตั้งค่าไว้ -->
                 <select id="routineSelect" onchange="window.loadWorkoutForm()">
-                    <option value="">-- เลือกตารางเวท --</option>
-                    <option value="Day 1: Push Day (อก, ไหล่, หลังแขน)">Day 1: Push Day (อก, ไหล่, หลังแขน)</option>
-                    <option value="Day 2: Pull Day & Abs (หลัง, หน้าแขน, ท้อง)">Day 2: Pull Day & Abs (หลัง, หน้าแขน)</option>
-                    <option value="Day 3: Legs Day (ขา, น่อง)">Day 3: Legs Day (ขา, น่อง)</option>
+                    <option value="">-- กรุณาสร้างตารางเวทในหน้า 'ตั้งค่า' --</option>
                 </select>
 
                 <div id="workoutFormContainer" style="margin-top: 20px; display: none;">
@@ -193,7 +195,7 @@
             </div>
         </div>
 
-        <!-- 3. BODY METRICS TAB (มวลร่างกาย) -->
+        <!-- 3. BODY METRICS TAB -->
         <div id="tab-body" class="tab-content">
             <div class="card">
                 <h2>⚖️ บันทึกสัดส่วนร่างกาย</h2>
@@ -216,15 +218,25 @@
             </div>
         </div>
 
-        <!-- 4. SETTINGS TAB (ตั้งค่า) -->
+        <!-- 4. SETTINGS TAB (เพิ่มตัวสร้างตารางเวท) -->
         <div id="tab-settings" class="tab-content">
             <div class="card">
-                <h2>⚙️ ตั้งค่าเป้าหมายส่วนตัว</h2>
+                <h2>⚙️ เป้าหมายแคลอรี</h2>
                 <label>เป้าหมายพลังงาน (TDEE / Calorie):</label>
                 <input type="number" id="setCal" inputmode="decimal">
                 <label>เป้าหมายโปรตีน (Protein - กรัม):</label>
                 <input type="number" id="setPro" inputmode="decimal">
-                <button onclick="window.saveSettings()">💾 บันทึกการตั้งค่าลง Cloud</button>
+                <button onclick="window.saveSettings()">💾 บันทึกเป้าหมาย</button>
+            </div>
+
+            <div class="card">
+                <h2>🛠️ สร้างตารางเวทส่วนตัว</h2>
+                <p style="font-size: 13px; color: #64748b; margin-top:-10px;">สร้างวันเล่นเวท และเพิ่มชื่อท่า พร้อมแนบรูปลิงก์ได้ตามต้องการ ข้อมูลนี้จะไปปรากฏในหน้าตารางเวท</p>
+                
+                <div id="routineBuilderContainer"></div>
+                
+                <button class="btn-outline" onclick="window.addRoutineDay()">+ เพิ่มวัน (New Day)</button>
+                <button onclick="window.saveSettings()" style="background: var(--success);">💾 บันทึกตารางเวทขึ้นคลาวด์</button>
             </div>
         </div>
     </div>
@@ -258,40 +270,10 @@
         let foodDB = [];
         let selectedFoodIndex = -1;
         let userSettings = { targetCal: 2000, targetPro: 140 };
+        
+        // โครงสร้างข้อมูลตารางเวทที่ผู้ใช้สร้างเอง
+        let customRoutines = [];
 
-        // --- ข้อมูลตารางเวทตามภาพเป๊ะๆ ---
-        const routines = {
-            "Day 1: Push Day (อก, ไหล่, หลังแขน)": [
-                "1. Incline dumbbell bench press",
-                "2. Dumbbell bench press",
-                "3. Seated dumbbell overhead press",
-                "4. Dumbbell lateral raise",
-                "5. Tricep Overhead Extension",
-                "6. Incline dumbbell fly",
-                "7. Hyght dumbbell fly"
-            ],
-            "Day 2: Pull Day & Abs (หลัง, หน้าแขน, ท้อง)": [
-                "1. Lat Pulldown",
-                "1.1 Reverse-grip lat pull-down",
-                "1.2 Medium-grip lat pull-down",
-                "2. Bent-over dumbbell row",
-                "3.1 Reverse dumbbell fly",
-                "3.2 Seated reverse dumbbell fly",
-                "4. Dumbbell curl",
-                "5. Dumbbell hammer curl"
-            ],
-            "Day 3: Legs Day (ขา, น่อง)": [
-                "1. Dumbbell Goblet Squat",
-                "1.2 Dumbbell squat",
-                "1.2 Dumbbell goblet split squat",
-                "2. Dumbbell Romanian Deadlift",
-                "2.1 Dumbbell deadlift",
-                "3. Dumbbell lunge",
-                "4. Calf Raises"
-            ]
-        };
-
-        // UI Tab Switcher
         window.switchTab = (tabId) => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -299,7 +281,6 @@
             document.getElementById('tab-' + tabId).classList.add('active');
         };
 
-        // Authentication
         document.getElementById('btnLogin').onclick = () => signInWithPopup(auth, provider);
         document.getElementById('btnLogout').onclick = () => signOut(auth);
 
@@ -310,7 +291,7 @@
                 document.getElementById('appContent').style.display = 'block';
                 document.getElementById('userNameDisplay').innerText = `ผู้ใช้: ${user.displayName}`;
                 
-                await loadFoodDB(); // โหลด JSON จากไฟล์
+                await loadFoodDB();
                 await loadSettings();
                 
                 const dateInput = document.getElementById('datePicker');
@@ -329,44 +310,58 @@
             }
         });
 
-        // 1. โหลดข้อมูลอาหารจาก food-db.json 
         async function loadFoodDB() {
             try {
-                // พยายามดึงจากไฟล์ food-db.json ในโฟลเดอร์เดียวกัน
                 const response = await fetch('./food-db.json', { cache: 'no-store' });
-                if (!response.ok) throw new Error("HTTP error " + response.status);
                 foodDB = await response.json();
-                console.log("โหลดฐานข้อมูลอาหารสำเร็จ:", foodDB.length, "รายการ");
             } catch (error) {
-                console.warn('ดึง JSON ไม่สำเร็จ ใช้ข้อมูลสำรองเล็กน้อยแทน', error);
-                // ข้อมูลสำรองกันแอปพัง
-                foodDB = [ 
-                    { "cat": "โปรตีน", "name": "อกไก่ต้ม/เวฟ (สุก)", "cal": 165, "pro": 31, "base": 100, "unit": "g" },
-                    { "cat": "คาร์บ", "name": "ข้าวสวย", "cal": 130, "pro": 2.5, "base": 100, "unit": "g" }
-                ];
+                console.warn('ดึง JSON ไม่สำเร็จ ใช้ข้อมูลสำรอง', error);
+                foodDB = [ { "cat": "โปรตีน", "name": "อกไก่ต้ม/เวฟ (สุก)", "cal": 165, "pro": 31, "base": 100, "unit": "g" } ];
             }
         }
 
         async function loadSettings() {
             try {
                 const docSnap = await getDoc(doc(db, "users", currentUser.uid));
-                if (docSnap.exists() && docSnap.data().settings) {
-                    userSettings = docSnap.data().settings;
+                if (docSnap.exists()) {
+                    if (docSnap.data().settings) userSettings = docSnap.data().settings;
+                    if (docSnap.data().routines) customRoutines = docSnap.data().routines;
                 }
                 document.getElementById('setCal').value = userSettings.targetCal;
                 document.getElementById('setPro').value = userSettings.targetPro;
                 updateTargetsUI();
+                renderRoutineBuilder(); // วาด UI หน้าตั้งค่าตารางเวท
+                updateWorkoutDropdown(); // อัปเดต Dropdown ในหน้าตารางเวท
             } catch (err) { console.error("โหลดตั้งค่าไม่ได้:", err); }
         }
 
         window.saveSettings = async () => {
+            // ดึงข้อมูลแคลอรี
             const cal = parseFloat(document.getElementById('setCal').value) || 2000;
             const pro = parseFloat(document.getElementById('setPro').value) || 140;
             userSettings = { targetCal: cal, targetPro: pro };
-            await setDoc(doc(db, "users", currentUser.uid), { settings: userSettings }, { merge: true });
+            
+            // ดึงข้อมูลตารางเวทจากหน้า Builder
+            const routineElements = document.querySelectorAll('.builder-day');
+            const newRoutines = [];
+            routineElements.forEach((dayEl, dIndex) => {
+                const dayName = dayEl.querySelector('.r-day-name').value;
+                const exercises = [];
+                dayEl.querySelectorAll('.builder-ex').forEach(exEl => {
+                    const exName = exEl.querySelector('.r-ex-name').value;
+                    const exImg = exEl.querySelector('.r-ex-img').value;
+                    if (exName) exercises.push({ name: exName, img: exImg });
+                });
+                if(dayName) newRoutines.push({ dayName: dayName, exercises: exercises });
+            });
+            customRoutines = newRoutines;
+
+            // บันทึกขึ้นคลาวด์
+            await setDoc(doc(db, "users", currentUser.uid), { settings: userSettings, routines: customRoutines }, { merge: true });
             updateTargetsUI();
+            updateWorkoutDropdown();
             window.changeDate();
-            alert('✅ บันทึกเป้าหมายขึ้นคลาวด์สำเร็จ!');
+            alert('✅ บันทึกเป้าหมาย และ ตารางเวท ขึ้นคลาวด์สำเร็จ!');
         }
 
         function updateTargetsUI() {
@@ -374,167 +369,95 @@
             document.getElementById('uiTargetPro').innerText = userSettings.targetPro;
         }
 
-        // โหลดข้อมูลทุก Tab เมื่อเปลี่ยนวันที่
-        window.changeDate = () => {
-            const dateStr = document.getElementById('datePicker').value;
-            
-            // ยกเลิก Listener เดิมถ้ามี
-            if(unsubscribeMeals) unsubscribeMeals();
-            if(unsubscribeWorkouts) unsubscribeWorkouts();
-            if(unsubscribeBody) unsubscribeBody();
-            
-            // 1. โหลดข้อมูลอาหาร
-            const mealQ = query(collection(db, "users", currentUser.uid, "logs"), where("dateStr", "==", dateStr));
-            unsubscribeMeals = onSnapshot(mealQ, (snapshot) => {
-                const dailyData = [];
-                snapshot.forEach((doc) => { dailyData.push({ id: doc.id, ...doc.data() }); });
-                renderDashboard(dailyData);
-            });
-
-            // 2. โหลดข้อมูลเวทเทรนนิ่ง
-            const workoutQ = query(collection(db, "users", currentUser.uid, "workouts"), where("dateStr", "==", dateStr));
-            unsubscribeWorkouts = onSnapshot(workoutQ, (snapshot) => {
-                const workoutData = [];
-                snapshot.forEach((doc) => { workoutData.push({ id: doc.id, ...doc.data() }); });
-                renderWorkoutLogs(workoutData);
-            });
-
-            // 3. โหลดข้อมูลสัดส่วนร่างกาย
-            const bodyQ = query(collection(db, "users", currentUser.uid, "metrics"), where("dateStr", "==", dateStr));
-            unsubscribeBody = onSnapshot(bodyQ, (snapshot) => {
-                const bodyData = [];
-                snapshot.forEach((doc) => { bodyData.push({ id: doc.id, ...doc.data() }); });
-                renderBodyLogs(bodyData);
-            });
-        }
-
-        // ================= TAB 1: อาหาร =================
-        const foodSearch = document.getElementById('foodSearch');
-        const foodList = document.getElementById('foodList');
-        foodSearch.oninput = (e) => {
-            const filter = e.target.value.toLowerCase();
-            foodList.innerHTML = '';
-            if(!filter) { foodList.style.display = 'none'; return; }
-            
-            const filtered = foodDB.filter(f => f.name.toLowerCase().includes(filter) || f.cat.toLowerCase().includes(filter));
-            if(filtered.length === 0) { foodList.innerHTML = '<div class="search-item" style="color:red;">ไม่พบเมนูนี้ (กดปุ่มคีย์เองได้เลย)</div>'; foodList.style.display = 'block'; return; }
-
-            filtered.forEach(f => {
-                const div = document.createElement('div');
-                div.className = 'search-item';
-                div.innerHTML = `<div><span class="cat-tag">${f.cat}</span> ${f.name}</div> <div style="color:#64748b; font-size:12px;">${f.cal} kcal / ${f.base}${f.unit}</div>`;
-                div.onclick = () => {
-                    selectedFoodIndex = foodDB.indexOf(f);
-                    foodSearch.value = f.name;
-                    foodList.style.display = 'none';
-                    document.getElementById('unitHint').innerHTML = `(<b style="color:var(--primary);">ใส่ ${f.base}</b> หากทานปริมาณ ${f.base} ${f.unit})`;
-                };
-                foodList.appendChild(div);
-            });
-            foodList.style.display = 'block';
-        };
-
-        window.toggleCustomBox = () => {
-            const box = document.getElementById('customFoodBox');
-            box.style.display = box.style.display === 'block' ? 'none' : 'block';
-        }
-
-        window.addEntry = async () => {
-            if (selectedFoodIndex === -1) { alert("กรุณาเลือกเมนูจากลิสต์ครับ"); return; }
-            const amount = parseFloat(document.getElementById('foodAmount').value);
-            if (!amount || amount <= 0) { alert("กรุณาใส่ปริมาณ"); return; }
-            const f = foodDB[selectedFoodIndex];
-            try {
-                await addDoc(collection(db, "users", currentUser.uid, "logs"), {
-                    dateStr: document.getElementById('datePicker').value,
-                    meal: document.getElementById('mealTime').value,
-                    name: f.name, amount: amount, unit: f.unit,
-                    cal: (f.cal/f.base)*amount, pro: (f.pro/f.base)*amount, timestamp: Date.now()
-                });
-                foodSearch.value = ''; document.getElementById('foodAmount').value = ''; selectedFoodIndex = -1;
-                document.getElementById('unitHint').innerText = "กรุณาเลือกอาหารก่อนครับ";
-            } catch (e) { alert("Error: " + e.message); }
-        }
-
-        window.addCustomEntry = async () => {
-            const meal = document.getElementById('mealTime').value;
-            const name = document.getElementById('c_name').value;
-            const unit = document.getElementById('c_unit').value || "ที่ทาน";
-            const cal = parseFloat(document.getElementById('c_cal').value);
-            const pro = parseFloat(document.getElementById('c_pro').value) || 0;
-            if (!name || isNaN(cal)) { alert("กรุณาใส่ชื่อเมนูและแคลอรี"); return; }
-            try {
-                await addDoc(collection(db, "users", currentUser.uid, "logs"), {
-                    dateStr: document.getElementById('datePicker').value, meal: meal, name: name,
-                    amount: 1, unit: unit, cal: cal, pro: pro, timestamp: Date.now()
-                });
-                document.getElementById('customFoodBox').style.display = 'none';
-                document.getElementById('c_name').value = ''; document.getElementById('c_unit').value = ''; document.getElementById('c_cal').value = ''; document.getElementById('c_pro').value = '';
-            } catch (e) { alert("Error: " + e.message); }
-        }
-
-        window.deleteLog = async (docId, type) => {
-            if(confirm("ต้องการลบรายการนี้ใช่ไหม?")) {
-                try { await deleteDoc(doc(db, "users", currentUser.uid, type, docId)); }
-                catch (e) { alert("ลบไม่สำเร็จ: " + e.message); }
-            }
-        }
-
-        function renderDashboard(dailyData) {
-            let totalCal = 0; let totalPro = 0;
-            const mealGroups = { "มื้อเช้า (หลังเวท)": [], "มื้อเที่ยง": [], "มื้อเย็น": [], "ของว่าง/เครื่องดื่ม": [] };
-            dailyData.forEach(item => { totalCal += item.cal; totalPro += item.pro; if(mealGroups[item.meal]) mealGroups[item.meal].push(item); });
-
-            document.getElementById('totalCalUI').innerText = totalCal.toFixed(0);
-            document.getElementById('totalProUI').innerText = totalPro.toFixed(1);
-
-            let percent = (totalCal / userSettings.targetCal) * 100;
-            let displayPercent = percent > 100 ? 100 : percent; 
-            let statusText = "กำลังเผาผลาญดีเยี่ยม"; let color = "var(--primary)"; 
-            if(percent >= 100) { color = "var(--danger)"; statusText = "⚠️ แคลอรีถึงโควตาแล้ว!"; } else if (percent > 85) { statusText = "ใกล้ครบโควตาวันนี้แล้ว"; }
-            
-            document.getElementById('totalCalUI').style.color = color; document.getElementById('calStatus').innerText = statusText;
-            document.getElementById('stop1').setAttribute('offset', `${displayPercent}%`); document.getElementById('stop2').setAttribute('offset', `${displayPercent}%`); document.getElementById('stop1').setAttribute('stop-color', color);
-
-            const container = document.getElementById('mealLogs');
+        // --- ระบบสร้างตารางเวท (Builder Logic) ---
+        function renderRoutineBuilder() {
+            const container = document.getElementById('routineBuilderContainer');
             container.innerHTML = '';
-            let hasData = false;
-            for (const [mealName, items] of Object.entries(mealGroups)) {
-                if (items.length > 0) {
-                    hasData = true;
-                    let mealCal = 0; let mealPro = 0;
-                    items.forEach(i => { mealCal += i.cal; mealPro += i.pro; });
-                    let html = `<div class="meal-section"><div class="meal-header"><span>${mealName}</span><span>🔥 ${mealCal.toFixed(0)} cal | Pro ${mealPro.toFixed(1)}g</span></div>`;
-                    items.forEach(item => {
-                        let amountDisplay = item.unit === "ที่ทาน" ? item.unit : `${item.amount} ${item.unit}`;
-                        if(item.amount === 1 && item.unit !== "g") amountDisplay = item.unit;
-                        html += `<div class="log-item">
-                                    <div><div class="log-name">${item.name} (${amountDisplay})</div><div class="log-cal">${item.cal.toFixed(0)} kcal | โปรตีน ${item.pro.toFixed(1)}g</div></div>
-                                    <button class="del-btn" onclick="deleteLog('${item.id}', 'logs')">ลบ</button>
-                                 </div>`;
-                    });
-                    html += `</div>`; container.innerHTML += html;
-                }
-            }
-            if(!hasData) container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 30px 0; font-size:14px;">ยังไม่มีข้อมูลอาหารวันนี้</div>';
+            
+            customRoutines.forEach((routine, dIndex) => {
+                let exercisesHtml = '';
+                routine.exercises.forEach((ex, eIndex) => {
+                    exercisesHtml += `
+                        <div class="builder-ex">
+                            <span class="remove-icon" onclick="window.removeExercise(${dIndex}, ${eIndex})">✕</span>
+                            <label style="margin-top:0; font-size:12px;">ชื่อท่า:</label>
+                            <input type="text" class="r-ex-name" value="${ex.name}" placeholder="เช่น Bench Press" style="padding:8px; font-size:14px;">
+                            <label style="font-size:12px;">ลิงก์รูปภาพ (ใส่หรือไม่ใส่ก็ได้):</label>
+                            <input type="text" class="r-ex-img" value="${ex.img || ''}" placeholder="เช่น https://..." style="padding:8px; font-size:14px;">
+                        </div>`;
+                });
+
+                container.innerHTML += `
+                    <div class="builder-day" id="day-${dIndex}">
+                        <span class="remove-icon" onclick="window.removeRoutineDay(${dIndex})">✕</span>
+                        <label style="margin-top:0;">ชื่อวัน (Day Name):</label>
+                        <input type="text" class="r-day-name" value="${routine.dayName}" placeholder="เช่น Day 1: Push Day">
+                        
+                        <div id="ex-container-${dIndex}">${exercisesHtml}</div>
+                        
+                        <button class="btn-outline" onclick="window.addExerciseToDay(${dIndex})" style="padding: 8px; font-size: 14px; margin-top: 10px;">+ เพิ่มท่าในวันนี้</button>
+                    </div>`;
+            });
         }
 
-        // ================= TAB 2: ตารางเวท =================
+        window.addRoutineDay = () => {
+            customRoutines.push({ dayName: "", exercises: [] });
+            renderRoutineBuilder();
+        }
+        window.removeRoutineDay = (dIndex) => {
+            if(confirm("ลบวันนี้ออกจากตารางใช่ไหม?")) { customRoutines.splice(dIndex, 1); renderRoutineBuilder(); }
+        }
+        window.addExerciseToDay = (dIndex) => {
+            // คว้าข้อมูลปัจจุบันก่อนรีเรนเดอร์ เพื่อไม่ให้ข้อมูลที่พิมพ์ค้างอยู่หายไป
+            saveBuilderStateTemporarily();
+            customRoutines[dIndex].exercises.push({ name: "", img: "" });
+            renderRoutineBuilder();
+        }
+        window.removeExercise = (dIndex, eIndex) => {
+            saveBuilderStateTemporarily();
+            customRoutines[dIndex].exercises.splice(eIndex, 1);
+            renderRoutineBuilder();
+        }
+        
+        function saveBuilderStateTemporarily() {
+            const newRoutines = [];
+            document.querySelectorAll('.builder-day').forEach((dayEl) => {
+                const dayName = dayEl.querySelector('.r-day-name').value;
+                const exercises = [];
+                dayEl.querySelectorAll('.builder-ex').forEach(exEl => {
+                    exercises.push({ name: exEl.querySelector('.r-ex-name').value, img: exEl.querySelector('.r-ex-img').value });
+                });
+                newRoutines.push({ dayName: dayName, exercises: exercises });
+            });
+            customRoutines = newRoutines;
+        }
+
+        function updateWorkoutDropdown() {
+            const select = document.getElementById('routineSelect');
+            select.innerHTML = '<option value="">-- เลือกตารางเวทของวันนี้ --</option>';
+            customRoutines.forEach((routine, index) => {
+                select.innerHTML += `<option value="${index}">${routine.dayName}</option>`;
+            });
+            document.getElementById('workoutFormContainer').style.display = 'none';
+        }
+
         window.loadWorkoutForm = () => {
-            const routine = document.getElementById('routineSelect').value;
+            const rIndex = document.getElementById('routineSelect').value;
             const container = document.getElementById('workoutFormContainer');
             const listDiv = document.getElementById('exerciseList');
             
-            if(!routine) { container.style.display = 'none'; return; }
+            if(rIndex === "") { container.style.display = 'none'; return; }
             
-            document.getElementById('routineTitle').innerText = routine;
+            const routine = customRoutines[rIndex];
+            document.getElementById('routineTitle').innerText = routine.dayName;
             listDiv.innerHTML = '';
             
-            const exercises = routines[routine];
-            exercises.forEach((exName, index) => {
+            routine.exercises.forEach((ex) => {
+                let imgHtml = ex.img ? `<img src="${ex.img}" class="exercise-img" onerror="this.style.display='none'">` : '';
                 listDiv.innerHTML += `
-                    <div class="exercise-item" data-name="${exName}">
-                        <div class="exercise-name">💪 ${exName}</div>
+                    <div class="exercise-item" data-name="${ex.name}">
+                        <div class="exercise-name">💪 ${ex.name}</div>
+                        ${imgHtml}
                         <div class="ex-inputs">
                             <div><label>จำนวนเซ็ต</label><input type="number" class="w-sets" placeholder="Set" inputmode="numeric"></div>
                             <div><label>จำนวนครั้ง</label><input type="number" class="w-reps" placeholder="Reps" inputmode="numeric"></div>
@@ -547,7 +470,7 @@
         }
 
         window.saveWorkout = async () => {
-            const routine = document.getElementById('routineSelect').value;
+            const rIndex = document.getElementById('routineSelect').value;
             const items = document.querySelectorAll('.exercise-item');
             const workoutData = [];
             
@@ -556,11 +479,7 @@
                 const sets = item.querySelector('.w-sets').value;
                 const reps = item.querySelector('.w-reps').value;
                 const kg = item.querySelector('.w-kg').value;
-                
-                // บันทึกเฉพาะท่าที่มีการกรอกข้อมูลอย่างน้อย 1 ช่อง
-                if(sets || reps || kg) {
-                    workoutData.push({ name, sets: sets||"-", reps: reps||"-", kg: kg||"-" });
-                }
+                if(sets || reps || kg) { workoutData.push({ name, sets: sets||"-", reps: reps||"-", kg: kg||"-" }); }
             });
 
             if(workoutData.length === 0) { alert("กรุณากรอกข้อมูลเวทอย่างน้อย 1 ท่าครับ"); return; }
@@ -568,74 +487,113 @@
             try {
                 await addDoc(collection(db, "users", currentUser.uid, "workouts"), {
                     dateStr: document.getElementById('datePicker').value,
-                    routine: routine,
+                    routine: customRoutines[rIndex].dayName,
                     exercises: workoutData,
                     timestamp: Date.now()
                 });
                 alert('✅ บันทึกตารางเวทวันนี้เรียบร้อยครับ!');
-                // ล้างฟอร์ม
                 document.querySelectorAll('.w-sets, .w-reps, .w-kg').forEach(i => i.value = '');
             } catch (e) { alert("Error: " + e.message); }
         }
 
-        function renderWorkoutLogs(data) {
-            const container = document.getElementById('workoutLogs');
-            container.innerHTML = '';
-            if(data.length === 0) { container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 20px 0; font-size:14px;">ยังไม่มีประวัติเวทเทรนนิ่งวันนี้</div>'; return; }
+        // --- ระบบบันทึก อาหาร และ สัดส่วน (เหมือนเดิม) ---
+        window.changeDate = () => {
+            const dateStr = document.getElementById('datePicker').value;
+            if(unsubscribeMeals) unsubscribeMeals();
+            if(unsubscribeWorkouts) unsubscribeWorkouts();
+            if(unsubscribeBody) unsubscribeBody();
             
-            data.sort((a,b) => b.timestamp - a.timestamp).forEach(log => {
-                let exHtml = '';
-                log.exercises.forEach(ex => {
-                    exHtml += `<div style="font-size:13px; margin-bottom:4px; display:flex; justify-content:space-between;">
-                                <span>🔹 ${ex.name}</span>
-                                <span style="color:var(--primary); font-weight:bold;">${ex.sets} เซ็ต / ${ex.reps} ครั้ง / ${ex.kg} kg</span>
-                               </div>`;
-                });
-                
-                container.innerHTML += `
-                    <div class="history-box">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 8px;">
-                            <div style="font-weight:bold; font-size:14px; color:#334155;">📌 ${log.routine}</div>
-                            <button class="del-btn" onclick="deleteLog('${log.id}', 'workouts')">ลบ</button>
-                        </div>
-                        ${exHtml}
-                    </div>`;
+            unsubscribeMeals = onSnapshot(query(collection(db, "users", currentUser.uid, "logs"), where("dateStr", "==", dateStr)), (snap) => {
+                const data = []; snap.forEach(d => data.push({ id: d.id, ...d.data() })); renderDashboard(data);
+            });
+            unsubscribeWorkouts = onSnapshot(query(collection(db, "users", currentUser.uid, "workouts"), where("dateStr", "==", dateStr)), (snap) => {
+                const data = []; snap.forEach(d => data.push({ id: d.id, ...d.data() })); renderWorkoutLogs(data);
+            });
+            unsubscribeBody = onSnapshot(query(collection(db, "users", currentUser.uid, "metrics"), where("dateStr", "==", dateStr)), (snap) => {
+                const data = []; snap.forEach(d => data.push({ id: d.id, ...d.data() })); renderBodyLogs(data);
             });
         }
 
-        // ================= TAB 3: มวลร่างกาย =================
-        window.saveBodyMetrics = async () => {
-            const weight = document.getElementById('bodyWeight').value;
-            const fat = document.getElementById('bodyFat').value;
-            
-            if(!weight && !fat) { alert("กรุณากรอกน้ำหนัก หรือ เปอร์เซ็นต์ไขมันครับ"); return; }
+        const foodSearch = document.getElementById('foodSearch');
+        const foodList = document.getElementById('foodList');
+        foodSearch.oninput = (e) => {
+            const filter = e.target.value.toLowerCase();
+            foodList.innerHTML = '';
+            if(!filter) { foodList.style.display = 'none'; return; }
+            const filtered = foodDB.filter(f => f.name.toLowerCase().includes(filter) || f.cat.toLowerCase().includes(filter));
+            if(filtered.length === 0) { foodList.innerHTML = '<div class="search-item" style="color:red;">ไม่พบเมนูนี้ (กดปุ่มคีย์เองได้เลย)</div>'; foodList.style.display = 'block'; return; }
+            filtered.forEach(f => {
+                const div = document.createElement('div'); div.className = 'search-item';
+                div.innerHTML = `<div><span class="cat-tag">${f.cat}</span> ${f.name}</div> <div style="color:#64748b; font-size:12px;">${f.cal} kcal / ${f.base}${f.unit}</div>`;
+                div.onclick = () => { selectedFoodIndex = foodDB.indexOf(f); foodSearch.value = f.name; foodList.style.display = 'none'; document.getElementById('unitHint').innerHTML = `(<b style="color:var(--primary);">ใส่ ${f.base}</b> หากทานปริมาณ ${f.base} ${f.unit})`; };
+                foodList.appendChild(div);
+            });
+            foodList.style.display = 'block';
+        };
 
-            try {
-                await addDoc(collection(db, "users", currentUser.uid, "metrics"), {
-                    dateStr: document.getElementById('datePicker').value,
-                    weight: weight || "-",
-                    bodyFat: fat || "-",
-                    timestamp: Date.now()
-                });
-                document.getElementById('bodyWeight').value = ''; document.getElementById('bodyFat').value = '';
-                alert('✅ บันทึกสัดส่วนร่างกายเรียบร้อยครับ!');
-            } catch (e) { alert("Error: " + e.message); }
+        window.toggleCustomBox = () => { const box = document.getElementById('customFoodBox'); box.style.display = box.style.display === 'block' ? 'none' : 'block'; }
+
+        window.addEntry = async () => {
+            if (selectedFoodIndex === -1) return alert("กรุณาเลือกเมนูจากลิสต์ครับ");
+            const amount = parseFloat(document.getElementById('foodAmount').value);
+            if (!amount || amount <= 0) return alert("กรุณาใส่ปริมาณ");
+            const f = foodDB[selectedFoodIndex];
+            await addDoc(collection(db, "users", currentUser.uid, "logs"), { dateStr: document.getElementById('datePicker').value, meal: document.getElementById('mealTime').value, name: f.name, amount: amount, unit: f.unit, cal: (f.cal/f.base)*amount, pro: (f.pro/f.base)*amount, timestamp: Date.now() });
+            foodSearch.value = ''; document.getElementById('foodAmount').value = ''; selectedFoodIndex = -1; document.getElementById('unitHint').innerText = "กรุณาเลือกอาหารก่อนครับ";
+        }
+
+        window.addCustomEntry = async () => {
+            const meal = document.getElementById('mealTime').value; const name = document.getElementById('c_name').value; const unit = document.getElementById('c_unit').value || "ที่ทาน"; const cal = parseFloat(document.getElementById('c_cal').value); const pro = parseFloat(document.getElementById('c_pro').value) || 0;
+            if (!name || isNaN(cal)) return alert("กรุณาใส่ชื่อเมนูและแคลอรี");
+            await addDoc(collection(db, "users", currentUser.uid, "logs"), { dateStr: document.getElementById('datePicker').value, meal: meal, name: name, amount: 1, unit: unit, cal: cal, pro: pro, timestamp: Date.now() });
+            document.getElementById('customFoodBox').style.display = 'none'; document.getElementById('c_name').value = ''; document.getElementById('c_unit').value = ''; document.getElementById('c_cal').value = ''; document.getElementById('c_pro').value = '';
+        }
+
+        window.deleteLog = async (docId, type) => { if(confirm("ต้องการลบรายการนี้ใช่ไหม?")) await deleteDoc(doc(db, "users", currentUser.uid, type, docId)); }
+
+        function renderDashboard(dailyData) {
+            let totalCal = 0; let totalPro = 0; const mealGroups = { "มื้อเช้า (หลังเวท)": [], "มื้อเที่ยง": [], "มื้อเย็น": [], "ของว่าง/เครื่องดื่ม": [] };
+            dailyData.forEach(item => { totalCal += item.cal; totalPro += item.pro; if(mealGroups[item.meal]) mealGroups[item.meal].push(item); });
+            document.getElementById('totalCalUI').innerText = totalCal.toFixed(0); document.getElementById('totalProUI').innerText = totalPro.toFixed(1);
+            let percent = (totalCal / userSettings.targetCal) * 100; let displayPercent = percent > 100 ? 100 : percent; let statusText = "กำลังเผาผลาญดีเยี่ยม"; let color = "var(--primary)"; 
+            if(percent >= 100) { color = "var(--danger)"; statusText = "⚠️ แคลอรีถึงโควตาแล้ว!"; } else if (percent > 85) { statusText = "ใกล้ครบโควตาวันนี้แล้ว"; }
+            document.getElementById('totalCalUI').style.color = color; document.getElementById('calStatus').innerText = statusText;
+            document.getElementById('stop1').setAttribute('offset', `${displayPercent}%`); document.getElementById('stop2').setAttribute('offset', `${displayPercent}%`); document.getElementById('stop1').setAttribute('stop-color', color);
+            const container = document.getElementById('mealLogs'); container.innerHTML = ''; let hasData = false;
+            for (const [mealName, items] of Object.entries(mealGroups)) {
+                if (items.length > 0) {
+                    hasData = true; let mealCal = 0; let mealPro = 0; items.forEach(i => { mealCal += i.cal; mealPro += i.pro; });
+                    let html = `<div class="meal-section"><div class="meal-header"><span>${mealName}</span><span>🔥 ${mealCal.toFixed(0)} cal | Pro ${mealPro.toFixed(1)}g</span></div>`;
+                    items.forEach(item => {
+                        let amountDisplay = item.unit === "ที่ทาน" ? item.unit : `${item.amount} ${item.unit}`; if(item.amount === 1 && item.unit !== "g") amountDisplay = item.unit;
+                        html += `<div class="log-item"><div><div class="log-name">${item.name} (${amountDisplay})</div><div class="log-cal">${item.cal.toFixed(0)} kcal | โปรตีน ${item.pro.toFixed(1)}g</div></div><button class="del-btn" onclick="deleteLog('${item.id}', 'logs')">ลบ</button></div>`;
+                    }); html += `</div>`; container.innerHTML += html;
+                }
+            }
+            if(!hasData) container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 30px 0; font-size:14px;">ยังไม่มีข้อมูลอาหารวันนี้</div>';
+        }
+
+        function renderWorkoutLogs(data) {
+            const container = document.getElementById('workoutLogs'); container.innerHTML = '';
+            if(data.length === 0) { container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 20px 0; font-size:14px;">ยังไม่มีประวัติเวทเทรนนิ่งวันนี้</div>'; return; }
+            data.sort((a,b) => b.timestamp - a.timestamp).forEach(log => {
+                let exHtml = ''; log.exercises.forEach(ex => { exHtml += `<div style="font-size:13px; margin-bottom:4px; display:flex; justify-content:space-between;"><span>🔹 ${ex.name}</span><span style="color:var(--primary); font-weight:bold;">${ex.sets} เซ็ต / ${ex.reps} ครั้ง / ${ex.kg} kg</span></div>`; });
+                container.innerHTML += `<div class="history-box"><div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 8px;"><div style="font-weight:bold; font-size:14px; color:#334155;">📌 ${log.routine}</div><button class="del-btn" onclick="deleteLog('${log.id}', 'workouts')">ลบ</button></div>${exHtml}</div>`;
+            });
+        }
+
+        window.saveBodyMetrics = async () => {
+            const weight = document.getElementById('bodyWeight').value; const fat = document.getElementById('bodyFat').value;
+            if(!weight && !fat) return alert("กรุณากรอกน้ำหนัก หรือ เปอร์เซ็นต์ไขมันครับ");
+            await addDoc(collection(db, "users", currentUser.uid, "metrics"), { dateStr: document.getElementById('datePicker').value, weight: weight || "-", bodyFat: fat || "-", timestamp: Date.now() });
+            document.getElementById('bodyWeight').value = ''; document.getElementById('bodyFat').value = ''; alert('✅ บันทึกสัดส่วนร่างกายเรียบร้อยครับ!');
         }
 
         function renderBodyLogs(data) {
-            const container = document.getElementById('bodyLogs');
-            container.innerHTML = '';
+            const container = document.getElementById('bodyLogs'); container.innerHTML = '';
             if(data.length === 0) { container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 20px 0; font-size:14px;">ยังไม่มีการบันทึกสัดส่วนวันนี้</div>'; return; }
-            
             data.sort((a,b) => b.timestamp - a.timestamp).forEach(log => {
-                container.innerHTML += `
-                    <div class="history-box" style="display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <div style="font-weight:bold; font-size:16px; color:var(--primary);">น้ำหนัก: ${log.weight} kg</div>
-                            <div style="font-size:13px; color:#64748b;">ไขมัน (Fat): ${log.bodyFat} %</div>
-                        </div>
-                        <button class="del-btn" onclick="deleteLog('${log.id}', 'metrics')">ลบ</button>
-                    </div>`;
+                container.innerHTML += `<div class="history-box" style="display:flex; justify-content:space-between; align-items:center;"><div><div style="font-weight:bold; font-size:16px; color:var(--primary);">น้ำหนัก: ${log.weight} kg</div><div style="font-size:13px; color:#64748b;">ไขมัน (Fat): ${log.bodyFat} %</div></div><button class="del-btn" onclick="deleteLog('${log.id}', 'metrics')">ลบ</button></div>`;
             });
         }
     </script>
