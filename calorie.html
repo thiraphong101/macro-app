@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Theerapong Macro Tracker V4 (Cloud)</title>
+    <title>Theerapong Macro Tracker V4.1 (Cloud)</title>
     <style>
         :root { --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --border: #cbd5e1; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; padding-bottom: 80px; }
@@ -62,7 +62,6 @@
 </head>
 <body>
 
-    <!-- หน้าจอล็อกอิน (ปิดบังแอปไว้จนกว่าจะล็อกอิน) -->
     <div id="loginScreen">
         <svg class="human-svg" viewBox="0 0 24 24" fill="var(--primary)" style="width: 100px; margin-bottom: 20px;">
             <path d="M12,2 A2.5,2.5 0 0,1 14.5,4.5 A2.5,2.5 0 0,1 12,7 A2.5,2.5 0 0,1 9.5,4.5 A2.5,2.5 0 0,1 12,2 M9,8 L15,8 C16.5,8 17.5,9 18,10.5 L16.5,16 L14.5,16 L14.5,22 L9.5,22 L9.5,16 L7.5,16 L6,10.5 C6.5,9 7.5,8 9,8 Z"/>
@@ -75,9 +74,7 @@
         </button>
     </div>
 
-    <!-- ตัวแอปหลัก (จะแสดงเมื่อล็อกอินสำเร็จ) -->
     <div id="appContent">
-        <!-- Tab Navigation -->
         <div class="tab-nav">
             <div class="tab-btn active" onclick="switchTab('tracker')">🏠 หน้าบันทึก</div>
             <div class="tab-btn" onclick="switchTab('settings')">⚙️ ตั้งค่าเป้าหมาย</div>
@@ -197,16 +194,15 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, addDoc, deleteDoc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
-        // 🔴 วาง CONFIG ของคุณตรงนี้ 🔴
         const firebaseConfig = {
-  apiKey: "AIzaSyCkdDavRRPVfS66wY4rN5--LNbLDk-EPh0",
-  authDomain: "macro-tracker-f264b.firebaseapp.com",
-  projectId: "macro-tracker-f264b",
-  storageBucket: "macro-tracker-f264b.firebasestorage.app",
-  messagingSenderId: "642201969074",
-  appId: "1:642201969074:web:c15cd07d72a4a28148c4ab",
-  measurementId: "G-L7Z7HZC0WM"
-};
+            apiKey: "AIzaSyCkdDavRRPVfS66wY4rN5--LNbLDk-EPh0",
+            authDomain: "macro-tracker-f264b.firebaseapp.com",
+            projectId: "macro-tracker-f264b",
+            storageBucket: "macro-tracker-f264b.firebasestorage.app",
+            messagingSenderId: "642201969074",
+            appId: "1:642201969074:web:c15cd07d72a4a28148c4ab",
+            measurementId: "G-L7Z7HZC0WM"
+        };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -215,11 +211,108 @@
 
         let currentUser = null;
         let unsubscribeLogs = null;
-        let foodDB = [];
         let selectedFoodIndex = -1;
         let userSettings = { targetCal: 2000, targetPro: 140 };
 
-        // UI & Login Logic
+        // ฝังฐานข้อมูลอาหารลงในแอปโดยตรง (ไม่ต้องพึ่งไฟล์อื่น)
+        const foodDB = [
+            // --- แหล่งโปรตีน (เนื้อสัตว์/ไข่/เวย์) ---
+            { cat: "โปรตีน (ไก่)", name: "อกไก่ลอกหนัง (ดิบ)", cal: 120, pro: 23, base: 100, unit: "g" },
+            { cat: "โปรตีน (ไก่)", name: "อกไก่ต้ม/เวฟ (สุก)", cal: 165, pro: 31, base: 100, unit: "g" },
+            { cat: "โปรตีน (ไก่)", name: "อกไก่ 7-11 (พร้อมทาน)", cal: 90, pro: 17, base: 1, unit: "ชิ้น" },
+            { cat: "โปรตีน (ไก่)", name: "ไก่ย่างลอกหนัง (สุก)", cal: 170, pro: 28, base: 100, unit: "g" },
+            { cat: "โปรตีน (หมู)", name: "สันในหมู (ดิบ)", cal: 140, pro: 22, base: 100, unit: "g" },
+            { cat: "โปรตีน (หมู)", name: "สันนอกหมู ตัดมัน (ดิบ)", cal: 160, pro: 21, base: 100, unit: "g" },
+            { cat: "โปรตีน (หมู)", name: "หมูสับ (ลีน 90%)", cal: 180, pro: 20, base: 100, unit: "g" },
+            { cat: "โปรตีน (เนื้อวัว)", name: "เนื้อสันในวัว หั่นเต๋า (ดิบ)", cal: 150, pro: 21, base: 100, unit: "g" },
+            { cat: "โปรตีน (เนื้อวัว)", name: "เนื้อสันนอกวัว (ดิบ)", cal: 180, pro: 20, base: 100, unit: "g" },
+            { cat: "โปรตีน (เนื้อวัว)", name: "เนื้อบดลีน (ดิบ)", cal: 170, pro: 21, base: 100, unit: "g" },
+            { cat: "โปรตีน (ไข่/เวย์)", name: "ไข่ไก่ต้ม (เต็มฟอง)", cal: 75, pro: 7, base: 1, unit: "ฟอง" },
+            { cat: "โปรตีน (ไข่/เวย์)", name: "ไข่ขาวต้ม", cal: 17, pro: 4, base: 1, unit: "ฟอง" },
+            { cat: "โปรตีน (ไข่/เวย์)", name: "เวย์โปรตีน BAAM", cal: 150, pro: 30, base: 1, unit: "Scoop" },
+            { cat: "โปรตีน (ทะเล)", name: "แซลมอน (ดิบ)", cal: 208, pro: 20, base: 100, unit: "g" },
+            { cat: "โปรตีน (ทะเล)", name: "ปลาดอลลี่/แพนกาเซียส", cal: 90, pro: 15, base: 100, unit: "g" },
+            { cat: "โปรตีน (ทะเล)", name: "ปลานิล (ดิบ)", cal: 96, pro: 20, base: 100, unit: "g" },
+            { cat: "โปรตีน (ทะเล)", name: "ทูน่ากระป๋อง (ในน้ำแร่)", cal: 90, pro: 21, base: 100, unit: "g" },
+            { cat: "โปรตีน (ทะเล)", name: "กุ้งขาว (ดิบ)", cal: 85, pro: 20, base: 100, unit: "g" },
+            { cat: "โปรตีน (ทะเล)", name: "ปลาหมึกกล้วย (ดิบ)", cal: 92, pro: 16, base: 100, unit: "g" },
+            { cat: "โปรตีน (พืช)", name: "เต้าหู้ขาว/เต้าหู้แข็ง", cal: 140, pro: 16, base: 100, unit: "g" },
+            { cat: "โปรตีน (พืช)", name: "เต้าหู้ไข่", cal: 70, pro: 5, base: 1, unit: "หลอด" },
+            { cat: "โปรตีน (พืช)", name: "เทมเป้", cal: 190, pro: 19, base: 100, unit: "g" },
+
+            // --- แหล่งคาร์บ (ข้าว/แป้ง/ธัญพืช) ---
+            { cat: "คาร์บ (ข้าว/แป้ง)", name: "ข้าวไรซ์เบอร์รี่ (หุงสุก)", cal: 130, pro: 2.5, base: 100, unit: "g" },
+            { cat: "คาร์บ (ข้าว/แป้ง)", name: "ข้าวหอมมะลิ (หุงสุก)", cal: 130, pro: 2.5, base: 100, unit: "g" },
+            { cat: "คาร์บ (ข้าว/แป้ง)", name: "ข้าวกล้อง (หุงสุก)", cal: 110, pro: 2.5, base: 100, unit: "g" },
+            { cat: "คาร์บ (ข้าว/แป้ง)", name: "ขนมปังโฮลวีต", cal: 65, pro: 3, base: 1, unit: "แผ่น" },
+            { cat: "คาร์บ (ข้าว/แป้ง)", name: "ขนมปังขาว", cal: 70, pro: 2, base: 1, unit: "แผ่น" },
+            { cat: "คาร์บ (ข้าว/แป้ง)", name: "เส้นเล็ก (ลวก)", cal: 110, pro: 1, base: 100, unit: "g" },
+            { cat: "คาร์บ (ข้าว/แป้ง)", name: "เส้นหมี่ (ลวก)", cal: 105, pro: 1, base: 100, unit: "g" },
+            { cat: "คาร์บ (ข้าว/แป้ง)", name: "บะหมี่เหลือง", cal: 140, pro: 4, base: 1, unit: "ก้อน" },
+            { cat: "คาร์บ (ข้าว/แป้ง)", name: "วุ้นเส้น (แช่น้ำ)", cal: 90, pro: 0, base: 100, unit: "g" },
+            { cat: "คาร์บ (ธัญพืช/พืชหัว)", name: "มันเทศ (นึ่ง/ต้ม)", cal: 90, pro: 1.5, base: 100, unit: "g" },
+            { cat: "คาร์บ (ธัญพืช/พืชหัว)", name: "ฟักทอง (นึ่ง)", cal: 26, pro: 1, base: 100, unit: "g" },
+            { cat: "คาร์บ (ธัญพืช/พืชหัว)", name: "ข้าวโพดหวาน (ต้ม)", cal: 95, pro: 3, base: 100, unit: "g" },
+            { cat: "คาร์บ (ธัญพืช/พืชหัว)", name: "ข้าวโอ๊ต (ดิบ)", cal: 380, pro: 13, base: 100, unit: "g" },
+            { cat: "คาร์บ (ธัญพืช/พืชหัว)", name: "ถั่วแระญี่ปุ่น (แกะเปลือก)", cal: 120, pro: 11, base: 100, unit: "g" },
+            { cat: "คาร์บ (ธัญพืช/พืชหัว)", name: "ถั่วเขียวซีก (ต้มสุก)", cal: 105, pro: 7, base: 100, unit: "g" },
+            { cat: "คาร์บ (ธัญพืช/พืชหัว)", name: "ถั่วแดง (ต้มสุก)", cal: 125, pro: 8, base: 100, unit: "g" },
+            { cat: "คาร์บ (ธัญพืช/พืชหัว)", name: "ลูกเดือย (ต้มสุก)", cal: 110, pro: 4, base: 100, unit: "g" },
+
+            // --- แหล่งไขมันดี ---
+            { cat: "ไขมันดี", name: "อะโวคาโด", cal: 160, pro: 2, base: 100, unit: "g" },
+            { cat: "ไขมันดี", name: "เนยถั่ว Jif (Crunchy)", cal: 100, pro: 4, base: 1, unit: "ช้อนโต๊ะ" },
+            { cat: "ไขมันดี", name: "เนยถั่วคลีน 100%", cal: 95, pro: 4.5, base: 1, unit: "ช้อนโต๊ะ" },
+            { cat: "ไขมันดี", name: "อัลมอนด์ (อบ)", cal: 580, pro: 21, base: 100, unit: "g" },
+            { cat: "ไขมันดี", name: "เม็ดมะม่วงหิมพานต์", cal: 550, pro: 18, base: 100, unit: "g" },
+            { cat: "ไขมันดี", name: "น้ำมันมะกอก / น้ำมันพืช", cal: 120, pro: 0, base: 1, unit: "ช้อนโต๊ะ" },
+            { cat: "ไขมันดี", name: "ชีสแผ่น (Cheddar)", cal: 70, pro: 4, base: 1, unit: "แผ่น" },
+
+            // --- ผักและผลไม้ ---
+            { cat: "ผลไม้", name: "กล้วยหอม", cal: 105, pro: 1, base: 1, unit: "ลูก" },
+            { cat: "ผลไม้", name: "กล้วยน้ำว้า", cal: 60, pro: 1, base: 1, unit: "ลูก" },
+            { cat: "ผลไม้", name: "แอปเปิล", cal: 95, pro: 0.5, base: 1, unit: "ลูก" },
+            { cat: "ผลไม้", name: "ฝรั่ง", cal: 70, pro: 1, base: 1, unit: "ลูก" },
+            { cat: "ผลไม้", name: "แตงโม", cal: 30, pro: 0.5, base: 100, unit: "g" },
+            { cat: "ผลไม้", name: "มะละกอสุก", cal: 40, pro: 0.5, base: 100, unit: "g" },
+            { cat: "ผลไม้", name: "ส้ม", cal: 45, pro: 1, base: 1, unit: "ลูก" },
+            { cat: "ผักไฟเบอร์สูง", name: "บรอกโคลี", cal: 35, pro: 2.8, base: 100, unit: "g" },
+            { cat: "ผักไฟเบอร์สูง", name: "ผักกาดขาว / กะหล่ำปลี", cal: 20, pro: 1.5, base: 100, unit: "g" },
+            { cat: "ผักไฟเบอร์สูง", name: "ผักบุ้ง / ผักโขม", cal: 25, pro: 2, base: 100, unit: "g" },
+            { cat: "ผักไฟเบอร์สูง", name: "แครอท", cal: 40, pro: 1, base: 100, unit: "g" },
+            { cat: "ผักไฟเบอร์สูง", name: "เห็ดเข็มทอง / เห็ดชิเมจิ", cal: 35, pro: 2.5, base: 100, unit: "g" },
+            { cat: "ผักไฟเบอร์สูง", name: "สาหร่ายวากาเมะ (แช่น้ำ)", cal: 45, pro: 3, base: 100, unit: "g" },
+            { cat: "ผักไฟเบอร์สูง", name: "แตงกวา / มะเขือเทศ", cal: 15, pro: 1, base: 100, unit: "g" },
+
+            // --- เครื่องดื่ม ---
+            { cat: "เครื่องดื่ม", name: "น้ำมะพร้าวสด (เฉพาะน้ำ)", cal: 50, pro: 0, base: 1, unit: "ลูก (250ml)" },
+            { cat: "เครื่องดื่ม", name: "กาแฟดำ (ไม่ใส่น้ำตาล)", cal: 5, pro: 0, base: 1, unit: "แก้ว" },
+            { cat: "เครื่องดื่ม", name: "ชาเขียว (สูตรไม่มีน้ำตาล)", cal: 0, pro: 0, base: 1, unit: "ขวด" },
+            { cat: "เครื่องดื่ม", name: "นมจืด Low Fat", cal: 45, pro: 3.5, base: 100, unit: "ml" },
+            { cat: "เครื่องดื่ม", name: "นมจืด 0% Fat", cal: 35, pro: 3.5, base: 100, unit: "ml" },
+            { cat: "เครื่องดื่ม", name: "นมจืด Whole Milk", cal: 65, pro: 3.2, base: 100, unit: "ml" },
+            { cat: "เครื่องดื่ม", name: "นมอัลมอนด์ (ไม่หวาน)", cal: 15, pro: 0.5, base: 100, unit: "ml" },
+            { cat: "เครื่องดื่ม", name: "ดีน่า งาดำ (น้ำตาลน้อย)", cal: 90, pro: 5, base: 1, unit: "กล่อง" },
+            { cat: "เครื่องดื่ม", name: "โค้กซีโร่ / เป๊ปซี่แม็กซ์", cal: 0, pro: 0, base: 1, unit: "กระป๋อง" },
+
+            // --- หมวดชาบู / ปิ้งย่าง / อาหารตามสั่ง ---
+            { cat: "เมนูร้านอาหาร/ชาบู", name: "สันคอหมูสไลด์", cal: 250, pro: 18, base: 100, unit: "g" },
+            { cat: "เมนูร้านอาหาร/ชาบู", name: "หมูสามชั้นสไลด์", cal: 350, pro: 14, base: 100, unit: "g" },
+            { cat: "เมนูร้านอาหาร/ชาบู", name: "เนื้อเสือร้องไห้สไลด์", cal: 320, pro: 15, base: 100, unit: "g" },
+            { cat: "เมนูร้านอาหาร/ชาบู", name: "เนื้อริบอายสไลด์", cal: 280, pro: 19, base: 100, unit: "g" },
+            { cat: "เมนูร้านอาหาร/ชาบู", name: "ลูกชิ้นหมู/เนื้อ", cal: 250, pro: 12, base: 100, unit: "g" },
+            { cat: "เมนูร้านอาหาร/ชาบู", name: "เต้าหู้ปลา", cal: 180, pro: 10, base: 100, unit: "g" },
+            { cat: "เมนูร้านอาหาร/ชาบู", name: "ไส้กรอกหมู", cal: 300, pro: 10, base: 100, unit: "g" },
+            { cat: "เมนูร้านอาหาร/ชาบู", name: "ปูอัด", cal: 110, pro: 8, base: 100, unit: "g" },
+            { cat: "เมนูร้านอาหาร/ชาบู", name: "น้ำจิ้มสุกี้", cal: 40, pro: 0.5, base: 1, unit: "ช้อนโต๊ะ" },
+            { cat: "เมนูร้านอาหาร/ชาบู", name: "ส้มตำไทย (ไม่หวานจัด)", cal: 120, pro: 3, base: 1, unit: "จาน" },
+            { cat: "เมนูร้านอาหาร/ชาบู", name: "กะเพราหมูสับ (ไม่รวมข้าว)", cal: 300, pro: 20, base: 1, unit: "จาน" },
+            { cat: "เมนูร้านอาหาร/ชาบู", name: "ไข่ดาว", cal: 160, pro: 7, base: 1, unit: "ฟอง" },
+            { cat: "เมนูร้านอาหาร/ชาบู", name: "ไข่เจียว (น้ำมันเยอะ)", cal: 220, pro: 7, base: 1, unit: "ฟอง" },
+            { cat: "เมนูร้านอาหาร/ชาบู", name: "เกาเหลาเนื้อ (ไม่ซดน้ำ)", cal: 200, pro: 25, base: 1, unit: "ชาม" },
+            { cat: "เมนูร้านอาหาร/ชาบู", name: "แซนด์วิชทูน่า", cal: 280, pro: 15, base: 1, unit: "ชิ้น" }
+        ];
+
         document.getElementById('btnLogin').onclick = () => signInWithPopup(auth, provider);
         document.getElementById('btnLogout').onclick = () => signOut(auth);
 
@@ -230,11 +323,8 @@
                 document.getElementById('appContent').style.display = 'block';
                 document.getElementById('userNameDisplay').innerText = `ผู้ใช้: ${user.displayName}`;
                 
-                // ดึงข้อมูลพื้นฐานเมื่อล็อกอิน
-                await loadFoodDB();
                 await loadSettings();
                 
-                // เซ็ตวันที่และเริ่มดึงข้อมูลเรียลไทม์
                 const dateInput = document.getElementById('datePicker');
                 if (!dateInput.value) {
                     const tzoffset = (new Date()).getTimezoneOffset() * 60000; 
@@ -249,40 +339,35 @@
             }
         });
 
-        // 1. ดึงฐานข้อมูลอาหารจาก GitHub (ประหยัดค่า Database)
-        async function loadFoodDB() {
-            try {
-                const response = await fetch('./food-db.json', { cache: 'no-store' });
-                foodDB = await response.json();
-            } catch (error) {
-                console.warn('ดึง JSON ไม่สำเร็จ ใช้ข้อมูลสำรอง');
-                foodDB = [ { cat: "โปรตีน", name: "อกไก่ต้ม (สุก)", cal: 165, pro: 31, base: 100, unit: "g" } ]; // ใส่ fallback จำเป็น
-            }
-        }
-
-        // 2. ดึงเป้าหมายส่วนตัวจาก Firestore
         async function loadSettings() {
-            const docRef = doc(db, "users", currentUser.uid);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists() && docSnap.data().settings) {
-                userSettings = docSnap.data().settings;
+            try {
+                const docRef = doc(db, "users", currentUser.uid);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists() && docSnap.data().settings) {
+                    userSettings = docSnap.data().settings;
+                }
+                document.getElementById('setCal').value = userSettings.targetCal;
+                document.getElementById('setPro').value = userSettings.targetPro;
+                updateTargetsUI();
+            } catch (err) {
+                console.error("โหลดตั้งค่าไม่ได้:", err);
             }
-            document.getElementById('setCal').value = userSettings.targetCal;
-            document.getElementById('setPro').value = userSettings.targetPro;
-            updateTargetsUI();
         }
 
         window.saveSettings = async () => {
-            const cal = parseFloat(document.getElementById('setCal').value) || 2000;
-            const pro = parseFloat(document.getElementById('setPro').value) || 140;
-            userSettings = { targetCal: cal, targetPro: pro };
-            
-            await setDoc(doc(db, "users", currentUser.uid), { settings: userSettings }, { merge: true });
-            
-            updateTargetsUI();
-            window.changeDate(); // บังคับรีเฟรชหน้าจอ
-            alert('บันทึกเป้าหมายขึ้นคลาวด์สำเร็จ!');
-            window.switchTab('tracker');
+            try {
+                const cal = parseFloat(document.getElementById('setCal').value) || 2000;
+                const pro = parseFloat(document.getElementById('setPro').value) || 140;
+                userSettings = { targetCal: cal, targetPro: pro };
+                
+                await setDoc(doc(db, "users", currentUser.uid), { settings: userSettings }, { merge: true });
+                updateTargetsUI();
+                window.changeDate();
+                alert('✅ บันทึกเป้าหมายขึ้นคลาวด์สำเร็จ!');
+                window.switchTab('tracker');
+            } catch (error) {
+                alert("❌ บันทึกไม่ได้: ฐานข้อมูลอาจยังไม่ได้เปิดใช้งาน กรุณาตั้งค่า Firestore ก่อนครับ");
+            }
         }
 
         function updateTargetsUI() {
@@ -290,54 +375,47 @@
             document.getElementById('uiTargetPro').innerText = userSettings.targetPro;
         }
 
-        // 3. ระบบดึงประวัติการกินแบบ Real-time (เปลี่ยนวันที่ก็จะดึงใหม่)
         window.changeDate = () => {
-            if(unsubscribeLogs) unsubscribeLogs(); // ยกเลิกการฟังข้อมูลวันเก่า
+            if(unsubscribeLogs) unsubscribeLogs();
             const dateStr = document.getElementById('datePicker').value;
-            
             const logsRef = collection(db, "users", currentUser.uid, "logs");
             const q = query(logsRef, where("dateStr", "==", dateStr));
             
-            // onSnapshot คือการดึงข้อมูลแบบ Real-time
             unsubscribeLogs = onSnapshot(q, (snapshot) => {
                 const dailyData = [];
-                snapshot.forEach((doc) => {
-                    dailyData.push({ id: doc.id, ...doc.data() });
-                });
+                snapshot.forEach((doc) => { dailyData.push({ id: doc.id, ...doc.data() }); });
                 renderDashboard(dailyData);
+            }, (error) => {
+                console.error("ดึงข้อมูลไม่ได้:", error);
             });
         }
 
-        // 4. บันทึกข้อมูลขึ้น Firestore
         async function saveToCloud(meal, name, amount, unit, cal, pro) {
-            const dateStr = document.getElementById('datePicker').value;
-            const logsRef = collection(db, "users", currentUser.uid, "logs");
-            await addDoc(logsRef, {
-                dateStr: dateStr,
-                meal: meal,
-                name: name,
-                amount: amount,
-                unit: unit,
-                cal: cal,
-                pro: pro,
-                timestamp: Date.now()
-            });
-            // ไม่ต้องเรียก renderDashboard() เพราะ onSnapshot จะรับรู้และวาดใหม่เองโดยอัตโนมัติ
+            try {
+                const dateStr = document.getElementById('datePicker').value;
+                const logsRef = collection(db, "users", currentUser.uid, "logs");
+                await addDoc(logsRef, {
+                    dateStr: dateStr, meal: meal, name: name, amount: amount,
+                    unit: unit, cal: cal, pro: pro, timestamp: Date.now()
+                });
+            } catch (error) {
+                alert("❌ บันทึกไม่สำเร็จ!\nกรุณาเข้าไปที่เว็บ Firebase > เลือก Firestore Database > สร้าง Database > และเลือก Start in test mode ครับ\n\nError: " + error.message);
+            }
         }
 
-        window.addEntry = () => {
+        window.addEntry = async () => {
             if (selectedFoodIndex === -1) { alert("กรุณาเลือกเมนูครับ"); return; }
             const amount = parseFloat(document.getElementById('foodAmount').value);
-            if (!amount || amount <= 0) return;
+            if (!amount || amount <= 0) { alert("กรุณาใส่ปริมาณ"); return; }
             
             const f = foodDB[selectedFoodIndex];
-            saveToCloud(document.getElementById('mealTime').value, f.name, amount, f.unit, (f.cal/f.base)*amount, (f.pro/f.base)*amount);
+            await saveToCloud(document.getElementById('mealTime').value, f.name, amount, f.unit, (f.cal/f.base)*amount, (f.pro/f.base)*amount);
             
             foodSearch.value = ''; document.getElementById('foodAmount').value = ''; selectedFoodIndex = -1;
             document.getElementById('unitHint').innerText = "กรุณาเลือกอาหารก่อนครับ";
         }
 
-        window.addCustomEntry = () => {
+        window.addCustomEntry = async () => {
             const meal = document.getElementById('mealTime').value;
             const name = document.getElementById('c_name').value;
             const unit = document.getElementById('c_unit').value || "ที่ทาน";
@@ -345,12 +423,15 @@
             const pro = parseFloat(document.getElementById('c_pro').value) || 0;
             if (!name || isNaN(cal)) { alert("กรุณาใส่ชื่อเมนูและแคลอรี"); return; }
 
-            saveToCloud(meal, name, 1, unit, cal, pro);
+            await saveToCloud(meal, name, 1, unit, cal, pro);
             document.getElementById('customFoodBox').style.display = 'none';
         }
 
         window.deleteEntry = async (docId) => {
-            await deleteDoc(doc(db, "users", currentUser.uid, "logs", docId));
+            if(confirm("ต้องการลบรายการนี้ใช่ไหม?")) {
+                try { await deleteDoc(doc(db, "users", currentUser.uid, "logs", docId)); }
+                catch (e) { alert("ลบไม่สำเร็จ: " + e.message); }
+            }
         }
 
         // --- ฟังก์ชัน UI ทั่วไป ---
@@ -375,7 +456,7 @@
             if(!filter) { foodList.style.display = 'none'; return; }
             
             const filtered = foodDB.filter(f => f.name.toLowerCase().includes(filter) || f.cat.toLowerCase().includes(filter));
-            if(filtered.length === 0) { foodList.innerHTML = '<div class="search-item" style="color:red;">ไม่พบเมนูนี้</div>'; foodList.style.display = 'block'; return; }
+            if(filtered.length === 0) { foodList.innerHTML = '<div class="search-item" style="color:red;">ไม่พบเมนูนี้ (กดปุ่มคีย์เองได้เลยครับ)</div>'; foodList.style.display = 'block'; return; }
 
             filtered.forEach(f => {
                 const div = document.createElement('div');
@@ -392,7 +473,6 @@
             foodList.style.display = 'block';
         };
 
-        // วาดหน้าจอ
         function renderDashboard(dailyData) {
             let totalCal = 0; let totalPro = 0;
             const mealGroups = { "มื้อเช้า (หลังเวท)": [], "มื้อเที่ยง": [], "มื้อเย็น": [], "ของว่าง/เครื่องดื่ม": [] };
