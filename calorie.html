@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Theerapong Fitness & Macro Tracker V6</title>
+    <title>Theerapong Fitness & Macro Tracker V6.1</title>
     <style>
         :root { --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --border: #cbd5e1; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; padding-bottom: 90px; }
@@ -38,13 +38,14 @@
         .builder-ex { background: white; border: 1px dashed var(--border); padding: 10px; border-radius: 8px; margin-top: 10px; position: relative; }
         .remove-icon { position: absolute; right: 10px; top: 10px; color: var(--danger); font-weight: bold; cursor: pointer; font-size: 18px; }
         
-        /* Workout Form Specifics */
-        .exercise-item { background: #f8fafc; border: 1px solid var(--border); padding: 15px; border-radius: 12px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .exercise-name { font-weight: bold; font-size: 15px; color: var(--primary); display: flex; align-items: center; gap: 8px; }
-        .exercise-img { width: 100%; max-height: 150px; object-fit: contain; border-radius: 8px; background: white; border: 1px solid var(--border); }
-        .ex-inputs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .ex-inputs input { padding: 10px; font-size: 14px; text-align: center; }
-        .ex-inputs label { margin: 0 0 5px 0; font-size: 12px; text-align: center; color: #64748b; }
+        /* Workout Form Specifics (ใหม่ - จัดหน้าให้รูปอยู่ซ้าย) */
+        .exercise-item { background: #f8fafc; border: 1px solid var(--border); padding: 12px; border-radius: 12px; margin-bottom: 12px; }
+        .exercise-name { font-weight: bold; font-size: 15px; color: var(--primary); margin-bottom: 10px; display: block; }
+        .exercise-layout { display: flex; align-items: center; gap: 12px; }
+        .exercise-img { width: 85px; height: 85px; object-fit: contain; border-radius: 8px; background: white; border: 1px solid var(--border); flex-shrink: 0; }
+        .ex-inputs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; flex-grow: 1; }
+        .ex-inputs input { width: 100%; padding: 8px 4px; font-size: 14px; text-align: center; box-sizing: border-box; border: 1px solid var(--border); border-radius: 6px; }
+        .ex-inputs label { margin: 0 0 4px 0; font-size: 12px; text-align: center; color: #64748b; display: block; }
         .history-box { background: #fafafa; border-left: 4px solid var(--primary); padding: 12px; border-radius: 0 8px 8px 0; margin-bottom: 10px; }
 
         /* General Layout */
@@ -231,7 +232,7 @@
 
             <div class="card">
                 <h2>🛠️ สร้างตารางเวทส่วนตัว</h2>
-                <p style="font-size: 13px; color: #64748b; margin-top:-10px;">สร้างวันเล่นเวท และเพิ่มชื่อท่า พร้อมแนบรูปลิงก์ได้ตามต้องการ ข้อมูลนี้จะไปปรากฏในหน้าตารางเวท</p>
+                <p style="font-size: 13px; color: #64748b; margin-top:-10px;">สร้างวันเล่นเวท และเพิ่มชื่อท่า พร้อมแนบรูปลิงก์หรือชื่อไฟล์รูปภาพ (เช่น 1.jpg) ได้ตามต้องการ</p>
                 
                 <div id="routineBuilderContainer"></div>
                 
@@ -271,7 +272,6 @@
         let selectedFoodIndex = -1;
         let userSettings = { targetCal: 2000, targetPro: 140 };
         
-        // โครงสร้างข้อมูลตารางเวทที่ผู้ใช้สร้างเอง
         let customRoutines = [];
 
         window.switchTab = (tabId) => {
@@ -330,18 +330,16 @@
                 document.getElementById('setCal').value = userSettings.targetCal;
                 document.getElementById('setPro').value = userSettings.targetPro;
                 updateTargetsUI();
-                renderRoutineBuilder(); // วาด UI หน้าตั้งค่าตารางเวท
-                updateWorkoutDropdown(); // อัปเดต Dropdown ในหน้าตารางเวท
+                renderRoutineBuilder(); 
+                updateWorkoutDropdown(); 
             } catch (err) { console.error("โหลดตั้งค่าไม่ได้:", err); }
         }
 
         window.saveSettings = async () => {
-            // ดึงข้อมูลแคลอรี
             const cal = parseFloat(document.getElementById('setCal').value) || 2000;
             const pro = parseFloat(document.getElementById('setPro').value) || 140;
             userSettings = { targetCal: cal, targetPro: pro };
             
-            // ดึงข้อมูลตารางเวทจากหน้า Builder
             const routineElements = document.querySelectorAll('.builder-day');
             const newRoutines = [];
             routineElements.forEach((dayEl, dIndex) => {
@@ -356,7 +354,6 @@
             });
             customRoutines = newRoutines;
 
-            // บันทึกขึ้นคลาวด์
             await setDoc(doc(db, "users", currentUser.uid), { settings: userSettings, routines: customRoutines }, { merge: true });
             updateTargetsUI();
             updateWorkoutDropdown();
@@ -369,7 +366,6 @@
             document.getElementById('uiTargetPro').innerText = userSettings.targetPro;
         }
 
-        // --- ระบบสร้างตารางเวท (Builder Logic) ---
         function renderRoutineBuilder() {
             const container = document.getElementById('routineBuilderContainer');
             container.innerHTML = '';
@@ -382,8 +378,8 @@
                             <span class="remove-icon" onclick="window.removeExercise(${dIndex}, ${eIndex})">✕</span>
                             <label style="margin-top:0; font-size:12px;">ชื่อท่า:</label>
                             <input type="text" class="r-ex-name" value="${ex.name}" placeholder="เช่น Bench Press" style="padding:8px; font-size:14px;">
-                            <label style="font-size:12px;">ลิงก์รูปภาพ (ใส่หรือไม่ใส่ก็ได้):</label>
-                            <input type="text" class="r-ex-img" value="${ex.img || ''}" placeholder="เช่น https://..." style="padding:8px; font-size:14px;">
+                            <label style="font-size:12px;">ลิงก์รูปภาพ หรือ ชื่อไฟล์ (เช่น 1.jpg):</label>
+                            <input type="text" class="r-ex-img" value="${ex.img || ''}" placeholder="เช่น 1.jpg" style="padding:8px; font-size:14px;">
                         </div>`;
                 });
 
@@ -408,7 +404,6 @@
             if(confirm("ลบวันนี้ออกจากตารางใช่ไหม?")) { customRoutines.splice(dIndex, 1); renderRoutineBuilder(); }
         }
         window.addExerciseToDay = (dIndex) => {
-            // คว้าข้อมูลปัจจุบันก่อนรีเรนเดอร์ เพื่อไม่ให้ข้อมูลที่พิมพ์ค้างอยู่หายไป
             saveBuilderStateTemporarily();
             customRoutines[dIndex].exercises.push({ name: "", img: "" });
             renderRoutineBuilder();
@@ -441,6 +436,7 @@
             document.getElementById('workoutFormContainer').style.display = 'none';
         }
 
+        // จัดหน้าตาฟอร์มตารางเวทใหม่ให้รูปอยู่ซ้ายมือ
         window.loadWorkoutForm = () => {
             const rIndex = document.getElementById('routineSelect').value;
             const container = document.getElementById('workoutFormContainer');
@@ -457,11 +453,13 @@
                 listDiv.innerHTML += `
                     <div class="exercise-item" data-name="${ex.name}">
                         <div class="exercise-name">💪 ${ex.name}</div>
-                        ${imgHtml}
-                        <div class="ex-inputs">
-                            <div><label>จำนวนเซ็ต</label><input type="number" class="w-sets" placeholder="Set" inputmode="numeric"></div>
-                            <div><label>จำนวนครั้ง</label><input type="number" class="w-reps" placeholder="Reps" inputmode="numeric"></div>
-                            <div><label>น้ำหนัก</label><input type="number" class="w-kg" placeholder="Kg" inputmode="decimal"></div>
+                        <div class="exercise-layout">
+                            ${imgHtml}
+                            <div class="ex-inputs">
+                                <div><label>เซ็ต</label><input type="number" class="w-sets" placeholder="Set" inputmode="numeric"></div>
+                                <div><label>ครั้ง</label><input type="number" class="w-reps" placeholder="Reps" inputmode="numeric"></div>
+                                <div><label>น้ำหนัก</label><input type="number" class="w-kg" placeholder="Kg" inputmode="decimal"></div>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -496,7 +494,7 @@
             } catch (e) { alert("Error: " + e.message); }
         }
 
-        // --- ระบบบันทึก อาหาร และ สัดส่วน (เหมือนเดิม) ---
+        // --- ระบบบันทึก อาหาร และ สัดส่วน ---
         window.changeDate = () => {
             const dateStr = document.getElementById('datePicker').value;
             if(unsubscribeMeals) unsubscribeMeals();
