@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Theerapong Fitness & Macro Tracker V12</title>
+    <title>Theerapong Fitness & Macro Tracker V13 (Pro Graph)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --border: #cbd5e1; }
@@ -68,6 +68,9 @@
         #loginScreen { position: fixed; top:0; left:0; right:0; bottom:0; background: white; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
         #appContent { display: none; }
         .user-profile { font-size: 12px; text-align: center; padding: 10px; background: #e2e8f0; margin-bottom: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Graph Container */
+        .chart-container { position: relative; width: 100%; height: 280px; }
     </style>
 </head>
 <body>
@@ -220,9 +223,12 @@
                 <button id="btnSaveBody" onclick="window.saveBodyMetrics()" style="background: var(--success);">💾 บันทึกสัดส่วน</button>
             </div>
 
+            <!-- กราฟสถิติรูปแบบใหม่ -->
             <div class="card">
-                <h3 style="font-size: 16px;">📈 กราฟสถิติร่างกาย</h3>
-                <canvas id="bodyChart" style="width: 100%; max-height: 280px;"></canvas>
+                <h3 style="font-size: 16px;">📈 กราฟสถิติร่างกาย (น้ำหนัก & ไขมัน)</h3>
+                <div class="chart-container">
+                    <canvas id="bodyChart"></canvas>
+                </div>
             </div>
 
             <div class="card">
@@ -502,27 +508,97 @@
             unsubscribeWorkouts = onSnapshot(query(collection(db, "users", currentUser.uid, "workouts"), where("dateStr", "==", dateStr)), (snap) => {
                 const data = []; snap.forEach(d => data.push({ id: d.id, ...d.data() })); renderWorkoutLogs(data);
             });
+            
+            // ดึงข้อมูลกราฟร่างกาย
             unsubscribeBody = onSnapshot(collection(db, "users", currentUser.uid, "metrics"), (snap) => {
-                const allData = []; snap.forEach(d => allData.push({ id: d.id, ...d.data() }));
+                const allData = []; 
+                snap.forEach(d => allData.push({ id: d.id, ...d.data() }));
                 renderBodyChart(allData);
+                
                 const dailyData = allData.filter(d => d.dateStr === dateStr);
                 renderBodyLogs(dailyData);
             });
         }
 
+        // 🔴 ระบบวาดกราฟแบบจัดเต็ม (แยก 2 เส้น + ใส่จุดบนเส้น) 🔴
         function renderBodyChart(allData) {
+            // เรียงวันที่จากอดีต -> ปัจจุบัน
             const sortedData = [...allData].sort((a,b) => a.timestamp - b.timestamp);
-            const labels = []; const weightData = []; const fatData = [];
-            sortedData.forEach(d => { labels.push(d.dateStr); weightData.push(d.weight !== "-" ? parseFloat(d.weight) : null); fatData.push(d.bodyFat !== "-" ? parseFloat(d.bodyFat) : null); });
+            
+            const labels = []; 
+            const weightData = []; 
+            const fatData = [];
+            
+            sortedData.forEach(d => { 
+                labels.push(d.dateStr); 
+                // เช็คว่ามีข้อมูลตัวเลขไหม ถ้าเป็น "-" ให้ข้ามเป็น null
+                weightData.push((d.weight && d.weight !== "-") ? parseFloat(d.weight) : null); 
+                fatData.push((d.bodyFat && d.bodyFat !== "-") ? parseFloat(d.bodyFat) : null); 
+            });
+
             const ctx = document.getElementById('bodyChart').getContext('2d');
             if(window.bodyChartInstance) { window.bodyChartInstance.destroy(); }
+            
             window.bodyChartInstance = new Chart(ctx, {
                 type: 'line',
-                data: { labels: labels, datasets: [
-                    { label: 'น้ำหนัก (Kg)', data: weightData, borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', yAxisID: 'y', tension: 0.3, spanGaps: true },
-                    { label: 'ไขมัน (%)', data: fatData, borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', yAxisID: 'y1', tension: 0.3, spanGaps: true }
-                ]},
-                options: { responsive: true, interaction: { mode: 'index', intersect: false }, scales: { y: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'น้ำหนัก (Kg)' } }, y1: { type: 'linear', display: true, position: 'right', title: { display: true, text: 'ไขมัน (%)' }, grid: { drawOnChartArea: false } } } }
+                data: { 
+                    labels: labels, 
+                    datasets: [
+                        { 
+                            label: 'น้ำหนัก (Kg)', 
+                            data: weightData, 
+                            borderColor: '#2563eb', 
+                            backgroundColor: '#2563eb', 
+                            yAxisID: 'y', 
+                            tension: 0.4, // ความโค้งของเส้น
+                            borderWidth: 3, // ความหนาเส้น
+                            pointRadius: 5, // ขนาดจุด
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            spanGaps: true // เชื่อมเส้นให้แม้มีวันเว้นว่าง
+                        },
+                        { 
+                            label: 'ไขมัน (%)', 
+                            data: fatData, 
+                            borderColor: '#f59e0b', 
+                            backgroundColor: '#f59e0b', 
+                            yAxisID: 'y1', 
+                            tension: 0.4, 
+                            borderWidth: 3, 
+                            pointRadius: 5, 
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            spanGaps: true 
+                        }
+                    ]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, // ปล่อยให้ยืดเต็มกล่อง
+                    interaction: { mode: 'index', intersect: false }, 
+                    plugins: {
+                        legend: { labels: { font: { size: 14 } } }
+                    },
+                    scales: { 
+                        x: {
+                            grid: { display: false } // ปิดตารางแนวตั้งเพื่อให้ดูคลีน
+                        },
+                        y: { 
+                            type: 'linear', 
+                            display: true, 
+                            position: 'left', 
+                            title: { display: true, text: 'น้ำหนัก (Kg)', color: '#2563eb', font: {weight: 'bold'} },
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        }, 
+                        y1: { 
+                            type: 'linear', 
+                            display: true, 
+                            position: 'right', 
+                            title: { display: true, text: 'ไขมัน (%)', color: '#f59e0b', font: {weight: 'bold'} }, 
+                            grid: { drawOnChartArea: false } // ไม่ให้เส้นกริดทับกัน
+                        } 
+                    } 
+                }
             });
         }
 
