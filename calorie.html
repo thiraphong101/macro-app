@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Theerapong Fitness & Macro Tracker V10.1 (AI Food Scanner)</title>
+    <title>Theerapong Fitness & Macro Tracker V11</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --border: #cbd5e1; }
@@ -64,6 +64,11 @@
         .log-name { font-weight: 600; font-size: 15px; color: var(--primary); }
         .log-cal { font-size: 13px; color: #64748b; margin-top: 4px; }
         
+        /* Dashboard Progress Bar */
+        .progress-container { width: 100%; background: #e2e8f0; border-radius: 8px; margin-top: 10px; overflow: hidden; height: 18px; position: relative; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1); }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #0ea5e9, #2563eb); width: 0%; transition: width 0.3s ease-out; }
+        .progress-text { position: absolute; width: 100%; text-align: center; top: 0; left: 0; font-size: 11px; line-height: 18px; color: white; font-weight: bold; text-shadow: 0 0 3px rgba(0,0,0,0.5); }
+
         /* Login Screen */
         #loginScreen { position: fixed; top:0; left:0; right:0; bottom:0; background: white; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
         #appContent { display: none; }
@@ -133,13 +138,21 @@
                 </div>
             </div>
 
-            <!-- โซนใหม่: AI Food Scanner -->
+            <!-- โซน AI Food Scanner พร้อม Progress Bar -->
             <div class="card" style="background: #e0f2fe; border: 1px solid #bae6fd;">
                 <h3 style="font-size: 16px; color: #0284c7;">📸 สแกนอาหารด้วย AI</h3>
-                <p style="font-size: 12px; color: #475569; margin-top: -10px;">ถ่ายรูปหรือเลือกรูปอาหาร ให้ AI ประเมินแคลอรีและโปรตีนให้แบบอัตโนมัติ</p>
+                <p style="font-size: 12px; color: #475569; margin-top: -10px;">ถ่ายรูปอาหาร ให้ AI ประเมินแคลอรีและโปรตีนอัตโนมัติ</p>
                 <input type="file" id="aiFoodImage" accept="image/*" capture="environment" style="background: white;">
-                <button id="btnAiScan" onclick="window.analyzeFoodWithAI()" style="background: #0ea5e9; margin-top: 10px;">✨ วิเคราะห์รูปภาพ</button>
-                <p id="aiStatus" style="font-size: 12px; color: #0284c7; display: none; margin-top: 10px; font-weight: bold;">⏳ AI กำลังวิเคราะห์ส่วนผสม รอสักครู่...</p>
+                
+                <div id="aiStatusContainer" style="display: none; margin-top: 15px;">
+                    <div style="font-size: 13px; color: #0284c7; font-weight: bold; margin-bottom: 5px; text-align: left;" id="aiStatusText">⏳ กำลังเชื่อมต่อ AI...</div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="aiProgressBar"></div>
+                        <div class="progress-text" id="aiProgressText">0%</div>
+                    </div>
+                </div>
+
+                <button id="btnAiScan" onclick="window.analyzeFoodWithAI()" style="background: #0ea5e9; margin-top: 15px;">✨ วิเคราะห์รูปภาพ</button>
             </div>
 
             <div class="card">
@@ -166,7 +179,6 @@
 
                 <button class="btn-outline" onclick="window.toggleCustomBox()">✏️ คีย์ข้อมูลอาหารเอง</button>
 
-                <!-- Custom Box ที่ AI จะเอาข้อมูลมากรอกให้ -->
                 <div class="custom-box" id="customFoodBox">
                     <label style="margin-top:0;">ชื่อเมนู:</label>
                     <input type="text" id="c_name">
@@ -333,7 +345,7 @@
             }
         });
 
-        // 🔴 ระบบ AI Scan อาหาร (แก้ไขให้ทำงานปกติแล้ว) 🔴
+        // 🔴 ระบบ AI Scan อาหาร พร้อม Progress Bar 🔴
         window.analyzeFoodWithAI = async () => {
             const fileInput = document.getElementById('aiFoodImage');
             const file = fileInput.files[0];
@@ -341,8 +353,34 @@
 
             const geminiApiKey = "AQ.Ab8RN6J9ua1eq1gHwba1Bb4VcraaqgP4fkva8zAanUn2qfk1CA"; 
 
-            document.getElementById('aiStatus').style.display = 'block';
-            document.getElementById('btnAiScan').disabled = true;
+            const statusContainer = document.getElementById('aiStatusContainer');
+            const progressBar = document.getElementById('aiProgressBar');
+            const progressText = document.getElementById('aiProgressText');
+            const statusText = document.getElementById('aiStatusText');
+            const btnScan = document.getElementById('btnAiScan');
+
+            // เริ่มต้นแสดง UI โหลดข้อมูล
+            statusContainer.style.display = 'block';
+            btnScan.disabled = true;
+            progressBar.style.width = '0%';
+            progressText.innerText = '0%';
+            statusText.innerText = '⏳ กำลังอัปโหลดและเชื่อมต่อ AI...';
+
+            let progressValue = 0;
+            
+            // สร้างการจำลองตัวเลขวิ่งขึ้นไปเรื่อยๆ สูงสุดหยุดที่ 92% จนกว่า AI จะตอบกลับ
+            const progressInterval = setInterval(() => {
+                if (progressValue < 92) {
+                    // ยิ่งใกล้ 90% ยิ่งวิ่งช้าลง
+                    const increment = Math.random() * ((95 - progressValue) * 0.15) + 1;
+                    progressValue += increment;
+                    progressBar.style.width = `${progressValue}%`;
+                    progressText.innerText = `${Math.floor(progressValue)}%`;
+
+                    if(progressValue > 30) statusText.innerText = '🔍 AI กำลังสแกนส่วนผสมในภาพ...';
+                    if(progressValue > 70) statusText.innerText = '🧮 กำลังคำนวณแคลอรีและโปรตีน...';
+                }
+            }, 350);
 
             try {
                 const reader = new FileReader();
@@ -369,24 +407,36 @@
 
                     const data = await response.json();
                     let aiText = data.candidates[0].content.parts[0].text;
-                    
                     aiText = aiText.replace(/```json/g, '').replace(/```/g, '').trim();
                     const result = JSON.parse(aiText);
 
-                    document.getElementById('customFoodBox').style.display = 'block';
-                    document.getElementById('c_name').value = result.name + " (AI ประเมิน)";
-                    document.getElementById('c_cal').value = result.cal;
-                    document.getElementById('c_pro').value = result.pro;
+                    // หยุดการจำลองเปอร์เซ็นต์และตั้งให้เต็ม 100%
+                    clearInterval(progressInterval);
+                    progressBar.style.width = '100%';
+                    progressText.innerText = '100%';
+                    statusText.innerText = '✅ วิเคราะห์เสร็จสมบูรณ์!';
+                    statusText.style.color = 'var(--success)';
 
-                    alert("✨ AI วิเคราะห์เสร็จแล้ว! ตรวจสอบความถูกต้องและกดบันทึกเมนูนี้ได้เลยครับ");
-                    fileInput.value = ''; 
+                    // หน่วงเวลาเล็กน้อยให้ผู้ใช้เห็น 100% ก่อนแสดงผลลัพธ์
+                    setTimeout(() => {
+                        document.getElementById('customFoodBox').style.display = 'block';
+                        document.getElementById('c_name').value = result.name + " (AI ประเมิน)";
+                        document.getElementById('c_cal').value = result.cal;
+                        document.getElementById('c_pro').value = result.pro;
+
+                        // รีเซ็ต UI เตรียมพร้อมสำหรับการสแกนครั้งถัดไป
+                        statusContainer.style.display = 'none';
+                        statusText.style.color = '#0284c7';
+                        btnScan.disabled = false;
+                        fileInput.value = ''; 
+                    }, 800);
                 };
             } catch (e) {
+                clearInterval(progressInterval);
                 alert("วิเคราะห์ไม่สำเร็จ: " + e.message);
+                statusContainer.style.display = 'none';
+                btnScan.disabled = false;
                 console.error(e);
-            } finally {
-                document.getElementById('aiStatus').style.display = 'none';
-                document.getElementById('btnAiScan').disabled = false;
             }
         };
 
