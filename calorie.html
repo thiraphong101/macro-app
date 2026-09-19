@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Theerapong Fitness V32 (Daily Leaderboard)</title>
+    <title>Theerapong Fitness V33 (Daily Leaderboard)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --border: #cbd5e1; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; padding-bottom: 110px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; padding-bottom: 90px; }
         .card { background: var(--card); border-radius: 16px; padding: 20px; margin: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         h2, h3 { margin-top: 0; margin-bottom: 15px; color: #334155; }
         
@@ -66,7 +66,7 @@
         
         /* Dashboard Tab Specifics */
         .monthly-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
-        .day-card { display: flex; align-items: center; background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
+        .day-card { display: flex; align-items: center; background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border); position: relative; }
         .day-date { width: 50px; text-align: center; font-weight: bold; color: var(--text); font-size: 18px; }
         .day-date span { display: block; font-size: 11px; font-weight: normal; color: #64748b; }
         .day-svg { width: 50px; height: 50px; flex-shrink: 0; margin: 0 15px; border: 1px dashed #cbd5e1; border-radius: 4px; padding: 2px; }
@@ -204,7 +204,6 @@
                         <div class="stat-val" id="totalBurnUI" style="color: var(--danger); font-size: 18px;">0</div>
                     </div>
                 </div>
-                
                 <div style="font-size: 12px; color: #64748b; margin-top: 15px;" id="calStatus">สถานะ: รอโหลด...</div>
             </div>
 
@@ -317,7 +316,6 @@
 
         <!-- 4. BODY METRICS TAB -->
         <div id="tab-body" class="tab-content">
-            
             <div class="card">
                 <h3 style="font-size: 16px;">🧮 คำนวณ BMR & TDEE</h3>
                 <p style="font-size: 12px; color: #64748b; margin-top: -10px;">คำนวณอัตราการเผาผลาญพื้นฐานและพลังงานที่ใช้ต่อวัน</p>
@@ -377,16 +375,19 @@
             <div style="padding: 0 15px;">
                 <p id="dashStatus" style="font-size: 13px; color: #64748b; text-align: center;">เลือกเดือนที่ต้องการดูข้อมูลครับ</p>
                 
+                <h3 style="font-size: 15px; color: var(--primary); margin-top: 20px; border-bottom: 2px solid var(--border); padding-bottom: 5px;">📷 วิวัฒนาการรูปร่าง</h3>
                 <div id="monthlyGallery" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 25px;"></div>
+
+                <h3 style="font-size: 15px; color: var(--primary); border-bottom: 2px solid var(--border); padding-bottom: 5px;">📉 สรุปข้อมูลรายวัน</h3>
                 <div class="monthly-grid" id="monthlyGrid"></div>
             </div>
         </div>
 
-        <!-- 6. SCORE LEADERBOARD TAB (แก้ไขเป็นรายวัน) -->
+        <!-- 6. SCORE LEADERBOARD TAB (แก้ไขเป็นรายวัน + Hall of Fame) -->
         <div id="tab-score" class="tab-content">
             <div class="card" style="background: linear-gradient(135deg, #f59e0b, #ea580c); color: white; text-align: center;">
                 <h2 style="color: white; margin-bottom: 5px;">🏆 จัดอันดับประจำวัน</h2>
-                <p style="font-size: 12px; margin-top: 0; opacity: 0.9;">คะแนนความมีวินัยของวันที่เลือก (เต็ม 100%)</p>
+                <p style="font-size: 12px; margin-top: 0; opacity: 0.9;">คะแนนวินัยของ <span id="leaderboardDateDisplay">วันนี้</span> (เต็ม 100%)</p>
                 <div style="font-size: 11px; margin-top: 10px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px; display: inline-block; text-align: left;">
                     <b>เกณฑ์การให้คะแนน:</b><br>
                     • โปรตีนถึงเป้า (40%)<br>
@@ -397,6 +398,15 @@
             
             <div style="padding: 0 15px;" id="leaderboardContainer">
                 <p style="font-size: 13px; color: #64748b; text-align: center;">กำลังโหลดตารางคะแนน...</p>
+            </div>
+
+            <!-- กล่องสถิติแชมป์ประจำเดือน -->
+            <div class="card" style="margin-top: 30px; border: 2px solid var(--warning);">
+                <h3 style="font-size: 16px; color: var(--warning); text-align: center; margin-bottom: 10px;">👑 สถิติแชมป์ประจำเดือน</h3>
+                <p style="font-size: 11px; color: #64748b; text-align: center; margin-top: -10px; margin-bottom: 15px;">ใครได้ที่ 1 บ่อยที่สุดในเดือนนี้</p>
+                <div id="hallOfFameContainer" style="display: flex; flex-direction: column; gap: 8px;">
+                    <p style="text-align:center; font-size:13px; color:#94a3b8;">รอระบบประมวลผลสักครู่...</p>
+                </div>
             </div>
         </div>
 
@@ -483,10 +493,9 @@
         let foodDB = [];
         let selectedFoodIndex = -1;
         let userSettings = { targetCal: 2000, targetPro: 140 };
-        
         let customRoutines = []; 
-        window.tempCalculatedTDEE = 0; 
         
+        window.tempCalculatedTDEE = 0; 
         window.currentMonthImages = [];
         window.currentImageIndex = 0;
 
@@ -527,7 +536,7 @@
             document.getElementById('tab-' + tabId).classList.add('active');
             
             if(tabId === 'dashboard') { window.loadMonthlyData(); }
-            if(tabId === 'score') { window.loadLeaderboard(); }
+            if(tabId === 'score') { window.loadDailyLeaderboard(); }
             if(tabId === 'admin' && currentUser && currentUser.email === ADMIN_EMAIL) { window.loadAdminPanel(); }
         };
 
@@ -544,7 +553,7 @@
 
                     const userRef = doc(db, "users", user.uid);
                     const userSnap = await getDoc(userRef);
-
+                    
                     let dName = user.displayName || (user.email ? user.email.split('@')[0] : "ไม่ระบุชื่อ");
 
                     if (!userSnap.exists()) {
@@ -559,7 +568,8 @@
                             displayName: dName,
                             photoURL: user.photoURL || "",
                             isBanned: false,
-                            role: user.email === ADMIN_EMAIL ? "admin" : "user"
+                            role: user.email === ADMIN_EMAIL ? "admin" : "user",
+                            scores: {} // สร้างฟิลด์ Object เปล่าสำหรับเก็บคะแนนรายวัน
                         });
                     } else {
                         if (userSnap.data().isBanned && user.email !== ADMIN_EMAIL) {
@@ -605,30 +615,60 @@
             }
         });
 
-        // 🔴 ระบบตารางจัดอันดับรายวัน 🔴
-        window.loadLeaderboard = async () => {
+        // 🔴 ระบบ Leaderboard รายวัน 🔴
+        window.loadDailyLeaderboard = async () => {
             const container = document.getElementById('leaderboardContainer');
-            const selectedDate = document.getElementById('datePicker').value;
+            const selectedDate = document.getElementById('datePicker').value; // YYYY-MM-DD
+            
+            if(!selectedDate) {
+                container.innerHTML = '<p style="text-align:center;">กรุณาเลือกวันที่ก่อน</p>';
+                return;
+            }
+
             const dateParts = selectedDate.split('-');
             const thaiDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
             
+            document.getElementById('leaderboardDateDisplay').innerText = thaiDate;
             container.innerHTML = `<p style="text-align:center; font-size:13px;">กำลังโหลดตารางคะแนนของวันที่ ${thaiDate}...</p>`;
             
             try {
                 const usersSnap = await getDocs(collection(db, "users"));
                 let usersList = [];
+                let monthlyWinners = {}; // สำหรับเก็บสถิติแชมป์ประจำเดือน (Hall of Fame)
                 
+                const currentMonthPrefix = selectedDate.slice(0, 7); // เอาแค่ YYYY-MM
+
                 usersSnap.forEach(doc => {
                     const data = doc.data();
                     if (data.isBanned !== true) { 
-                        let score = 0;
-                        if(data.scores && data.scores[selectedDate] !== undefined) {
-                            score = data.scores[selectedDate];
+                        let todayScore = 0;
+                        
+                        if (data.scores) {
+                            // ดึงคะแนนเฉพาะของวันที่เลือกมาโชว์
+                            if (data.scores[selectedDate] !== undefined) {
+                                todayScore = data.scores[selectedDate];
+                            }
+                            
+                            // [สำหรับ Hall of fame] - คำนวณหาแชมป์ของแต่ละวันในเดือนนี้
+                            Object.keys(data.scores).forEach(dateKey => {
+                                if(dateKey.startsWith(currentMonthPrefix) && data.scores[dateKey] > 0) {
+                                    if(!monthlyWinners[dateKey]) monthlyWinners[dateKey] = { score: -1, users: [] };
+                                    
+                                    if(data.scores[dateKey] > monthlyWinners[dateKey].score) {
+                                        monthlyWinners[dateKey].score = data.scores[dateKey];
+                                        monthlyWinners[dateKey].users = [{ id: doc.id, name: data.displayName, photo: data.photoURL }];
+                                    } else if (data.scores[dateKey] === monthlyWinners[dateKey].score) {
+                                        monthlyWinners[dateKey].users.push({ id: doc.id, name: data.displayName, photo: data.photoURL });
+                                    }
+                                }
+                            });
                         }
-                        usersList.push({ id: doc.id, ...data, displayScore: score });
+                        
+                        usersList.push({ id: doc.id, ...data, displayScore: todayScore });
                     }
                 });
                 
+                // --- เรนเดอร์ Leaderboard รายวัน ---
                 usersList.sort((a, b) => b.displayScore - a.displayScore);
 
                 if (usersList.length === 0) {
@@ -640,9 +680,7 @@
                 usersList.forEach((u, idx) => {
                     const rank = idx + 1;
                     let medal = '';
-                    if(rank === 1 && u.displayScore > 0) medal = '🥇'; 
-                    else if(rank === 2 && u.displayScore > 0) medal = '🥈'; 
-                    else if(rank === 3 && u.displayScore > 0) medal = '🥉';
+                    if(rank === 1 && u.displayScore > 0) medal = '🥇'; else if(rank === 2 && u.displayScore > 0) medal = '🥈'; else if(rank === 3 && u.displayScore > 0) medal = '🥉';
                     
                     const scoreStr = u.displayScore.toFixed(1);
                     const photo = u.photoURL || "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png";
@@ -665,6 +703,36 @@
                     `;
                 });
                 container.innerHTML = html;
+
+                // --- เรนเดอร์ Hall of Fame (สรุปใครชนะบ่อยสุดในเดือน) ---
+                let champCounts = {};
+                Object.keys(monthlyWinners).forEach(dateKey => {
+                    monthlyWinners[dateKey].users.forEach(u => {
+                        if(!champCounts[u.id]) champCounts[u.id] = { name: u.name, photo: u.photo, count: 0 };
+                        champCounts[u.id].count++;
+                    });
+                });
+
+                let champArray = Object.values(champCounts).sort((a,b) => b.count - a.count);
+                let hofContainer = document.getElementById('hallOfFameContainer');
+                
+                if(champArray.length > 0) {
+                    let hofHtml = '';
+                    champArray.forEach(champ => {
+                        let p = champ.photo || "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png";
+                        hofHtml += `
+                            <div style="display:flex; align-items:center; background: #fffbeb; padding: 10px; border-radius: 8px; border: 1px solid #fde68a;">
+                                <img src="${p}" style="width:30px; height:30px; border-radius:50%; margin-right:10px; object-fit:cover;" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png'">
+                                <div style="flex-grow:1; font-weight:bold; font-size:14px; color:var(--text);">${champ.name}</div>
+                                <div style="font-weight:bold; color:var(--warning); font-size:14px;">ชนะ ${champ.count} ครั้ง</div>
+                            </div>
+                        `;
+                    });
+                    hofContainer.innerHTML = hofHtml;
+                } else {
+                    hofContainer.innerHTML = '<p style="text-align:center; font-size:13px; color:#94a3b8;">ยังไม่มีข้อมูลการชนะในเดือนนี้</p>';
+                }
+
             } catch (e) {
                 container.innerHTML = '<p style="text-align:center; color:red;">โหลดล้มเหลว: ' + e.message + '</p>';
             }
@@ -698,7 +766,7 @@
                             <td><img src="${photo}" style="width:30px; height:30px; border-radius:50%; object-fit:cover;" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png'"></td>
                             <td><b>${displayName}</b><br><span style="font-size:10px; color:#64748b;">${email} ${isBannedStr}</span></td>
                             <td>
-                                <button class="ban-btn" style="background: ${btnColor};" onclick="window.toggleBanUser('${uid}', ${!u.isBanned})" ${disableAdmin}>${btnLabel}</button>
+                                <button class="ban-btn" style="background: ${btnColor}; color: white;" onclick="window.toggleBanUser('${uid}', ${!u.isBanned})" ${disableAdmin}>${btnLabel}</button>
                             </td>
                         </tr>
                     `;
@@ -780,7 +848,7 @@
             const proEl = document.getElementById('uiTargetPro'); if(proEl) proEl.innerText = userSettings.targetPro || 140;
         }
 
-        // 🔴 ระบบอัปเดตหน้าจอหลัก (คำนวณคะแนนแบบรายวันแล้วเซฟลง Cloud ทันที) 🔴
+        // --- Core Application Tracking functions ---
         function renderDashboard() {
             let totalCal = 0; let totalPro = 0; const mealGroups = { "มื้อเช้า (หลังเวท)": [], "มื้อเที่ยง": [], "มื้อเย็น": [], "ของว่าง/เครื่องดื่ม": [] };
             currentDayLogs.forEach(item => { totalCal += item.cal; totalPro += item.pro; if(mealGroups[item.meal]) mealGroups[item.meal].push(item); });
@@ -814,7 +882,7 @@
             let proPct = Math.min((totalPro / safeTargetPro) * 100, 100); if(isNaN(proPct)) proPct = 0;
             const fillPro = document.getElementById('fillProtein'); if(fillPro) { fillPro.setAttribute('y', 100 - proPct); fillPro.setAttribute('height', proPct); }
             
-            // --- การคำนวณคะแนนของวันนี้ ---
+            // --- การคำนวณและอัปเดตคะแนนของ "วันนี้" ขึ้น Cloud อัตโนมัติ ---
             let proScore = (totalPro / safeTargetPro) * 100;
             if(isNaN(proScore)) proScore = 0;
             proScore = Math.min(proScore, 100) * 0.4;
@@ -837,10 +905,12 @@
 
             const dateStr = document.getElementById('datePicker').value;
             if (currentUser) {
+                // อัปเดตเฉพาะ key วันที่นั้นๆ ลงไปใน object `scores` 
                 setDoc(doc(db, "users", currentUser.uid), {
                     scores: { [dateStr]: dailyScore }
                 }, { merge: true }).catch(e => console.log(e));
             }
+            // -----------------------------------------------------------
 
             const container = document.getElementById('mealLogs'); 
             if(container) {
@@ -992,6 +1062,12 @@
                     snap.forEach(docSnap => { deletePromises.push(deleteDoc(doc(db, "users", currentUser.uid, colName, docSnap.id))); });
                     await Promise.all(deletePromises);
                 }
+                
+                // ลบคะแนนใน array scores ด้วย
+                await setDoc(doc(db, "users", currentUser.uid), {
+                    scores: { [dateStr]: deleteDoc() } // ไม่บันทึกคะแนนวันนั้น
+                }, { merge: true });
+
                 alert(`✅ ลบข้อมูลวันที่ ${thaiDate} เรียบร้อยแล้ว`);
                 window.loadMonthlyData(); 
                 if (document.getElementById('datePicker') && document.getElementById('datePicker').value === dateStr) { window.changeDate(); }
