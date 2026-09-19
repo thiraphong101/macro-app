@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Theerapong Fitness V31 (Detailed Leaderboard)</title>
+    <title>Theerapong Fitness V29 (Stable Version)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --border: #cbd5e1; }
@@ -12,9 +12,9 @@
         h2, h3 { margin-top: 0; margin-bottom: 15px; color: #334155; }
         
         /* Tab Navigation */
-        .tab-nav { display: flex; overflow-x: auto; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-        .tab-nav::-webkit-scrollbar { display: none; }
-        .tab-btn { flex: 0 0 auto; min-width: 70px; padding: 12px 8px; text-align: center; font-weight: bold; font-size: 11px; color: #64748b; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .tab-nav { display: grid; grid-template-columns: repeat(4, 1fr); background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .tab-btn { padding: 10px 0; text-align: center; font-weight: bold; font-size: 11px; color: #64748b; cursor: pointer; border-bottom: 3px solid transparent; border-right: 1px solid #f8fafc; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .tab-btn:nth-child(n+5) { border-top: 1px solid #f8fafc; }
         .tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); background: #f0fdf4; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
@@ -41,9 +41,6 @@
         .builder-ex { background: white; border: 1px dashed var(--border); padding: 10px; border-radius: 8px; margin-top: 10px; position: relative; }
         .remove-icon { position: absolute; right: 10px; top: 10px; color: var(--danger); font-weight: bold; cursor: pointer; font-size: 18px; }
         .exercise-item { background: #f8fafc; border: 1px solid var(--border); padding: 12px; border-radius: 12px; margin-bottom: 12px; }
-        .exercise-name { font-weight: bold; font-size: 15px; color: var(--primary); margin-bottom: 10px; display: block; }
-        .exercise-layout { display: flex; align-items: center; gap: 12px; }
-        .exercise-img { width: 60px; height: 60px; object-fit: contain; border-radius: 8px; background: white; border: 1px solid var(--border); flex-shrink: 0; aspect-ratio: 1/1; }
         .ex-inputs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; flex-grow: 1; }
         .ex-inputs input { width: 100%; padding: 8px 4px; font-size: 14px; text-align: center; box-sizing: border-box; border: 1px solid var(--border); border-radius: 6px; }
         .ex-inputs label { margin: 0 0 4px 0; font-size: 12px; text-align: center; color: #64748b; display: block; }
@@ -63,7 +60,7 @@
         
         /* Dashboard & Gallery */
         .monthly-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
-        .day-card { display: flex; flex-direction: column; background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
+        .day-card { display: flex; flex-direction: column; background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border); position: relative; }
         .day-date { width: 50px; text-align: center; font-weight: bold; color: var(--text); font-size: 18px; }
         .day-date span { display: block; font-size: 11px; font-weight: normal; color: #64748b; }
         .day-svg { width: 50px; height: 50px; flex-shrink: 0; margin: 0 15px; border: 1px dashed #cbd5e1; border-radius: 4px; padding: 2px; }
@@ -82,18 +79,17 @@
         .rank-card { display: flex; align-items: center; background: white; padding: 12px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px; position: relative; overflow: hidden; }
         .rank-num { width: 30px; font-size: 18px; font-weight: bold; color: #64748b; text-align: center; }
         .rank-avatar { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--border); margin: 0 12px; object-fit: cover; }
-        .rank-info { flex-grow: 1; overflow: hidden; }
-        .rank-name { font-weight: bold; font-size: 14px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .rank-info { flex-grow: 1; }
+        .rank-name { font-weight: bold; font-size: 14px; color: var(--text); }
         .rank-bar-bg { width: 100%; background: #e2e8f0; height: 8px; border-radius: 4px; margin-top: 6px; overflow: hidden; }
         .rank-bar-fill { height: 100%; background: linear-gradient(90deg, #10b981, #2563eb); width: 0%; transition: 1s; }
-        .rank-score { font-size: 16px; font-weight: bold; color: var(--primary); text-align: right; width: 55px; }
+        .rank-score { font-size: 16px; font-weight: bold; color: var(--primary); text-align: right; width: 50px; }
         .rank-medal { position: absolute; top: -5px; right: -5px; font-size: 30px; opacity: 0.2; transform: rotate(15deg); }
-        .rank-details { font-size: 10px; color: #64748b; margin-top: 5px; display: flex; gap: 8px; }
         
-        .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }
-        .admin-table th, .admin-table td { border-bottom: 1px solid var(--border); padding: 8px 4px; text-align: left; }
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
+        .admin-table th, .admin-table td { border-bottom: 1px solid var(--border); padding: 10px 5px; text-align: left; }
         .admin-table th { background: #f8fafc; color: #334155; }
-        .ban-btn { background: #fee2e2; color: var(--danger); border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
+        .ban-btn { background: #fee2e2; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
 
         #loginScreen { position: fixed; top:0; left:0; right:0; bottom:0; background: white; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
         #appContent { display: none; }
@@ -112,18 +108,19 @@
     </div>
 
     <div id="loginScreen">
-        <svg viewBox="0 0 24 24" fill="var(--primary)" style="width: 100px; margin-bottom: 20px;">
+        <svg class="human-svg" viewBox="0 0 24 24" fill="var(--primary)" style="width: 100px; margin-bottom: 20px;">
             <path d="M12,2 A2.5,2.5 0 0,1 14.5,4.5 A2.5,2.5 0 0,1 12,7 A2.5,2.5 0 0,1 9.5,4.5 A2.5,2.5 0 0,1 12,2 M9,8 L15,8 C16.5,8 17.5,9 18,10.5 L16.5,16 L14.5,16 L14.5,22 L9.5,22 L9.5,16 L7.5,16 L6,10.5 C6.5,9 7.5,8 9,8 Z"/>
         </svg>
         <h1 style="color: var(--text);">Fitness & Macro</h1>
-        <p style="color: #64748b;">ระบบบันทึกสุขภาพและจัดอันดับ</p>
-        <button id="btnLogin" style="background: white; color: #333; border: 1px solid #ccc; padding: 10px 20px; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: bold; cursor: pointer;">
+        <p style="color: #64748b;">ระบบบันทึกสุขภาพและจัดอันดับ (Leaderboard)</p>
+        <button id="btnLogin" style="background: white; color: #333; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; gap: 10px;">
             <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" width="20">
             เข้าสู่ระบบด้วย Google
         </button>
     </div>
 
     <div id="appContent">
+        <!-- เมนู 8 แท็บ 4 คอลัมน์ 2 แถว -->
         <div class="tab-nav">
             <div class="tab-btn active" onclick="switchTab('tracker')"><span style="font-size:18px">🍽️</span> อาหาร</div>
             <div class="tab-btn" onclick="switchTab('workout')"><span style="font-size:18px">🏋️</span> เวท</div>
@@ -136,11 +133,11 @@
         </div>
 
         <div class="card user-profile" style="margin-top: 15px;">
-            <div style="display: flex; align-items: center; gap: 10px; overflow: hidden;">
-                <img id="userProfilePic" src="https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png" style="width: 30px; height: 30px; border-radius: 50%; display: none;">
-                <span id="userNameDisplay" style="font-weight: bold; color: var(--primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">กำลังโหลด...</span>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <img id="userProfilePic" src="" style="width: 30px; height: 30px; border-radius: 50%; display: none; object-fit: cover;">
+                <span id="userNameDisplay" style="font-weight: bold; color: var(--primary);">กำลังโหลด...</span>
             </div>
-            <button id="btnLogout" style="background: #ef4444; padding: 6px 12px; margin: 0; width: auto; font-size: 12px; flex-shrink: 0;">ออกจากระบบ</button>
+            <button id="btnLogout" style="background: #ef4444; padding: 6px 12px; margin: 0; width: auto; font-size: 12px;">ออกจากระบบ</button>
         </div>
 
         <div class="card header-date" style="margin-top: 0;" id="globalDateHeader">
@@ -158,33 +155,29 @@
                 
                 <div class="visual-container">
                     <div class="stat-box" style="margin: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #bae6fd;">
-                        <div style="height: 85px; display: flex; justify-content: center; align-items: flex-end;">
-                            <svg viewBox="0 0 24 24" style="height: 100%; width: auto; background: transparent;">
-                                <defs>
-                                    <clipPath id="person-shape-main">
-                                        <path d="M12,2 A2.5,2.5 0 0,1 14.5,4.5 A2.5,2.5 0 0,1 12,7 A2.5,2.5 0 0,1 9.5,4.5 A2.5,2.5 0 0,1 12,2 M9,8 L15,8 C16.5,8 17.5,9 18,10.5 L16.5,16 L14.5,16 L14.5,22 L9.5,22 L9.5,16 L7.5,16 L6,10.5 C6.5,9 7.5,8 9,8 Z"/>
-                                    </clipPath>
-                                </defs>
-                                <g clip-path="url(#person-shape-main)">
-                                    <rect x="0" y="0" width="24" height="24" fill="#e2e8f0" />
-                                    <rect id="fillIntake" x="0" y="24" width="24" height="0" fill="#2563eb" style="transition: all 0.5s;" />
-                                    <rect id="fillBurn" x="0" y="24" width="24" height="0" fill="#ef4444" style="transition: all 0.5s;" />
-                                </g>
-                            </svg>
-                        </div>
+                        <svg class="human-svg" viewBox="0 0 24 24" style="background: transparent;">
+                            <defs>
+                                <clipPath id="person-shape-main">
+                                    <path d="M12,2 A2.5,2.5 0 0,1 14.5,4.5 A2.5,2.5 0 0,1 12,7 A2.5,2.5 0 0,1 9.5,4.5 A2.5,2.5 0 0,1 12,2 M9,8 L15,8 C16.5,8 17.5,9 18,10.5 L16.5,16 L14.5,16 L14.5,22 L9.5,22 L9.5,16 L7.5,16 L6,10.5 C6.5,9 7.5,8 9,8 Z"/>
+                                </clipPath>
+                            </defs>
+                            <g clip-path="url(#person-shape-main)">
+                                <rect x="0" y="0" width="24" height="24" fill="#e2e8f0" />
+                                <rect id="fillIntake" x="0" y="24" width="24" height="0" fill="#2563eb" />
+                                <rect id="fillBurn" x="0" y="24" width="24" height="0" fill="#ef4444" />
+                            </g>
+                        </svg>
                         <div style="font-size: 11px; font-weight: bold; color: #0284c7; margin-top: 10px;">แคลอรีสุทธิ (Net)</div>
                         <div id="netCalUI" style="font-size: 24px; font-weight: bold; color: #0284c7; line-height: 1.1; margin: 4px 0;">0</div>
                         <div style="font-size: 10px; color: transparent;">-</div>
                     </div>
 
-                    <!-- แท่งโปรตีน Bar Scale -->
+                    <!-- ไอคอนโปรตีนแบบหลอดแท่ง -->
                     <div class="stat-box" style="margin: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #a7f3d0;">
-                        <div style="height: 85px; display: flex; justify-content: center; align-items: flex-end;">
-                            <svg viewBox="0 0 24 100" style="height: 100%; width: auto; display: block; margin: 0 auto;">
-                                <rect x="4" y="0" width="16" height="100" rx="8" fill="#e2e8f0" />
-                                <rect id="fillProtein" x="4" y="100" width="16" height="0" rx="8" fill="#10b981" style="transition: all 0.5s;" />
-                            </svg>
-                        </div>
+                        <svg style="height: 95px; width: auto; display: block; margin: 0 auto;" viewBox="0 0 24 100">
+                            <rect x="4" y="0" width="16" height="100" rx="6" fill="#e2e8f0" />
+                            <rect id="fillProtein" x="4" y="100" width="16" height="0" rx="6" fill="#10b981" />
+                        </svg>
                         <div style="font-size: 11px; font-weight: bold; color: var(--success); margin-top: 10px;">โปรตีนที่ได้</div>
                         <div id="totalProUI" style="font-size: 24px; font-weight: bold; color: var(--success); line-height: 1.1; margin: 4px 0;">0</div>
                         <div style="font-size: 10px; color: #64748b;">เป้า <span id="uiTargetPro">140</span>g</div>
@@ -264,7 +257,7 @@
             </div>
 
             <div class="card">
-                <h3 style="font-size: 16px;">📜 ประวัติการยกเวท (วันที่เลือก)</h3>
+                <h3 style="font-size: 16px;">📜 ประวัติการยกเวท</h3>
                 <div id="workoutLogs"></div>
             </div>
         </div>
@@ -526,13 +519,12 @@
             
             if(tabId === 'dashboard') { window.loadMonthlyData(); }
             if(tabId === 'score') { window.loadLeaderboard(); }
-            if(tabId === 'admin' && currentUser.email === ADMIN_EMAIL) { window.loadAdminPanel(); }
+            if(tabId === 'admin' && currentUser && currentUser.email === ADMIN_EMAIL) { window.loadAdminPanel(); }
         };
 
         document.getElementById('btnLogin').onclick = () => signInWithPopup(auth, provider);
         document.getElementById('btnLogout').onclick = () => signOut(auth);
 
-        // 🔴 ระบบ Login ที่ปลอดภัยจาก Undefined และอัปเดต Email เสมอ 🔴
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 try {
@@ -544,12 +536,9 @@
                     const userRef = doc(db, "users", user.uid);
                     const userSnap = await getDoc(userRef);
 
-                    // สร้างชื่อโปรไฟล์ที่ปลอดภัย
-                    let safeName = user.displayName;
-                    if (!safeName || safeName === "undefined") {
-                        safeName = user.email ? user.email.split('@')[0] : "ไม่ระบุชื่อ";
-                    }
-                    let safePhoto = user.photoURL && user.photoURL !== "undefined" ? user.photoURL : "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png";
+                    // แก้ไขป้องกันค่า undefined
+                    let dName = user.displayName || (user.email ? user.email.split('@')[0] : "ไม่ระบุชื่อ");
+                    let photoUrl = user.photoURL || "";
 
                     if (!userSnap.exists()) {
                         const allUsersSnap = await getDocs(collection(db, "users"));
@@ -559,32 +548,34 @@
                             return;
                         }
                         await setDoc(userRef, {
-                            email: user.email,
-                            displayName: safeName,
-                            photoURL: safePhoto,
+                            email: user.email || "",
+                            displayName: dName,
+                            photoURL: photoUrl,
                             isBanned: false,
                             monthlyScore: 0,
                             role: user.email === ADMIN_EMAIL ? "admin" : "user",
                             createdAt: Date.now()
                         });
                     } else {
-                        if (userSnap.data().isBanned === true && user.email !== ADMIN_EMAIL) {
+                        if (userSnap.data().isBanned && user.email !== ADMIN_EMAIL) {
                             alert("🚫 บัญชีของคุณถูกผู้ดูแลระบบระงับการใช้งาน");
                             signOut(auth);
                             return;
                         }
-                        // อัปเดตข้อมูลรวมถึงอีเมลด้วย (เผื่อคนเก่าไม่มีฟิลด์ email)
-                        await setDoc(userRef, { email: user.email, displayName: safeName, photoURL: safePhoto }, { merge: true });
+                        // อัปเดตข้อมูลเผื่อ Google มีการเปลี่ยนชื่อหรือรูป
+                        await setDoc(userRef, { displayName: dName, photoURL: photoUrl }, { merge: true });
                     }
 
                     currentUser = user;
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('appContent').style.display = 'block';
-                    document.getElementById('userNameDisplay').innerText = `ผู้ใช้: ${safeName}`;
+                    document.getElementById('userNameDisplay').innerText = `ผู้ใช้: ${dName}`;
                     
-                    const imgEl = document.getElementById('userProfilePic');
-                    imgEl.src = safePhoto;
-                    imgEl.style.display = 'block';
+                    if (photoUrl) {
+                        const imgEl = document.getElementById('userProfilePic');
+                        imgEl.src = photoUrl;
+                        imgEl.style.display = 'block';
+                    }
 
                     if (user.email === ADMIN_EMAIL) {
                         document.getElementById('adminTabBtn').style.display = 'flex';
@@ -601,9 +592,9 @@
                     
                     window.changeDate(); 
                     window.calcCardioBurn(); 
-                } catch(e) {
-                    console.error("Login Error:", e);
-                    alert("เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล โปรดรีเฟรชหน้าเว็บ");
+                } catch (error) {
+                    console.error("Auth Error:", error);
+                    alert("เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้");
                 }
             } else {
                 currentUser = null;
@@ -616,24 +607,23 @@
             }
         });
 
-        // 🔴 ระบบ Leaderboard แก้ปัญหาไม่ขึ้นคนและโชว์คะแนนย่อย 🔴
+        // 🔴 ระบบ Leaderboard ดึงข้อมูลปลอดภัย 🔴
         window.loadLeaderboard = async () => {
             const container = document.getElementById('leaderboardContainer');
             container.innerHTML = '<p style="text-align:center; font-size:13px;">กำลังโหลดตารางคะแนน...</p>';
             
             try {
-                // ดึงรายชื่อทั้งหมดโดยตรง
+                // ดึงรายชื่อทั้งหมดเพื่อป้องกันปัญหา isBanned เป็น undefined ในคนเก่าๆ
                 const usersSnap = await getDocs(collection(db, "users"));
                 let usersList = [];
-                
                 usersSnap.forEach(doc => {
                     const data = doc.data();
-                    if (data.isBanned !== true) { 
+                    if (data.isBanned !== true) {
                         usersList.push({ id: doc.id, ...data });
                     }
                 });
                 
-                usersList.sort((a, b) => (parseFloat(b.monthlyScore) || 0) - (parseFloat(a.monthlyScore) || 0));
+                usersList.sort((a, b) => (b.monthlyScore || 0) - (a.monthlyScore || 0));
 
                 if (usersList.length === 0) {
                     container.innerHTML = '<p style="text-align:center; font-size:13px;">ยังไม่มีสมาชิกในระบบ</p>';
@@ -646,15 +636,10 @@
                     let medal = '';
                     if(rank === 1) medal = '🥇'; else if(rank === 2) medal = '🥈'; else if(rank === 3) medal = '🥉';
                     
-                    const score = (parseFloat(u.monthlyScore) || 0).toFixed(1);
+                    const score = (u.monthlyScore || 0).toFixed(1);
                     const photo = u.photoURL || "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png";
                     const isMe = u.email === currentUser.email ? 'border: 2px solid var(--primary); background: #f0fdf4;' : '';
-                    
-                    let safeName = u.displayName;
-                    if(!safeName || safeName === "undefined") safeName = u.email ? u.email.split('@')[0] : "ไม่ระบุชื่อ";
-
-                    // ดึงคะแนนย่อยที่เซฟไว้
-                    const details = u.scoreDetails || { pro: 0, cal: 0, burn: 0 };
+                    const dName = u.displayName || 'ไม่ระบุชื่อ';
 
                     html += `
                         <div class="rank-card" style="${isMe}">
@@ -662,14 +647,9 @@
                             <div class="rank-num">#${rank}</div>
                             <img src="${photo}" class="rank-avatar" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png'">
                             <div class="rank-info">
-                                <div class="rank-name">${safeName} ${u.email === currentUser.email ? '(คุณ)' : ''}</div>
+                                <div class="rank-name">${dName} ${u.email === currentUser.email ? '(คุณ)' : ''}</div>
                                 <div class="rank-bar-bg">
                                     <div class="rank-bar-fill" style="width: ${score}%"></div>
-                                </div>
-                                <div class="rank-details">
-                                    <span>🥩 โปร: ${details.pro.toFixed(1)}/40</span> |
-                                    <span>⚖️ แคล: ${details.cal.toFixed(1)}/40</span> |
-                                    <span>🔥 เบิร์น: ${details.burn.toFixed(1)}/20</span>
                                 </div>
                             </div>
                             <div class="rank-score">${score}%</div>
@@ -688,16 +668,15 @@
             if(dates.length === 0) return;
 
             let totalDailyScores = 0;
-            let sumPro = 0; let sumCal = 0; let sumBurn = 0;
+            let safeTargetPro = parseFloat(userSettings.targetPro) || 140;
+            let safeTargetCal = parseFloat(userSettings.targetCal) || 2000;
 
             dates.forEach(date => {
                 const stat = dailyStatsObject[date];
                 let netCal = stat.cal - stat.burn; if(netCal < 0) netCal = 0;
                 
-                let safeTargetPro = parseFloat(userSettings.targetPro) || 140;
-                let safeTargetCal = parseFloat(userSettings.targetCal) || 2000;
-
                 let proScore = Math.min((stat.pro / safeTargetPro) * 100, 100) * 0.4;
+                if (isNaN(proScore)) proScore = 0;
                 
                 let calScore = 0;
                 if (netCal <= safeTargetCal) {
@@ -706,28 +685,18 @@
                     let overPct = ((netCal - safeTargetCal) / safeTargetCal);
                     calScore = Math.max(40 - (overPct * 40 * 2), 0); 
                 }
+                if (isNaN(calScore)) calScore = 0;
 
                 let burnScore = Math.min((stat.burn / 300) * 100, 100) * 0.2;
+                if (isNaN(burnScore)) burnScore = 0;
 
-                sumPro += proScore;
-                sumCal += calScore;
-                sumBurn += burnScore;
                 totalDailyScores += (proScore + calScore + burnScore);
             });
 
             let avgScore = totalDailyScores / dates.length;
-            if(isNaN(avgScore)) avgScore = 0;
-
-            let avgPro = sumPro / dates.length;
-            let avgCal = sumCal / dates.length;
-            let avgBurn = sumBurn / dates.length;
+            if (isNaN(avgScore)) avgScore = 0;
             
-            try { 
-                await setDoc(doc(db, "users", currentUser.uid), { 
-                    monthlyScore: avgScore,
-                    scoreDetails: { pro: avgPro, cal: avgCal, burn: avgBurn }
-                }, { merge: true }); 
-            } catch (e) {}
+            try { await setDoc(doc(db, "users", currentUser.uid), { monthlyScore: avgScore }, { merge: true }); } catch (e) {}
         };
 
         window.loadAdminPanel = async () => {
@@ -745,22 +714,20 @@
                     const u = userDoc.data();
                     const uid = userDoc.id;
                     const photo = u.photoURL || "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png";
-                    const isBannedStr = u.isBanned === true ? '<span style="color:red;">[ถูกแบน]</span>' : '';
-                    const btnLabel = u.isBanned === true ? 'ปลดแบน' : 'เตะออก';
-                    const btnColor = u.isBanned === true ? 'var(--success)' : 'var(--danger)';
+                    const isBannedStr = u.isBanned ? '<span style="color:red;">[ถูกแบน]</span>' : '';
+                    const btnLabel = u.isBanned ? 'ปลดแบน' : 'เตะออก';
+                    const btnColor = u.isBanned ? 'var(--success)' : 'var(--danger)';
                     const disableAdmin = u.email === ADMIN_EMAIL ? 'disabled' : ''; 
                     
-                    let safeName = u.displayName;
-                    if(!safeName || safeName === "undefined") safeName = u.email ? u.email.split('@')[0] : "ไม่มีชื่อ";
-                    let safeEmail = u.email;
-                    if(!safeEmail || safeEmail === "undefined") safeEmail = "ไม่มีอีเมล";
+                    const displayName = u.displayName || 'ไม่ระบุชื่อ';
+                    const email = u.email || 'ไม่มีอีเมล';
                     
                     tbody.innerHTML += `
                         <tr>
-                            <td style="width: 40px;"><img src="${photo}" style="width:30px; height:30px; border-radius:50%; object-fit:cover;" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png'"></td>
-                            <td><b style="font-size:13px;">${safeName}</b><br><span style="font-size:10px; color:#64748b;">${safeEmail} ${isBannedStr}</span></td>
-                            <td style="text-align: right; width: 60px;">
-                                <button class="ban-btn" style="background: ${btnColor}; color: white;" onclick="window.toggleBanUser('${uid}', ${!u.isBanned})" ${disableAdmin}>${btnLabel}</button>
+                            <td><img src="${photo}" style="width:30px; height:30px; border-radius:50%; object-fit:cover;" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png'"></td>
+                            <td><b>${displayName}</b><br><span style="font-size:10px; color:#64748b;">${email} ${isBannedStr}</span></td>
+                            <td>
+                                <button class="ban-btn" style="background: ${btnColor};" onclick="window.toggleBanUser('${uid}', ${!u.isBanned})" ${disableAdmin}>${btnLabel}</button>
                             </td>
                         </tr>
                     `;
@@ -787,7 +754,6 @@
             } catch (e) { alert("Error: " + e.message); }
         };
 
-        // --- Core Application Logic ---
         async function loadFoodDB() {
             try {
                 const response = await fetch('./food-db.json', { cache: 'no-store' });
@@ -804,8 +770,8 @@
                     if (docSnap.data().settings) userSettings = docSnap.data().settings;
                     if (docSnap.data().routines) customRoutines = docSnap.data().routines;
                 }
-                document.getElementById('setCal').value = userSettings.targetCal;
-                document.getElementById('setPro').value = userSettings.targetPro;
+                document.getElementById('setCal').value = userSettings.targetCal || 2000;
+                document.getElementById('setPro').value = userSettings.targetPro || 140;
                 updateTargetsUI();
                 renderRoutineBuilder(); 
                 updateWorkoutDropdown(); 
@@ -842,6 +808,86 @@
         function updateTargetsUI() {
             document.getElementById('uiTargetCal').innerText = userSettings.targetCal || 2000;
             document.getElementById('uiTargetPro').innerText = userSettings.targetPro || 140;
+        }
+
+        // --- DASHBOARD UI SAFE RENDER ---
+        function renderDashboard() {
+            let totalCal = 0; let totalPro = 0; const mealGroups = { "มื้อเช้า (หลังเวท)": [], "มื้อเที่ยง": [], "มื้อเย็น": [], "ของว่าง/เครื่องดื่ม": [] };
+            currentDayLogs.forEach(item => { totalCal += item.cal; totalPro += item.pro; if(mealGroups[item.meal]) mealGroups[item.meal].push(item); });
+            let totalBurn = 0; currentDayCardio.forEach(item => { totalBurn += item.burn; });
+            let netCal = totalCal - totalBurn; if(netCal < 0) netCal = 0;
+
+            const totalCalUI = document.getElementById('totalCalUI');
+            if(totalCalUI) totalCalUI.innerText = totalCal.toFixed(0); 
+            const totalProUI = document.getElementById('totalProUI');
+            if(totalProUI) totalProUI.innerText = totalPro.toFixed(1);
+            const totalBurnUI = document.getElementById('totalBurnUI');
+            if(totalBurnUI) totalBurnUI.innerText = totalBurn.toFixed(0);
+            const netCalUI = document.getElementById('netCalUI');
+            if(netCalUI) netCalUI.innerText = netCal.toFixed(0);
+
+            let safeTargetCal = parseFloat(userSettings.targetCal) || 2000;
+            let safeTargetPro = parseFloat(userSettings.targetPro) || 140;
+
+            let statusText = "แคลอรีสุทธิอยู่ในเกณฑ์ดี"; let color = "#0284c7"; 
+            if(netCal >= safeTargetCal) { color = "var(--danger)"; statusText = "⚠️ แคลอรีสุทธิเกินโควตาวันนี้แล้ว!"; } 
+            else if (netCal > safeTargetCal * 0.85) { statusText = "แคลอรีสุทธิใกล้ครบโควตาวันนี้แล้ว"; }
+            
+            if(netCalUI) netCalUI.style.color = color; 
+            const calStatus = document.getElementById('calStatus');
+            if(calStatus) calStatus.innerText = statusText;
+
+            let intakePct = Math.min((totalCal / safeTargetCal) * 100, 100);
+            if(isNaN(intakePct)) intakePct = 0;
+            let burnPct = Math.min((totalBurn / safeTargetCal) * 100, intakePct); 
+            if(isNaN(burnPct)) burnPct = 0;
+
+            let yIntake = 24 - (24 * (intakePct / 100)); let hIntake = 24 * (intakePct / 100);
+            let yBurn = yIntake; let hBurn = 24 * (burnPct / 100);
+
+            const fillIntake = document.getElementById('fillIntake');
+            if(fillIntake) { fillIntake.setAttribute('y', yIntake); fillIntake.setAttribute('height', hIntake); }
+            const fillBurn = document.getElementById('fillBurn');
+            if(fillBurn) { fillBurn.setAttribute('y', yBurn); fillBurn.setAttribute('height', hBurn); }
+            
+            let proPct = Math.min((totalPro / safeTargetPro) * 100, 100);
+            if(isNaN(proPct)) proPct = 0;
+            const fillProtein = document.getElementById('fillProtein');
+            if(fillProtein) { fillProtein.setAttribute('y', 100 - proPct); fillProtein.setAttribute('height', proPct); }
+            
+            const container = document.getElementById('mealLogs'); 
+            if(container) {
+                container.innerHTML = ''; let hasData = false;
+                for (const [mealName, items] of Object.entries(mealGroups)) {
+                    if (items.length > 0) {
+                        hasData = true; let mealCal = 0; let mealPro = 0; items.forEach(i => { mealCal += i.cal; mealPro += i.pro; });
+                        let html = `<div class="meal-section"><div class="meal-header"><span>${mealName}</span><span>🔥 ${mealCal.toFixed(0)} cal | Pro ${mealPro.toFixed(1)}g</span></div>`;
+                        items.forEach(item => {
+                            let amountDisplay = item.unit === "ที่ทาน" ? item.unit : `${item.amount} ${item.unit}`; if(item.amount === 1 && item.unit !== "g") amountDisplay = item.unit;
+                            html += `<div class="log-item"><div><div class="log-name">${item.name} (${amountDisplay})</div><div class="log-cal">${item.cal.toFixed(0)} kcal | โปรตีน ${item.pro.toFixed(1)}g</div></div><button class="del-btn" onclick="deleteLog('${item.id}', 'logs')">ลบ</button></div>`;
+                        }); html += `</div>`; container.innerHTML += html;
+                    }
+                }
+                if(!hasData) container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 30px 0; font-size:14px;">ยังไม่มีข้อมูลอาหารวันนี้</div>';
+            }
+        }
+
+        let currentDayLogs = []; let currentDayCardio = [];
+        window.changeDate = () => {
+            const dateStr = document.getElementById('datePicker').value;
+            if(unsubscribeMeals) unsubscribeMeals();
+            if(unsubscribeWorkouts) unsubscribeWorkouts();
+            if(unsubscribeCardio) unsubscribeCardio();
+            
+            unsubscribeMeals = onSnapshot(query(collection(db, "users", currentUser.uid, "logs"), where("dateStr", "==", dateStr)), (snap) => {
+                currentDayLogs = []; snap.forEach(d => currentDayLogs.push({ id: d.id, ...d.data() })); renderDashboard();
+            });
+            unsubscribeCardio = onSnapshot(query(collection(db, "users", currentUser.uid, "cardio"), where("dateStr", "==", dateStr)), (snap) => {
+                currentDayCardio = []; snap.forEach(d => currentDayCardio.push({ id: d.id, ...d.data() })); renderCardioLogs(currentDayCardio); renderDashboard();
+            });
+            unsubscribeWorkouts = onSnapshot(query(collection(db, "users", currentUser.uid, "workouts"), where("dateStr", "==", dateStr)), (snap) => {
+                const data = []; snap.forEach(d => data.push({ id: d.id, ...d.data() })); renderWorkoutLogs(data); 
+            });
         }
 
         window.loadMonthlyData = async () => {
@@ -885,7 +931,6 @@
                     if(d.imageUrl) dailyStats[d.dateStr].imageUrl = d.imageUrl;
                 });
 
-                // อัปเดตคะแนน
                 updateMyMonthlyScore(dailyStats);
 
                 const dates = Object.keys(dailyStats).sort((a,b) => b.localeCompare(a)); 
@@ -904,9 +949,8 @@
                     const stat = dailyStats[date];
                     const dayNum = date.split('-')[2];
                     let netCal = stat.cal - stat.burn; if(netCal < 0) netCal = 0;
-                    
-                    let intakePct = Math.min((stat.cal / safeTargetCal) * 100, 100) || 0;
-                    let burnPct = Math.min((stat.burn / safeTargetCal) * 100, intakePct) || 0;
+                    let intakePct = Math.min((stat.cal / safeTargetCal) * 100, 100); if(isNaN(intakePct)) intakePct = 0;
+                    let burnPct = Math.min((stat.burn / safeTargetCal) * 100, intakePct); if(isNaN(burnPct)) burnPct = 0;
                     let yIntake = 24 - (24 * (intakePct / 100)); let hIntake = 24 * (intakePct / 100);
                     let yBurn = yIntake; let hBurn = 24 * (burnPct / 100);
 
@@ -965,12 +1009,75 @@
             } catch (e) { alert("เกิดข้อผิดพลาดในการลบข้อมูล: " + e.message); console.error(e); }
         };
 
+        // --- Other Utility Functions (Add Entry, Render Form etc.) ---
+        function renderWorkoutLogs(data) {
+            const container = document.getElementById('workoutLogs'); container.innerHTML = '';
+            if(data.length === 0) { container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 20px 0; font-size:14px;">ยังไม่มีประวัติเวทเทรนนิ่งวันนี้</div>'; return; }
+            const imgMap = {};
+            customRoutines.forEach(r => { r.exercises.forEach(ex => { if(ex.name && ex.img) imgMap[ex.name] = ex.img; }); });
+            data.sort((a,b) => b.timestamp - a.timestamp).forEach(log => {
+                let exHtml = ''; 
+                log.exercises.forEach(ex => { 
+                    let imgUrl = ex.img || imgMap[ex.name] || '';
+                    let exImgHtml = imgUrl ? `<img src="${imgUrl}" style="width:50px; height:50px; border-radius:8px; object-fit:cover; border:1px solid var(--border); background:white; margin-right:12px; flex-shrink:0;" onerror="this.style.display='none'">` : `<div style="width:50px; height:50px; border-radius:8px; background:#e2e8f0; color:#64748b; display:flex; align-items:center; justify-content:center; margin-right:12px; font-size:24px; flex-shrink:0;">💪</div>`;
+                    exHtml += `<div style="background: white; border: 1px solid var(--border); border-radius: 10px; padding: 10px; margin-bottom: 8px; display:flex; align-items:center; justify-content:space-between; box-shadow: 0 1px 2px rgba(0,0,0,0.02);"><div style="display:flex; align-items:center; flex:1; overflow:hidden;">${exImgHtml}<span style="font-weight:600; font-size:15px; color:var(--primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${ex.name}</span></div><div style="text-align:right; min-width:90px; margin-left:10px;"><div style="color:var(--text); font-weight:bold; font-size:14px;">${ex.sets} เซ็ต / ${ex.reps} ที</div><div style="color:var(--warning); font-weight:bold; font-size:13px; margin-top:2px;">${ex.kg} kg</div></div></div>`; 
+                });
+                container.innerHTML += `<div class="history-box" style="background:#f8fafc; border:none; padding:15px; border-radius:12px; margin-bottom:15px; border:1px solid var(--border);"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;"><div style="font-weight:bold; font-size:16px; color:#334155;">📌 ${log.routine}</div><button class="del-btn" onclick="deleteLog('${log.id}', 'workouts')">ลบ</button></div>${exHtml}</div>`;
+            });
+        }
+        function renderRoutineBuilder() {
+            const container = document.getElementById('routineBuilderContainer'); container.innerHTML = '';
+            customRoutines.forEach((routine, dIndex) => {
+                let exercisesHtml = '';
+                routine.exercises.forEach((ex, eIndex) => { exercisesHtml += `<div class="builder-ex"><span class="remove-icon" onclick="window.removeExercise(${dIndex}, ${eIndex})">✕</span><label style="margin-top:0; font-size:12px;">ชื่อท่า:</label><input type="text" class="r-ex-name" value="${ex.name}" placeholder="เช่น Bench Press" style="padding:8px; font-size:14px;"><label style="font-size:12px;">ลิงก์รูปภาพ หรือ ชื่อไฟล์:</label><input type="text" class="r-ex-img" value="${ex.img || ''}" placeholder="เช่น 1.jpg" style="padding:8px; font-size:14px;"></div>`; });
+                container.innerHTML += `<div class="builder-day" id="day-${dIndex}"><span class="remove-icon" onclick="window.removeRoutineDay(${dIndex})">✕</span><label style="margin-top:0;">ชื่อวัน (Day Name):</label><input type="text" class="r-day-name" value="${routine.dayName}" placeholder="เช่น Day 1: Push Day"><div id="ex-container-${dIndex}">${exercisesHtml}</div><button class="btn-outline" onclick="window.addExerciseToDay(${dIndex})" style="padding: 8px; font-size: 14px; margin-top: 10px;">+ เพิ่มท่าในวันนี้</button></div>`;
+            });
+        }
+        window.addRoutineDay = () => { customRoutines.push({ dayName: "", exercises: [] }); renderRoutineBuilder(); }
+        window.removeRoutineDay = (dIndex) => { if(confirm("ลบวันนี้ออกจากตารางใช่ไหม?")) { customRoutines.splice(dIndex, 1); renderRoutineBuilder(); } }
+        window.addExerciseToDay = (dIndex) => { saveBuilderStateTemporarily(); customRoutines[dIndex].exercises.push({ name: "", img: "" }); renderRoutineBuilder(); }
+        window.removeExercise = (dIndex, eIndex) => { saveBuilderStateTemporarily(); customRoutines[dIndex].exercises.splice(eIndex, 1); renderRoutineBuilder(); }
+        function saveBuilderStateTemporarily() {
+            const newRoutines = [];
+            document.querySelectorAll('.builder-day').forEach((dayEl) => {
+                const dayName = dayEl.querySelector('.r-day-name').value; const exercises = [];
+                dayEl.querySelectorAll('.builder-ex').forEach(exEl => { exercises.push({ name: exEl.querySelector('.r-ex-name').value, img: exEl.querySelector('.r-ex-img').value }); });
+                newRoutines.push({ dayName: dayName, exercises: exercises });
+            });
+            customRoutines = newRoutines;
+        }
+
+        function updateWorkoutDropdown() {
+            const select = document.getElementById('routineSelect'); select.innerHTML = '<option value="">-- เลือกตารางเวทของวันนี้ --</option>';
+            customRoutines.forEach((routine, index) => { select.innerHTML += `<option value="${index}">${routine.dayName}</option>`; });
+            document.getElementById('workoutFormContainer').style.display = 'none';
+        }
+
+        window.loadWorkoutForm = () => {
+            const rIndex = document.getElementById('routineSelect').value; const container = document.getElementById('workoutFormContainer'); const listDiv = document.getElementById('exerciseList');
+            if(rIndex === "") { container.style.display = 'none'; return; }
+            const routine = customRoutines[rIndex]; document.getElementById('routineTitle').innerText = routine.dayName; listDiv.innerHTML = '';
+            routine.exercises.forEach((ex) => {
+                let imgHtml = ex.img ? `<img src="${ex.img}" class="exercise-img" onerror="this.style.display='none'">` : '';
+                listDiv.innerHTML += `<div class="exercise-item" data-name="${ex.name}" data-img="${ex.img || ''}"><div class="exercise-name">💪 ${ex.name}</div><div class="exercise-layout">${imgHtml}<div class="ex-inputs"><div><label>เซ็ต</label><input type="number" class="w-sets" placeholder="Set" inputmode="numeric"></div><div><label>ครั้ง</label><input type="number" class="w-reps" placeholder="Reps" inputmode="numeric"></div><div><label>น้ำหนัก</label><input type="number" class="w-kg" placeholder="Kg" inputmode="decimal"></div></div></div></div>`;
+            });
+            container.style.display = 'block';
+        }
+
+        window.saveWorkout = async () => {
+            const rIndex = document.getElementById('routineSelect').value; const items = document.querySelectorAll('.exercise-item'); const workoutData = [];
+            items.forEach(item => {
+                const name = item.getAttribute('data-name'); const img = item.getAttribute('data-img'); const sets = item.querySelector('.w-sets').value; const reps = item.querySelector('.w-reps').value; const kg = item.querySelector('.w-kg').value;
+                if(sets || reps || kg) { workoutData.push({ name, sets: sets||"-", reps: reps||"-", kg: kg||"-", img: img }); }
+            });
+            if(workoutData.length === 0) { alert("กรุณากรอกข้อมูลเวทอย่างน้อย 1 ท่าครับ"); return; }
+            try { await addDoc(collection(db, "users", currentUser.uid, "workouts"), { dateStr: document.getElementById('datePicker').value, routine: customRoutines[rIndex].dayName, exercises: workoutData, timestamp: Date.now() }); alert('✅ บันทึกตารางเวทวันนี้เรียบร้อยครับ!'); document.querySelectorAll('.w-sets, .w-reps, .w-kg').forEach(i => i.value = ''); } catch (e) { alert("Error: " + e.message); }
+        }
+
         const foodSearch = document.getElementById('foodSearch');
         const foodList = document.getElementById('foodList');
         foodSearch.oninput = (e) => {
-            const filter = e.target.value.toLowerCase();
-            foodList.innerHTML = '';
-            if(!filter) { foodList.style.display = 'none'; return; }
+            const filter = e.target.value.toLowerCase(); foodList.innerHTML = ''; if(!filter) { foodList.style.display = 'none'; return; }
             const filtered = foodDB.filter(f => f.name.toLowerCase().includes(filter) || f.cat.toLowerCase().includes(filter));
             if(filtered.length === 0) { foodList.innerHTML = '<div class="search-item" style="color:red;">ไม่พบเมนูนี้ (กดปุ่มคีย์เองได้เลย)</div>'; foodList.style.display = 'block'; return; }
             filtered.forEach(f => {
@@ -986,7 +1093,6 @@
         window.addEntry = async () => { if (selectedFoodIndex === -1) return alert("กรุณาเลือกเมนูจากลิสต์ครับ"); const amount = parseFloat(document.getElementById('foodAmount').value); if (!amount || amount <= 0) return alert("กรุณาใส่ปริมาณ"); const f = foodDB[selectedFoodIndex]; await addDoc(collection(db, "users", currentUser.uid, "logs"), { dateStr: document.getElementById('datePicker').value, meal: document.getElementById('mealTime').value, name: f.name, amount: amount, unit: f.unit, cal: (f.cal/f.base)*amount, pro: (f.pro/f.base)*amount, timestamp: Date.now() }); foodSearch.value = ''; document.getElementById('foodAmount').value = ''; selectedFoodIndex = -1; document.getElementById('unitHint').innerText = "กรุณาเลือกอาหารก่อนครับ"; }
         window.addCustomEntry = async () => { const meal = document.getElementById('mealTime').value; const name = document.getElementById('c_name').value; const unit = document.getElementById('c_unit').value || "ที่ทาน"; const cal = parseFloat(document.getElementById('c_cal').value); const pro = parseFloat(document.getElementById('c_pro').value) || 0; if (!name || isNaN(cal)) return alert("กรุณาใส่ชื่อเมนูและแคลอรี"); await addDoc(collection(db, "users", currentUser.uid, "logs"), { dateStr: document.getElementById('datePicker').value, meal: meal, name: name, amount: 1, unit: unit, cal: cal, pro: pro, timestamp: Date.now() }); document.getElementById('customFoodBox').style.display = 'none'; document.getElementById('c_name').value = ''; document.getElementById('c_unit').value = '1 ที่'; document.getElementById('c_cal').value = ''; document.getElementById('c_pro').value = ''; }
         window.deleteLog = async (docId, type) => { if(confirm("ต้องการลบรายการนี้ใช่ไหม?")) await deleteDoc(doc(db, "users", currentUser.uid, type, docId)); }
-
         window.saveBodyMetrics = async () => {
             const weight = document.getElementById('bodyWeight').value; const fat = document.getElementById('bodyFat').value; const fileInput = document.getElementById('bodyImage'); const file = fileInput.files[0];
             if(!weight && !fat && !file) return alert("กรุณากรอกน้ำหนัก ไขมัน หรือเลือกรูปภาพก่อนครับ");
