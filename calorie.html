@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Theerapong Fitness V27 (Admin & Leaderboard)</title>
+    <title>Theerapong Fitness V28</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --border: #cbd5e1; }
@@ -11,7 +11,7 @@
         .card { background: var(--card); border-radius: 16px; padding: 20px; margin: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         h2, h3 { margin-top: 0; margin-bottom: 15px; color: #334155; }
         
-        /* Tab Navigation (ปรับเป็น 4 คอลัมน์) */
+        /* Tab Navigation */
         .tab-nav { display: grid; grid-template-columns: repeat(4, 1fr); background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
         .tab-btn { padding: 10px 0; text-align: center; font-weight: bold; font-size: 11px; color: #64748b; cursor: pointer; border-bottom: 3px solid transparent; border-right: 1px solid #f8fafc; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .tab-btn:nth-child(n+5) { border-top: 1px solid #f8fafc; }
@@ -172,17 +172,11 @@
                         <div style="font-size: 10px; color: transparent;">-</div>
                     </div>
 
+                    <!-- เปลี่ยนไอคอนโปรตีนกลับเป็นหลอดแท่ง -->
                     <div class="stat-box" style="margin: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #a7f3d0;">
-                        <svg class="human-svg" viewBox="0 0 24 24" style="background: transparent;">
-                            <defs>
-                                <clipPath id="arm-flex-shape">
-                                    <path d="M 6.19,4.45 C 6.62,4.2 7.11,4 7.69,4 C 9.07,4 10.14,4.69 10.92,5.89 C 12.14,7.77 13.95,8.16 15.98,8 H 16 C 17.11,8 18,8.89 18,10 V 18 C 18,19.11 17.11,20 16,20 H 15.8 C 15.4,20 15.01,20.09 14.65,20.26 L 12.53,21.27 C 11.3,21.86 9.88,21.95 8.6,21.51 L 7,21 C 4.78,20.24 3.27,17.9 3.77,15.54 C 3.99,14.5 4.61,13.54 5.55,12.89 C 7.1,11.82 7.86,10.41 7.12,9.2 C 6.67,8.47 6.65,7.65 7.19,7.02 C 7.49,6.67 7.86,6.48 8.19,6.45 C 7.64,6.45 7.09,6.9 6.54,7.45 L 5.13,6.04 C 5.58,5.59 6.03,5.14 6.19,4.45 Z"/>
-                                </clipPath>
-                            </defs>
-                            <g clip-path="url(#arm-flex-shape)">
-                                <rect x="0" y="0" width="24" height="24" fill="#e2e8f0" />
-                                <rect id="fillProtein" x="0" y="24" width="24" height="0" fill="#10b981" />
-                            </g>
+                        <svg style="height: 95px; width: auto; display: block; margin: 0 auto;" viewBox="0 0 24 100">
+                            <rect x="4" y="0" width="16" height="100" rx="6" fill="#e2e8f0" />
+                            <rect id="fillProtein" x="4" y="100" width="16" height="0" rx="6" fill="#10b981" />
                         </svg>
                         <div style="font-size: 11px; font-weight: bold; color: var(--success); margin-top: 10px;">โปรตีนที่ได้</div>
                         <div id="totalProUI" style="font-size: 24px; font-weight: bold; color: var(--success); line-height: 1.1; margin: 4px 0;">0</div>
@@ -379,7 +373,7 @@
             </div>
         </div>
 
-        <!-- 6. SCORE LEADERBOARD TAB (ใหม่) -->
+        <!-- 6. SCORE LEADERBOARD TAB -->
         <div id="tab-score" class="tab-content">
             <div class="card" style="background: linear-gradient(135deg, #f59e0b, #ea580c); color: white; text-align: center;">
                 <h2 style="color: white; margin-bottom: 5px;">🏆 จัดอันดับความมีวินัย</h2>
@@ -417,7 +411,7 @@
             </div>
         </div>
 
-        <!-- 8. ADMIN TAB (ใหม่ ซ่อนไว้เฉพาะแอดมิน) -->
+        <!-- 8. ADMIN TAB -->
         <div id="tab-admin" class="tab-content">
             <div class="card" style="border: 2px solid var(--danger);">
                 <h2 style="color: var(--danger);">👑 ระบบผู้ดูแล (Admin)</h2>
@@ -531,60 +525,57 @@
         document.getElementById('btnLogin').onclick = () => signInWithPopup(auth, provider);
         document.getElementById('btnLogout').onclick = () => signOut(auth);
 
-        // 🔴 ระบบตรวจสอบ Admin และจำกัด User 🔴
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // โหลด Config จากฐานข้อมูล
                 const configRef = doc(db, "app_config", "settings");
                 let configSnap = await getDoc(configRef);
-                let maxAllowedUsers = 10; // ค่าเริ่มต้นถ้าแอดมินยังไม่ได้ตั้ง
+                let maxAllowedUsers = 10; 
                 if(configSnap.exists()) { maxAllowedUsers = configSnap.data().maxUsers || 10; }
 
-                // เช็คโปรไฟล์ผู้ใช้
                 const userRef = doc(db, "users", user.uid);
                 const userSnap = await getDoc(userRef);
 
+                // แก้ไขปัญหา undefined โดยเช็คให้แน่ใจว่าดึงชื่อและอีเมลมาเซฟเสมอ
+                let dName = user.displayName || user.email.split('@')[0] || "Unknown User";
+                let photoUrl = user.photoURL || "";
+
                 if (!userSnap.exists()) {
-                    // ผู้ใช้ใหม่ -> เช็คจำนวนคน
                     const allUsersSnap = await getDocs(collection(db, "users"));
                     if (allUsersSnap.size >= maxAllowedUsers && user.email !== ADMIN_EMAIL) {
                         alert(`❌ ขออภัย ระบบจำกัดสมาชิกครบ ${maxAllowedUsers} คนแล้วครับ (เต็ม)`);
                         signOut(auth);
                         return;
                     }
-                    // สร้างโปรไฟล์ใหม่พร้อมคะแนนเริ่มต้น
                     await setDoc(userRef, {
                         email: user.email,
-                        displayName: user.displayName || "Unknown User",
-                        photoURL: user.photoURL || "",
+                        displayName: dName,
+                        photoURL: photoUrl,
                         isBanned: false,
                         monthlyScore: 0,
                         role: user.email === ADMIN_EMAIL ? "admin" : "user",
                         createdAt: Date.now()
                     });
                 } else {
-                    // ผู้ใช้เก่า -> เช็คแบน
                     if (userSnap.data().isBanned && user.email !== ADMIN_EMAIL) {
                         alert("🚫 บัญชีของคุณถูกผู้ดูแลระบบระงับการใช้งาน");
                         signOut(auth);
                         return;
                     }
-                    // อัปเดตรูป/ชื่อให้เป็นปัจจุบัน
-                    await setDoc(userRef, { displayName: user.displayName, photoURL: user.photoURL }, { merge: true });
+                    // อัปเดตข้อมูลเผื่อ Google มีการเปลี่ยนชื่อหรือรูป
+                    await setDoc(userRef, { displayName: dName, photoURL: photoUrl }, { merge: true });
                 }
 
                 currentUser = user;
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('appContent').style.display = 'block';
-                document.getElementById('userNameDisplay').innerText = `ผู้ใช้: ${user.displayName}`;
+                document.getElementById('userNameDisplay').innerText = `ผู้ใช้: ${dName}`;
                 
-                if (user.photoURL) {
+                if (photoUrl) {
                     const imgEl = document.getElementById('userProfilePic');
-                    imgEl.src = user.photoURL;
+                    imgEl.src = photoUrl;
                     imgEl.style.display = 'block';
                 }
 
-                // ปลดล็อคแท็บ Admin ให้เฉพาะแอดมิน
                 if (user.email === ADMIN_EMAIL) {
                     document.getElementById('adminTabBtn').style.display = 'flex';
                 }
@@ -611,20 +602,23 @@
             }
         });
 
-        // 🔴 ระบบ Leaderboard และ การคำนวณคะแนน 🔴
+        // 🔴 ระบบ Leaderboard แก้ปัญหาไม่ขึ้นคน 🔴
         window.loadLeaderboard = async () => {
             const container = document.getElementById('leaderboardContainer');
             container.innerHTML = '<p style="text-align:center; font-size:13px;">กำลังโหลดตารางคะแนน...</p>';
             
             try {
-                // ดึงเฉพาะคนที่ไม่โดนแบน
-                const usersSnap = await getDocs(query(collection(db, "users"), where("isBanned", "==", false)));
+                // ดึงรายชื่อทั้งหมดก่อน เพื่อป้องกันปัญหา isBanned เป็น undefined ในคนเก่าๆ
+                const usersSnap = await getDocs(collection(db, "users"));
                 let usersList = [];
                 usersSnap.forEach(doc => {
-                    usersList.push({ id: doc.id, ...doc.data() });
+                    const data = doc.data();
+                    // คัดเฉพาะคนที่ไม่โดนแบน (ถ้าไม่มีฟิลด์ isBanned ให้ถือว่าไม่แบน)
+                    if (data.isBanned !== true) {
+                        usersList.push({ id: doc.id, ...data });
+                    }
                 });
                 
-                // เรียงคะแนนจากมากไปน้อย
                 usersList.sort((a, b) => (b.monthlyScore || 0) - (a.monthlyScore || 0));
 
                 if (usersList.length === 0) {
@@ -646,9 +640,9 @@
                         <div class="rank-card" style="${isMe}">
                             <div class="rank-medal">${medal}</div>
                             <div class="rank-num">#${rank}</div>
-                            <img src="${photo}" class="rank-avatar">
+                            <img src="${photo}" class="rank-avatar" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png'">
                             <div class="rank-info">
-                                <div class="rank-name">${u.displayName} ${u.email === currentUser.email ? '(คุณ)' : ''}</div>
+                                <div class="rank-name">${u.displayName || 'Unknown User'} ${u.email === currentUser.email ? '(คุณ)' : ''}</div>
                                 <div class="rank-bar-bg">
                                     <div class="rank-bar-fill" style="width: ${score}%"></div>
                                 </div>
@@ -663,7 +657,6 @@
             }
         };
 
-        // ฟังก์ชันคำนวณและอัปเดตคะแนนลง Profile (ถูกเรียกใช้ตอนโหลด Dashboard เดือน)
         const updateMyMonthlyScore = async (dailyStatsObject) => {
             if(!currentUser) return;
             const dates = Object.keys(dailyStatsObject);
@@ -674,39 +667,31 @@
                 const stat = dailyStatsObject[date];
                 let netCal = stat.cal - stat.burn; if(netCal < 0) netCal = 0;
                 
-                // 1. โปรตีน 40% (เต็มคือถึงเป้า)
                 let proScore = Math.min((stat.pro / userSettings.targetPro) * 100, 100) * 0.4;
                 
-                // 2. แคลอรีสุทธิ 40% (ถ้าไม่เกินเป้าได้เต็ม ถ้าเกินลดหลั่นลงไป)
                 let calScore = 0;
                 if (netCal <= userSettings.targetCal) {
-                    calScore = 40; // คุมได้เป๊ะ
+                    calScore = 40; 
                 } else {
                     let overPct = ((netCal - userSettings.targetCal) / userSettings.targetCal);
-                    calScore = Math.max(40 - (overPct * 40 * 2), 0); // โดนหักหนักถ้าเกิน
+                    calScore = Math.max(40 - (overPct * 40 * 2), 0); 
                 }
 
-                // 3. เบิร์น 20% (ตีว่าเบิร์นสัก 300 kcal ได้เต็ม)
                 let burnScore = Math.min((stat.burn / 300) * 100, 100) * 0.2;
 
                 totalDailyScores += (proScore + calScore + burnScore);
             });
 
-            // ค่าเฉลี่ยตลอดวันที่มีการบันทึกในเดือนนั้น
             let avgScore = totalDailyScores / dates.length;
             
-            // อัปเดตลง Database ให้ชาวบ้านเห็น
             try { await setDoc(doc(db, "users", currentUser.uid), { monthlyScore: avgScore }, { merge: true }); } catch (e) {}
         };
 
-        // 🔴 ระบบ Admin Manager 🔴
         window.loadAdminPanel = async () => {
             try {
-                // โหลด Config
                 const configSnap = await getDoc(doc(db, "app_config", "settings"));
                 if(configSnap.exists()) { document.getElementById('adminMaxUsers').value = configSnap.data().maxUsers || 10; }
 
-                // โหลดรายชื่อผู้ใช้
                 const usersSnap = await getDocs(collection(db, "users"));
                 document.getElementById('adminUserCount').innerText = usersSnap.size;
                 
@@ -720,12 +705,16 @@
                     const isBannedStr = u.isBanned ? '<span style="color:red;">[ถูกแบน]</span>' : '';
                     const btnLabel = u.isBanned ? 'ปลดแบน' : 'เตะออก';
                     const btnColor = u.isBanned ? 'var(--success)' : 'var(--danger)';
-                    const disableAdmin = u.email === ADMIN_EMAIL ? 'disabled' : ''; // แอดมินเตะตัวเองไม่ได้
+                    const disableAdmin = u.email === ADMIN_EMAIL ? 'disabled' : ''; 
+                    
+                    // แก้ไขตรงนี้เพื่อกันแสดงคำว่า undefined
+                    const displayName = u.displayName || 'ไม่มีชื่อ';
+                    const email = u.email || 'ไม่มีอีเมล';
                     
                     tbody.innerHTML += `
                         <tr>
-                            <td><img src="${photo}" style="width:30px; height:30px; border-radius:50%; object-fit:cover;"></td>
-                            <td><b>${u.displayName}</b><br><span style="font-size:10px; color:#64748b;">${u.email} ${isBannedStr}</span></td>
+                            <td><img src="${photo}" style="width:30px; height:30px; border-radius:50%; object-fit:cover;" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png'"></td>
+                            <td><b>${displayName}</b><br><span style="font-size:10px; color:#64748b;">${email} ${isBannedStr}</span></td>
                             <td>
                                 <button class="ban-btn" style="background: ${btnColor}; color: white;" onclick="window.toggleBanUser('${uid}', ${!u.isBanned})" ${disableAdmin}>${btnLabel}</button>
                             </td>
@@ -750,11 +739,11 @@
             if(!confirm(`คุณต้องการ ${act} สมาชิกคนนี้ใช่หรือไม่?`)) return;
             try {
                 await setDoc(doc(db, "users", uid), { isBanned: shouldBan }, { merge: true });
-                window.loadAdminPanel(); // รีเฟรชตาราง
+                window.loadAdminPanel(); 
             } catch (e) { alert("Error: " + e.message); }
         };
 
-        // --- Core Application Logic (เดิม) ---
+        // --- Core Application Logic ---
         async function loadFoodDB() {
             try {
                 const response = await fetch('./food-db.json', { cache: 'no-store' });
@@ -811,7 +800,6 @@
             document.getElementById('uiTargetPro').innerText = userSettings.targetPro;
         }
 
-        // --- DASHBOARD MONTHLY (อัปเดตเรียกใช้การคำนวณคะแนน) ---
         window.loadMonthlyData = async () => {
             const monthStr = document.getElementById('monthPicker').value; 
             if (!monthStr || !currentUser) return;
@@ -853,7 +841,6 @@
                     if(d.imageUrl) dailyStats[d.dateStr].imageUrl = d.imageUrl;
                 });
 
-                // คำนวณและอัปเดตคะแนนให้ Leaderboard ทันที
                 updateMyMonthlyScore(dailyStats);
 
                 const dates = Object.keys(dailyStats).sort((a,b) => b.localeCompare(a)); 
@@ -931,7 +918,6 @@
             } catch (e) { alert("เกิดข้อผิดพลาดในการลบข้อมูล: " + e.message); console.error(e); }
         };
 
-        // --- ระบบอัปเดตหน้าจอหลัก (เหมือนเดิม) ---
         let currentDayLogs = []; let currentDayCardio = [];
 
         window.changeDate = () => {
@@ -994,7 +980,6 @@
             if(!hasData) container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 30px 0; font-size:14px;">ยังไม่มีข้อมูลอาหารวันนี้</div>';
         }
 
-        // --- ส่วนยิบย่อยอื่นๆ (คำนวณ TDEE, ค้นหาอาหาร ฯลฯ) ทำงานเหมือนเดิม ---
         const foodSearch = document.getElementById('foodSearch');
         const foodList = document.getElementById('foodList');
         foodSearch.oninput = (e) => {
