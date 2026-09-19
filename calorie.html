@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Theerapong Fitness & Macro Tracker V18 (TDEE Calculator)</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Theerapong Fitness & Macro Tracker V19 (Ultimate Dashboard)</title>
     <style>
         :root { --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --border: #cbd5e1; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; padding-bottom: 90px; }
@@ -66,8 +65,8 @@
         .log-cal { font-size: 13px; color: #64748b; margin-top: 4px; }
         
         /* Dashboard Tab Specifics */
-        .monthly-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
-        .day-card { display: flex; align-items: center; background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
+        .monthly-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 15px; }
+        .day-card { display: flex; flex-direction: column; background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
         .day-date { width: 50px; text-align: center; font-weight: bold; color: var(--text); font-size: 18px; }
         .day-date span { display: block; font-size: 11px; font-weight: normal; color: #64748b; }
         .day-svg { width: 50px; height: 50px; flex-shrink: 0; margin: 0 15px; border: 1px dashed #cbd5e1; border-radius: 4px; padding: 2px; }
@@ -77,7 +76,6 @@
         #loginScreen { position: fixed; top:0; left:0; right:0; bottom:0; background: white; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
         #appContent { display: none; }
         .user-profile { font-size: 12px; text-align: center; padding: 10px; background: #e2e8f0; margin-bottom: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .chart-container { position: relative; width: 100%; height: 280px; }
     </style>
 </head>
 <body>
@@ -272,7 +270,6 @@
         <!-- 4. BODY METRICS TAB -->
         <div id="tab-body" class="tab-content">
             
-            <!-- โซนใหม่: เครื่องคิดเลข BMR & TDEE -->
             <div class="card">
                 <h3 style="font-size: 16px;">🧮 คำนวณ BMR & TDEE</h3>
                 <p style="font-size: 12px; color: #64748b; margin-top: -10px;">คำนวณอัตราการเผาผลาญพื้นฐานและพลังงานที่ใช้ต่อวัน</p>
@@ -338,27 +335,16 @@
                 <input type="file" id="bodyImage" accept="image/*">
                 <p id="uploadStatus" style="font-size: 12px; color: var(--primary); display: none; margin-top: 5px;">⏳ กำลังอัปโหลดรูปภาพผ่าน ImgBB รอสักครู่...</p>
 
-                <button id="btnSaveBody" onclick="window.saveBodyMetrics()" style="background: var(--success);">💾 บันทึกสัดส่วน</button>
+                <button id="btnSaveBody" onclick="window.saveBodyMetrics()" style="background: var(--success);">💾 บันทึกสัดส่วน (ดูได้ที่สรุปเดือน)</button>
             </div>
-
-            <div class="card">
-                <h3 style="font-size: 16px;">📈 กราฟสถิติร่างกาย (น้ำหนัก & ไขมัน)</h3>
-                <div class="chart-container">
-                    <canvas id="bodyChart"></canvas>
-                </div>
-            </div>
-
-            <div class="card">
-                <h3 style="font-size: 16px;">📜 ประวัติสัดส่วน (วันที่เลือก)</h3>
-                <div id="bodyLogs"></div>
-            </div>
+            <!-- ตัดกราฟและประวัติออกจากหน้านี้ ย้ายไป Dashboard -->
         </div>
 
         <!-- 5. DASHBOARD MONTHLY TAB -->
         <div id="tab-dashboard" class="tab-content">
             <div class="card" style="background: var(--primary); color: white;">
                 <h2 style="color: white; margin-bottom: 5px;">📊 สรุปภาพรวมรายเดือน</h2>
-                <p style="font-size: 12px; margin-top: 0; opacity: 0.8;">เลือกเดือนเพื่อดูสถิติแคลอรีสุทธิ (Net Calories)</p>
+                <p style="font-size: 12px; margin-top: 0; opacity: 0.8;">เลือกเดือนเพื่อดูสถิติแคลอรีสุทธิ (Net Calories) และร่างกาย</p>
                 <input type="month" id="monthPicker" class="date-input" style="width: 100%; margin-top: 10px;" onchange="window.loadMonthlyData()">
             </div>
             
@@ -414,15 +400,13 @@
         let unsubscribeMeals = null;
         let unsubscribeWorkouts = null;
         let unsubscribeCardio = null;
-        let unsubscribeBody = null;
         
         let foodDB = [];
         let selectedFoodIndex = -1;
         let userSettings = { targetCal: 2000, targetPro: 140 };
         
         let customRoutines = []; 
-        window.bodyChartInstance = null;
-        window.tempCalculatedTDEE = 0; // ตัวแปรเก็บค่าชั่วคราวสำหรับเครื่องคิดเลข
+        window.tempCalculatedTDEE = 0; 
 
         window.switchTab = (tabId) => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -465,7 +449,6 @@
                 if(unsubscribeMeals) unsubscribeMeals();
                 if(unsubscribeWorkouts) unsubscribeWorkouts();
                 if(unsubscribeCardio) unsubscribeCardio();
-                if(unsubscribeBody) unsubscribeBody();
             }
         });
 
@@ -541,13 +524,8 @@
                 return;
             }
 
-            // สูตร Mifflin-St Jeor
             let bmr = (10 * weight) + (6.25 * height) - (5 * age);
-            if (gender === 'male') {
-                bmr += 5;
-            } else {
-                bmr -= 161;
-            }
+            if (gender === 'male') { bmr += 5; } else { bmr -= 161; }
 
             const tdee = bmr * activity;
 
@@ -560,7 +538,6 @@
 
         window.saveCalculatedTDEE = async () => {
             if (!window.tempCalculatedTDEE) return;
-            // อัปเดตในช่อง Setting แล้วเรียกฟังก์ชันเซฟปกติ
             document.getElementById('setCal').value = window.tempCalculatedTDEE;
             await window.saveSettings();
         };
@@ -727,7 +704,6 @@
             if(unsubscribeMeals) unsubscribeMeals();
             if(unsubscribeWorkouts) unsubscribeWorkouts();
             if(unsubscribeCardio) unsubscribeCardio();
-            if(unsubscribeBody) unsubscribeBody();
             
             unsubscribeMeals = onSnapshot(query(collection(db, "users", currentUser.uid, "logs"), where("dateStr", "==", dateStr)), (snap) => {
                 currentDayLogs = []; snap.forEach(d => currentDayLogs.push({ id: d.id, ...d.data() })); 
@@ -743,13 +719,6 @@
             unsubscribeWorkouts = onSnapshot(query(collection(db, "users", currentUser.uid, "workouts"), where("dateStr", "==", dateStr)), (snap) => {
                 const data = []; snap.forEach(d => data.push({ id: d.id, ...d.data() })); 
                 renderWorkoutLogs(data); 
-            });
-            
-            unsubscribeBody = onSnapshot(collection(db, "users", currentUser.uid, "metrics"), (snap) => {
-                const allData = []; snap.forEach(d => allData.push({ id: d.id, ...d.data() }));
-                renderBodyChart(allData);
-                const dailyData = allData.filter(d => d.dateStr === dateStr);
-                renderBodyLogs(dailyData);
             });
         }
 
@@ -768,7 +737,6 @@
                 let exHtml = ''; 
                 log.exercises.forEach(ex => { 
                     let imgUrl = ex.img || imgMap[ex.name] || '';
-                    
                     let exImgHtml = imgUrl 
                         ? `<img src="${imgUrl}" style="width:50px; height:50px; border-radius:8px; object-fit:cover; border:1px solid var(--border); background:white; margin-right:12px; flex-shrink:0;" onerror="this.style.display='none'">` 
                         : `<div style="width:50px; height:50px; border-radius:8px; background:#e2e8f0; color:#64748b; display:flex; align-items:center; justify-content:center; margin-right:12px; font-size:24px; flex-shrink:0;">💪</div>`;
@@ -830,7 +798,6 @@
 
             let yIntake = 24 - (24 * (intakePct / 100)); 
             let hIntake = 24 * (intakePct / 100);
-            
             let yBurn = yIntake; 
             let hBurn = 24 * (burnPct / 100);
 
@@ -853,6 +820,7 @@
             if(!hasData) container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 30px 0; font-size:14px;">ยังไม่มีข้อมูลอาหารวันนี้</div>';
         }
 
+        // 🔴 โหลดข้อมูลสรุปเดือนรวมถึง "น้ำหนัก ไขมัน รูปภาพ" 🔴
         window.loadMonthlyData = async () => {
             const monthStr = document.getElementById('monthPicker').value; 
             if (!monthStr || !currentUser) return;
@@ -870,19 +838,30 @@
                 const qCardio = query(collection(db, "users", currentUser.uid, "cardio"), where("dateStr", ">=", startStr), where("dateStr", "<=", endStr));
                 const snapCardio = await getDocs(qCardio);
 
+                const qMetrics = query(collection(db, "users", currentUser.uid, "metrics"), where("dateStr", ">=", startStr), where("dateStr", "<=", endStr));
+                const snapMetrics = await getDocs(qMetrics);
+
                 const dailyStats = {};
                 
                 snapLogs.forEach(doc => {
                     const d = doc.data();
-                    if(!dailyStats[d.dateStr]) dailyStats[d.dateStr] = { cal: 0, pro: 0, burn: 0 };
+                    if(!dailyStats[d.dateStr]) dailyStats[d.dateStr] = { cal: 0, pro: 0, burn: 0, weight: "-", fat: "-", imageUrl: "" };
                     dailyStats[d.dateStr].cal += d.cal;
                     dailyStats[d.dateStr].pro += d.pro;
                 });
 
                 snapCardio.forEach(doc => {
                     const d = doc.data();
-                    if(!dailyStats[d.dateStr]) dailyStats[d.dateStr] = { cal: 0, pro: 0, burn: 0 };
+                    if(!dailyStats[d.dateStr]) dailyStats[d.dateStr] = { cal: 0, pro: 0, burn: 0, weight: "-", fat: "-", imageUrl: "" };
                     dailyStats[d.dateStr].burn += d.burn;
+                });
+
+                snapMetrics.forEach(doc => {
+                    const d = doc.data();
+                    if(!dailyStats[d.dateStr]) dailyStats[d.dateStr] = { cal: 0, pro: 0, burn: 0, weight: "-", fat: "-", imageUrl: "" };
+                    dailyStats[d.dateStr].weight = d.weight || "-";
+                    dailyStats[d.dateStr].fat = d.bodyFat || "-";
+                    if(d.imageUrl) dailyStats[d.dateStr].imageUrl = d.imageUrl;
                 });
 
                 const dates = Object.keys(dailyStats).sort((a,b) => b.localeCompare(a)); 
@@ -924,16 +903,32 @@
                         </svg>
                     `;
 
+                    // เพิ่มการแสดงผลรูปภาพและข้อมูลร่างกาย
+                    const imgSection = stat.imageUrl 
+                        ? `<img src="${stat.imageUrl}" style="width: 100%; max-height: 250px; object-fit: cover; border-radius: 8px; margin-top: 15px; border: 1px solid var(--border);">` 
+                        : '';
+
                     gridHtml += `
                         <div class="day-card">
-                            <div class="day-date">${dayNum}<span>วันที่</span></div>
-                            ${svgHtml}
-                            <div class="day-stats">
-                                <div style="color:var(--primary); font-weight:bold; font-size:12px;">กิน: ${stat.cal.toFixed(0)}</div>
-                                <div style="color:var(--danger); font-weight:bold; font-size:12px; margin: 2px 0;">เผา: ${stat.burn.toFixed(0)}</div>
-                                <div style="color:#0284c7; font-weight:bold; font-size:12px; margin: 2px 0;">สุทธิ: ${netCal.toFixed(0)} / เป้า ${userSettings.targetCal}</div>
-                                <div style="color:var(--success); font-size:11px;">โปรตีน: ${stat.pro.toFixed(1)}g / เป้า ${userSettings.targetPro}g</div>
+                            <div style="display:flex; align-items:center; width:100%;">
+                                <div class="day-date">${dayNum}<span>วันที่</span></div>
+                                ${svgHtml}
+                                <div class="day-stats">
+                                    <div style="display:flex; justify-content:space-between; gap:10px;">
+                                        <div>
+                                            <div style="color:var(--primary); font-weight:bold; font-size:12px;">กิน: ${stat.cal.toFixed(0)}</div>
+                                            <div style="color:var(--danger); font-weight:bold; font-size:12px; margin: 2px 0;">เผา: ${stat.burn.toFixed(0)}</div>
+                                            <div style="color:#0284c7; font-weight:bold; font-size:12px; margin: 2px 0;">สุทธิ: ${netCal.toFixed(0)} <span style="font-weight:normal; font-size:10px; color:#64748b;">/ ${userSettings.targetCal}</span></div>
+                                        </div>
+                                        <div style="text-align:right;">
+                                            <div style="color:var(--text); font-weight:bold; font-size:12px;">นน: ${stat.weight !== "-" ? stat.weight + " kg" : "-"}</div>
+                                            <div style="color:#64748b; font-weight:bold; font-size:12px; margin: 2px 0;">ไขมัน: ${stat.fat !== "-" ? stat.fat + "%" : "-"}</div>
+                                            <div style="color:var(--success); font-size:11px; margin: 2px 0;">โปร: ${stat.pro.toFixed(1)}g</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                            ${imgSection}
                         </div>
                     `;
                 });
@@ -944,39 +939,6 @@
                 console.error(e);
                 document.getElementById('dashStatus').innerText = "เกิดข้อผิดพลาดในการโหลดข้อมูล: " + e.message;
             }
-        }
-
-        function renderBodyChart(allData) {
-            const sortedData = [...allData].sort((a,b) => a.timestamp - b.timestamp);
-            const labels = []; const weightData = []; const fatData = [];
-            sortedData.forEach(d => { 
-                labels.push(d.dateStr); 
-                weightData.push((d.weight && d.weight !== "-") ? parseFloat(d.weight) : null); 
-                fatData.push((d.bodyFat && d.bodyFat !== "-") ? parseFloat(d.bodyFat) : null); 
-            });
-
-            const ctx = document.getElementById('bodyChart').getContext('2d');
-            if(window.bodyChartInstance) { window.bodyChartInstance.destroy(); }
-            
-            window.bodyChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: { 
-                    labels: labels, 
-                    datasets: [
-                        { label: 'น้ำหนัก (Kg)', data: weightData, borderColor: '#2563eb', backgroundColor: '#2563eb', yAxisID: 'y', tension: 0.4, borderWidth: 3, pointRadius: 5, pointBackgroundColor: '#ffffff', pointBorderWidth: 2, spanGaps: true },
-                        { label: 'ไขมัน (%)', data: fatData, borderColor: '#f59e0b', backgroundColor: '#f59e0b', yAxisID: 'y1', tension: 0.4, borderWidth: 3, pointRadius: 5, pointBackgroundColor: '#ffffff', pointBorderWidth: 2, spanGaps: true }
-                    ]
-                },
-                options: { 
-                    responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, 
-                    plugins: { legend: { labels: { font: { size: 14 } } } },
-                    scales: { 
-                        x: { grid: { display: false } },
-                        y: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'น้ำหนัก (Kg)', color: '#2563eb', font: {weight: 'bold'} }, grid: { color: 'rgba(0,0,0,0.05)' } }, 
-                        y1: { type: 'linear', display: true, position: 'right', title: { display: true, text: 'ไขมัน (%)', color: '#f59e0b', font: {weight: 'bold'} }, grid: { drawOnChartArea: false } } 
-                    } 
-                }
-            });
         }
 
         const foodSearch = document.getElementById('foodSearch');
@@ -1041,19 +1003,10 @@
 
                 await addDoc(collection(db, "users", currentUser.uid, "metrics"), { dateStr: document.getElementById('datePicker').value, weight: weight || "-", bodyFat: fat || "-", imageUrl: imageUrl, timestamp: Date.now() });
                 
-                document.getElementById('bodyWeight').value = ''; document.getElementById('bodyFat').value = ''; fileInput.value = ''; alert('✅ บันทึกสัดส่วนและรูปภาพเรียบร้อยครับ!');
+                document.getElementById('bodyWeight').value = ''; document.getElementById('bodyFat').value = ''; fileInput.value = ''; alert('✅ บันทึกสัดส่วนและรูปภาพเรียบร้อยครับ! (สามารถดูสถิติได้ที่แท็บ สรุปเดือน)');
 
             } catch (e) { alert("เกิดข้อผิดพลาดในการอัปโหลดรูป: " + e.message); } 
             finally { document.getElementById('uploadStatus').style.display = 'none'; document.getElementById('btnSaveBody').disabled = false; }
-        }
-
-        function renderBodyLogs(dailyData) {
-            const container = document.getElementById('bodyLogs'); container.innerHTML = '';
-            if(dailyData.length === 0) { container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 20px 0; font-size:14px;">ยังไม่มีการบันทึกสัดส่วนวันนี้</div>'; return; }
-            dailyData.sort((a,b) => b.timestamp - a.timestamp).forEach(log => {
-                let imgHtml = log.imageUrl ? `<img src="${log.imageUrl}" style="width: 100%; border-radius: 8px; margin-top: 10px; border: 1px solid var(--border);">` : '';
-                container.innerHTML += `<div class="history-box" style="display:flex; flex-direction:column; gap: 8px;"><div style="display:flex; justify-content:space-between; align-items:flex-start;"><div><div style="font-weight:bold; font-size:16px; color:var(--primary);">น้ำหนัก: ${log.weight} kg</div><div style="font-size:13px; color:#64748b;">ไขมัน (Fat): ${log.bodyFat} %</div></div><button class="del-btn" onclick="deleteLog('${log.id}', 'metrics')">ลบ</button></div>${imgHtml}</div>`;
-            });
         }
     </script>
 </body>
