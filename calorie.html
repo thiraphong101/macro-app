@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Theerapong Fitness & Macro Tracker V22</title>
+    <title>Theerapong Fitness & Macro Tracker V23</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --border: #cbd5e1; }
@@ -66,7 +66,7 @@
         
         /* Dashboard Tab Specifics */
         .monthly-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
-        .day-card { display: flex; flex-direction: column; background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
+        .day-card { display: flex; align-items: center; background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
         .day-date { width: 50px; text-align: center; font-weight: bold; color: var(--text); font-size: 18px; }
         .day-date span { display: block; font-size: 11px; font-weight: normal; color: #64748b; }
         .day-svg { width: 50px; height: 50px; flex-shrink: 0; margin: 0 15px; border: 1px dashed #cbd5e1; border-radius: 4px; padding: 2px; }
@@ -81,6 +81,7 @@
         #loginScreen { position: fixed; top:0; left:0; right:0; bottom:0; background: white; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
         #appContent { display: none; }
         .user-profile { font-size: 12px; text-align: center; padding: 10px; background: #e2e8f0; margin-bottom: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .chart-container { position: relative; width: 100%; height: 280px; }
     </style>
 </head>
 <body>
@@ -88,7 +89,7 @@
     <!-- Popup Image Modal -->
     <div id="imageModal" class="img-modal" onclick="window.closeImageModal()">
         <span class="img-modal-close">&times;</span>
-        <img id="modalImgSrc" onclick="event.stopPropagation()"> <!-- หยุดการปิด modal ถ้ากดโดนรูป -->
+        <img id="modalImgSrc" onclick="event.stopPropagation()">
     </div>
 
     <div id="loginScreen">
@@ -152,12 +153,12 @@
                         <div style="font-size: 10px; color: transparent;">-</div>
                     </div>
 
-                    <!-- กล่องขวา: โปรตีน (ไอคอนกล้ามแขน) -->
+                    <!-- กล่องขวา: โปรตีน (ไอคอนกล้ามแขนหันซ้าย) -->
                     <div class="stat-box" style="margin: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #a7f3d0;">
                         <svg class="human-svg" viewBox="0 0 24 24" style="background: transparent;">
                             <defs>
                                 <clipPath id="arm-flex-shape">
-                                    <path d="M17.81,4.45C17.38,4.2 16.89,4 16.31,4C14.93,4 13.86,4.69 13.08,5.89C11.86,7.77 10.05,8.16 8.02,8H8C6.89,8 6,8.89 6,10V18C6,19.11 6.89,20 8,20H8.2C8.6,20 8.99,20.09 9.35,20.26L11.47,21.27C12.7,21.86 14.12,21.95 15.4,21.51L17,21C19.22,20.24 20.73,17.9 20.23,15.54C20.01,14.5 19.39,13.54 18.45,12.89C16.9,11.82 16.14,10.41 16.88,9.2C17.33,8.47 17.35,7.65 16.81,7.02C16.51,6.67 16.14,6.48 15.81,6.45C16.36,6.45 16.91,6.9 17.46,7.45L18.87,6.04C18.42,5.59 17.97,5.14 17.81,4.45Z"/>
+                                    <path d="M 6.19,4.45 C 6.62,4.2 7.11,4 7.69,4 C 9.07,4 10.14,4.69 10.92,5.89 C 12.14,7.77 13.95,8.16 15.98,8 H 16 C 17.11,8 18,8.89 18,10 V 18 C 18,19.11 17.11,20 16,20 H 15.8 C 15.4,20 15.01,20.09 14.65,20.26 L 12.53,21.27 C 11.3,21.86 9.88,21.95 8.6,21.51 L 7,21 C 4.78,20.24 3.27,17.9 3.77,15.54 C 3.99,14.5 4.61,13.54 5.55,12.89 C 7.1,11.82 7.86,10.41 7.12,9.2 C 6.67,8.47 6.65,7.65 7.19,7.02 C 7.49,6.67 7.86,6.48 8.19,6.45 C 7.64,6.45 7.09,6.9 6.54,7.45 L 5.13,6.04 C 5.58,5.59 6.03,5.14 6.19,4.45 Z"/>
                                 </clipPath>
                             </defs>
                             <g clip-path="url(#arm-flex-shape)">
@@ -171,7 +172,7 @@
                     </div>
                 </div>
 
-                <!-- แถบย่อย (In / Burn) จัดให้อยู่ด้านล่างสุด พร้อมย้ายเป้าหมายมาไว้ที่ In -->
+                <!-- แถบย่อย (In / Burn) -->
                 <div class="two-col" style="gap: 15px;">
                     <div class="stat-box" style="margin: 0; padding: 10px;">
                         <div style="font-size: 11px; color: #64748b;">กิน (In) / เป้า <span id="uiTargetCal">2000</span></div>
@@ -261,7 +262,6 @@
                     <option value="manual">กิจกรรมอื่นๆ (รู้ค่าแคลอรีแล้ว)</option>
                 </select>
 
-                <!-- โหมดคำนวณอัตโนมัติ (Treadmill) -->
                 <div id="cardioAutoForm" style="background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-top:15px;">
                     <div class="two-col">
                         <div><label style="margin-top:0;">เวลา (นาที):</label><input type="number" id="cd_duration" value="30" inputmode="decimal" oninput="window.calcCardioBurn()"></div>
@@ -276,7 +276,6 @@
                     </div>
                 </div>
 
-                <!-- โหมดกรอกเอง (Manual) -->
                 <div id="cardioManualForm" style="display: none; background: #fffbeb; padding: 15px; border-radius: 12px; border: 1px solid #fde68a; margin-top:15px;">
                     <label style="margin-top:0;">ชื่อกิจกรรม:</label>
                     <input type="text" id="cd_manual_name" placeholder="เช่น วิ่งสวนสาธารณะ, ปั่นจักรยาน, นาฬิกา Garmin">
@@ -345,16 +344,25 @@
             </div>
         </div>
 
-        <!-- 5. DASHBOARD MONTHLY TAB -->
+        <!-- 5. DASHBOARD MONTHLY TAB (V23 Updated) -->
         <div id="tab-dashboard" class="tab-content">
             <div class="card" style="background: var(--primary); color: white;">
                 <h2 style="color: white; margin-bottom: 5px;">📊 สรุปภาพรวมรายเดือน</h2>
-                <p style="font-size: 12px; margin-top: 0; opacity: 0.8;">เลือกเดือนเพื่อดูสถิติแคลอรีสุทธิ (Net Calories) และร่างกาย</p>
+                <p style="font-size: 12px; margin-top: 0; opacity: 0.8;">เลือกเดือนเพื่อดูสถิติและรูปภาพพัฒนาการ</p>
                 <input type="month" id="monthPicker" class="date-input" style="width: 100%; margin-top: 10px;" onchange="window.loadMonthlyData()">
             </div>
             
             <div style="padding: 0 15px;">
                 <p id="dashStatus" style="font-size: 13px; color: #64748b; text-align: center;">เลือกเดือนที่ต้องการดูข้อมูลครับ</p>
+                
+                <!-- แกลเลอรีวิวัฒนาการรูปร่างแบบปฏิทิน -->
+                <h3 style="font-size: 15px; color: var(--primary); margin-top: 20px; border-bottom: 2px solid var(--border); padding-bottom: 5px;">📷 วิวัฒนาการรูปร่าง</h3>
+                <div id="monthlyGallery" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-bottom: 25px;">
+                    <!-- รูปจะมาเรียงตรงนี้ -->
+                </div>
+
+                <!-- ข้อมูลสรุปรายวันแบบไม่มีรูปกวนใจ -->
+                <h3 style="font-size: 15px; color: var(--primary); border-bottom: 2px solid var(--border); padding-bottom: 5px;">📉 สรุปแคลอรีรายวัน</h3>
                 <div class="monthly-grid" id="monthlyGrid"></div>
             </div>
         </div>
@@ -413,7 +421,6 @@
         let customRoutines = []; 
         window.tempCalculatedTDEE = 0; 
 
-        // ระบบเปิด/ปิด Modal รูปภาพ
         window.openImageModal = (url) => {
             document.getElementById('modalImgSrc').src = url;
             document.getElementById('imageModal').style.display = 'flex';
@@ -422,7 +429,6 @@
             document.getElementById('imageModal').style.display = 'none';
         }
 
-        // ระบบสลับฟอร์มคาร์ดิโอ
         window.toggleCardioMode = () => {
             const type = document.getElementById('cd_entry_type').value;
             if(type === 'auto') {
@@ -864,6 +870,7 @@
             if(!hasData) container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 30px 0; font-size:14px;">ยังไม่มีข้อมูลอาหารวันนี้</div>';
         }
 
+        // 🔴 โหลดข้อมูลสรุปเดือน (จัดรูปแบบ Gallery และ List แยกกัน) 🔴
         window.loadMonthlyData = async () => {
             const monthStr = document.getElementById('monthPicker').value; 
             if (!monthStr || !currentUser) return;
@@ -873,6 +880,7 @@
             
             document.getElementById('dashStatus').innerText = "⏳ กำลังโหลดข้อมูลสรุปรายเดือน...";
             document.getElementById('monthlyGrid').innerHTML = "";
+            document.getElementById('monthlyGallery').innerHTML = "";
 
             try {
                 const qLogs = query(collection(db, "users", currentUser.uid, "logs"), where("dateStr", ">=", startStr), where("dateStr", "<=", endStr));
@@ -904,17 +912,21 @@
                     if(!dailyStats[d.dateStr]) dailyStats[d.dateStr] = { cal: 0, pro: 0, burn: 0, weight: "-", fat: "-", imageUrl: "" };
                     dailyStats[d.dateStr].weight = d.weight || "-";
                     dailyStats[d.dateStr].fat = d.bodyFat || "-";
+                    // ป้องกันการทับซ้อนถ้ารูปอัปโหลดหลายครั้งใน 1 วัน (เอารูปล่าสุด)
                     if(d.imageUrl) dailyStats[d.dateStr].imageUrl = d.imageUrl;
                 });
 
                 const dates = Object.keys(dailyStats).sort((a,b) => b.localeCompare(a)); 
                 if(dates.length === 0) {
                     document.getElementById('dashStatus').innerText = "ยังไม่มีข้อมูลบันทึกในเดือนนี้ครับ";
+                    document.getElementById('monthlyGallery').innerHTML = '<div style="color:#64748b; font-size:12px; grid-column:1/-1; text-align:center; padding:10px 0;">ยังไม่มีรูปถ่ายในเดือนนี้</div>';
                     return;
                 }
 
                 document.getElementById('dashStatus').innerText = `พบข้อมูล ${dates.length} วัน`;
+                
                 let gridHtml = "";
+                let galleryHtml = "";
 
                 dates.forEach(date => {
                     const stat = dailyStats[date];
@@ -931,6 +943,7 @@
                     let yBurn = yIntake;
                     let hBurn = 24 * (burnPct / 100);
 
+                    // วาดกราฟรูปร่างกายย่อส่วน
                     const svgHtml = `
                         <svg class="day-svg" viewBox="0 0 24 24">
                             <defs>
@@ -946,13 +959,19 @@
                         </svg>
                     `;
 
-                    // ปรับขนาดรูปเป็น 50% และเพิ่มฟังก์ชันคลิกเปิด Modal
-                    const imgSection = stat.imageUrl 
-                        ? `<img src="${stat.imageUrl}" onclick="window.openImageModal('${stat.imageUrl}')" style="width: 50%; max-height: 150px; object-fit: cover; border-radius: 8px; margin-top: 15px; border: 1px solid var(--border); cursor: pointer; display: block; margin-left: auto; margin-right: auto;">` 
-                        : '';
+                    // หากมีรูป ให้สร้างบล็อกรูปภาพขึ้นไปไว้ในส่วน Gallery
+                    if (stat.imageUrl) {
+                        galleryHtml += `
+                            <div style="position: relative; cursor: pointer; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); background: #fff;" onclick="window.openImageModal('${stat.imageUrl}')">
+                                <img src="${stat.imageUrl}" style="width: 100%; height: 85px; object-fit: cover; display: block;">
+                                <div style="position: absolute; top: 4px; right: 4px; background: rgba(37, 99, 235, 0.9); color: white; padding: 2px 6px; font-size: 11px; font-weight: bold; border-radius: 4px;">วันที่ ${dayNum}</div>
+                            </div>
+                        `;
+                    }
 
+                    // ข้อมูลสรุปตัวเลขแบบไม่มีรูปรบกวน
                     gridHtml += `
-                        <div class="day-card">
+                        <div class="day-card" style="flex-direction: row;">
                             <div style="display:flex; align-items:center; width:100%;">
                                 <div class="day-date">${dayNum}<span>วันที่</span></div>
                                 ${svgHtml}
@@ -971,11 +990,15 @@
                                     </div>
                                 </div>
                             </div>
-                            ${imgSection}
                         </div>
                     `;
                 });
 
+                if(galleryHtml === "") {
+                    galleryHtml = '<div style="color:#64748b; font-size:12px; grid-column:1/-1; text-align:center; padding:10px 0;">ยังไม่มีรูปถ่ายในเดือนนี้</div>';
+                }
+
+                document.getElementById('monthlyGallery').innerHTML = galleryHtml;
                 document.getElementById('monthlyGrid').innerHTML = gridHtml;
 
             } catch(e) {
