@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Theerapong Fitness & Macro Tracker V24</title>
+    <title>Theerapong Fitness & Macro Tracker V25</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --border: #cbd5e1; }
@@ -66,30 +66,37 @@
         
         /* Dashboard Tab Specifics */
         .monthly-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
-        .day-card { display: flex; align-items: center; background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
+        .day-card { display: flex; align-items: center; background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border); position: relative; }
         .day-date { width: 50px; text-align: center; font-weight: bold; color: var(--text); font-size: 18px; }
         .day-date span { display: block; font-size: 11px; font-weight: normal; color: #64748b; }
         .day-svg { width: 50px; height: 50px; flex-shrink: 0; margin: 0 15px; border: 1px dashed #cbd5e1; border-radius: 4px; padding: 2px; }
         .day-stats { flex-grow: 1; font-size: 13px; line-height: 1.4; }
         
-        /* Image Popup Modal */
+        /* Image Popup Modal Slider */
         .img-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); align-items: center; justify-content: center; flex-direction: column; }
-        .img-modal img { max-width: 95%; max-height: 85%; border-radius: 8px; object-fit: contain; }
-        .img-modal-close { color: white; font-size: 40px; font-weight: bold; position: absolute; top: 15px; right: 25px; cursor: pointer; }
+        .img-modal img { max-width: 90%; max-height: 80%; border-radius: 8px; object-fit: contain; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .img-modal-close { color: white; font-size: 35px; font-weight: bold; position: absolute; top: 15px; right: 25px; cursor: pointer; text-shadow: 0 2px 4px rgba(0,0,0,0.5); z-index: 1001; }
+        .modal-date { color: white; font-size: 16px; font-weight: bold; position: absolute; top: 25px; left: 25px; background: rgba(0,0,0,0.6); padding: 4px 12px; border-radius: 20px; z-index: 1001; }
+        .img-modal-nav { position: absolute; top: 50%; transform: translateY(-50%); color: white; font-size: 30px; font-weight: bold; cursor: pointer; padding: 15px; background: rgba(255,255,255,0.15); border-radius: 50%; user-select: none; z-index: 1001; backdrop-filter: blur(4px); }
+        .img-modal-nav:active { background: rgba(255,255,255,0.3); }
+        .img-modal-nav.left { left: 10px; }
+        .img-modal-nav.right { right: 10px; }
 
         /* Login Screen */
         #loginScreen { position: fixed; top:0; left:0; right:0; bottom:0; background: white; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
         #appContent { display: none; }
         .user-profile { font-size: 12px; text-align: center; padding: 10px; background: #e2e8f0; margin-bottom: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .chart-container { position: relative; width: 100%; height: 280px; }
     </style>
 </head>
 <body>
 
-    <!-- Popup Image Modal -->
+    <!-- Popup Image Modal Slider -->
     <div id="imageModal" class="img-modal" onclick="window.closeImageModal()">
-        <span class="img-modal-close">&times;</span>
+        <div id="modalDate" class="modal-date">วันที่ --/--/----</div>
+        <span class="img-modal-close" onclick="window.closeImageModal()">&times;</span>
+        <span class="img-modal-nav left" onclick="window.prevImage(event)">&#10094;</span>
         <img id="modalImgSrc" onclick="event.stopPropagation()">
+        <span class="img-modal-nav right" onclick="window.nextImage(event)">&#10095;</span>
     </div>
 
     <div id="loginScreen">
@@ -155,7 +162,6 @@
 
                     <!-- กล่องขวา: โปรตีน (ไอคอนแท่ง Bar Scale) -->
                     <div class="stat-box" style="margin: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #a7f3d0;">
-                        <!-- ใช้เป็นแท่งแนวตั้ง (Bar Scale) แทน -->
                         <svg style="height: 95px; width: auto; display: block; margin: 0 auto;" viewBox="0 0 24 100">
                             <rect x="4" y="0" width="16" height="100" rx="6" fill="#e2e8f0" />
                             <rect id="fillProtein" x="4" y="100" width="16" height="0" rx="6" fill="#10b981" />
@@ -166,7 +172,7 @@
                     </div>
                 </div>
 
-                <!-- แถบย่อย (In / Burn) จัดให้อยู่ด้านล่างสุด พร้อมเป้าหมายมาไว้ที่ In -->
+                <!-- แถบย่อย (In / Burn) จัดให้อยู่ด้านล่างสุด -->
                 <div class="two-col" style="gap: 15px;">
                     <div class="stat-box" style="margin: 0; padding: 10px;">
                         <div style="font-size: 11px; color: #64748b;">กิน (In) / เป้า <span id="uiTargetCal">2000</span></div>
@@ -342,7 +348,7 @@
         <div id="tab-dashboard" class="tab-content">
             <div class="card" style="background: var(--primary); color: white;">
                 <h2 style="color: white; margin-bottom: 5px;">📊 สรุปภาพรวมรายเดือน</h2>
-                <p style="font-size: 12px; margin-top: 0; opacity: 0.8;">เลือกเดือนเพื่อดูสถิติแคลอรีสุทธิ (Net Calories) และรูปภาพ</p>
+                <p style="font-size: 12px; margin-top: 0; opacity: 0.8;">เลือกเดือนเพื่อดูสถิติและรูปภาพพัฒนาการ</p>
                 <input type="month" id="monthPicker" class="date-input" style="width: 100%; margin-top: 10px;" onchange="window.loadMonthlyData()">
             </div>
             
@@ -414,15 +420,51 @@
         
         let customRoutines = []; 
         window.tempCalculatedTDEE = 0; 
+        
+        // ตัวแปรสำหรับระบบ Slider รูปภาพ
+        window.currentMonthImages = [];
+        window.currentImageIndex = 0;
 
-        window.openImageModal = (url) => {
-            document.getElementById('modalImgSrc').src = url;
+        // 🔴 ระบบเปิด/ปิด Modal และ Slider รูปภาพ 🔴
+        window.openImageModal = (index) => {
+            if(window.currentMonthImages.length === 0) return;
+            window.currentImageIndex = index;
+            window.updateModalContent();
             document.getElementById('imageModal').style.display = 'flex';
         }
+
+        window.updateModalContent = () => {
+            const imgData = window.currentMonthImages[window.currentImageIndex];
+            document.getElementById('modalImgSrc').src = imgData.url;
+            
+            // จัดฟอร์แมตวันที่ให้สวยขึ้น (จาก 2026-09-19 เป็น 19/09/2026)
+            const dateParts = imgData.date.split('-');
+            if(dateParts.length === 3) {
+                document.getElementById('modalDate').innerText = `วันที่ ${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+            } else {
+                document.getElementById('modalDate').innerText = `วันที่ ${imgData.date}`;
+            }
+        }
+
         window.closeImageModal = () => {
             document.getElementById('imageModal').style.display = 'none';
         }
 
+        window.prevImage = (event) => {
+            if(event) event.stopPropagation(); // ไม่ให้คลิกทะลุไปปิดรูป
+            if(window.currentMonthImages.length === 0) return;
+            window.currentImageIndex = (window.currentImageIndex - 1 + window.currentMonthImages.length) % window.currentMonthImages.length;
+            window.updateModalContent();
+        }
+
+        window.nextImage = (event) => {
+            if(event) event.stopPropagation(); // ไม่ให้คลิกทะลุไปปิดรูป
+            if(window.currentMonthImages.length === 0) return;
+            window.currentImageIndex = (window.currentImageIndex + 1) % window.currentMonthImages.length;
+            window.updateModalContent();
+        }
+
+        // ระบบสลับฟอร์มคาร์ดิโอ
         window.toggleCardioMode = () => {
             const type = document.getElementById('cd_entry_type').value;
             if(type === 'auto') {
@@ -844,7 +886,6 @@
             document.getElementById('fillBurn').setAttribute('y', yBurn);
             document.getElementById('fillBurn').setAttribute('height', hBurn);
             
-            // ใช้เป็นแบบแท่ง Vertical Bar (ความสูง 100px)
             let proPct = Math.min((totalPro / userSettings.targetPro) * 100, 100);
             document.getElementById('fillProtein').setAttribute('y', 100 - proPct);
             document.getElementById('fillProtein').setAttribute('height', proPct);
@@ -863,6 +904,7 @@
             if(!hasData) container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 30px 0; font-size:14px;">ยังไม่มีข้อมูลอาหารวันนี้</div>';
         }
 
+        // 🔴 โหลดข้อมูลสรุปเดือน (เตรียมข้อมูลสำหรับ Gallery Slider) 🔴
         window.loadMonthlyData = async () => {
             const monthStr = document.getElementById('monthPicker').value; 
             if (!monthStr || !currentUser) return;
@@ -872,6 +914,10 @@
             
             document.getElementById('dashStatus').innerText = "⏳ กำลังโหลดข้อมูลสรุปรายเดือน...";
             document.getElementById('monthlyGrid').innerHTML = "";
+            document.getElementById('monthlyGallery').innerHTML = "";
+            
+            // ล้างอาร์เรย์รูปภาพเก่า
+            window.currentMonthImages = [];
 
             try {
                 const qLogs = query(collection(db, "users", currentUser.uid, "logs"), where("dateStr", ">=", startStr), where("dateStr", "<=", endStr));
@@ -906,6 +952,7 @@
                     if(d.imageUrl) dailyStats[d.dateStr].imageUrl = d.imageUrl;
                 });
 
+                // เรียงวันที่จากใหม่ไปเก่า (ล่าสุดขึ้นก่อน)
                 const dates = Object.keys(dailyStats).sort((a,b) => b.localeCompare(a)); 
                 if(dates.length === 0) {
                     document.getElementById('dashStatus').innerText = "ยังไม่มีข้อมูลบันทึกในเดือนนี้ครับ";
@@ -917,6 +964,7 @@
                 
                 let gridHtml = "";
                 let galleryHtml = "";
+                let imgIndexCounter = 0; // ตัวนับ Index รูป
 
                 dates.forEach(date => {
                     const stat = dailyStats[date];
@@ -948,23 +996,28 @@
                         </svg>
                     `;
 
-                    // สร้างแกลเลอรีรูปแยกออกมาด้านบน
                     if (stat.imageUrl) {
+                        // เก็บรูปลง Array สำหรับ Slider
+                        window.currentMonthImages.push({ url: stat.imageUrl, date: date });
+                        let currentIndex = imgIndexCounter++;
+                        
                         galleryHtml += `
-                            <div style="position: relative; cursor: pointer; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); background: #000;" onclick="window.openImageModal('${stat.imageUrl}')">
+                            <div style="position: relative; cursor: pointer; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); background: #000;" onclick="window.openImageModal(${currentIndex})">
                                 <img src="${stat.imageUrl}" style="width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; opacity: 0.95;">
                                 <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0, 0, 0, 0.7); color: white; text-align: center; padding: 3px 0; font-size: 10px; font-weight: bold;">วันที่ ${dayNum}</div>
                             </div>
                         `;
                     }
 
-                    // สร้างกริดสรุปตัวเลขแบบไม่มีรูปรบกวนด้านล่าง
+                    // สร้างการ์ดสรุปรายวัน พร้อมปุ่มลบวัน
                     gridHtml += `
-                        <div class="day-card" style="flex-direction: row; align-items: center; padding: 12px;">
+                        <div class="day-card" style="flex-direction: row; align-items: center; padding: 12px; position: relative;">
+                            <button onclick="window.deleteWholeDay('${date}')" style="position: absolute; top: 8px; right: 8px; background: #fee2e2; color: var(--danger); border: none; border-radius: 4px; font-size: 10px; padding: 4px 8px; cursor: pointer; font-weight: bold;">🗑️ ลบวัน</button>
+                            
                             <div class="day-date" style="width: 40px; font-size: 16px;">${dayNum}<span>วันที่</span></div>
                             ${svgHtml}
                             <div class="day-stats" style="flex-grow: 1;">
-                                <div style="display:flex; justify-content:space-between; gap:5px;">
+                                <div style="display:flex; justify-content:space-between; gap:5px; margin-top: 10px;">
                                     <div>
                                         <div style="color:var(--primary); font-weight:bold; font-size:12px;">กิน: ${stat.cal.toFixed(0)}</div>
                                         <div style="color:var(--danger); font-weight:bold; font-size:12px; margin: 2px 0;">เผา: ${stat.burn.toFixed(0)}</div>
@@ -993,6 +1046,44 @@
                 document.getElementById('dashStatus').innerText = "เกิดข้อผิดพลาดในการโหลดข้อมูล: " + e.message;
             }
         }
+        
+        // 🔴 ฟังก์ชันลบข้อมูลทั้งหมดใน 1 วัน 🔴
+        window.deleteWholeDay = async (dateStr) => {
+            const dateParts = dateStr.split('-');
+            const thaiDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+            
+            if(!confirm(`⚠️ คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลทั้งหมดของวันที่ ${thaiDate}?\n\n(การกระทำนี้จะลบ อาหาร, คาร์ดิโอ, เวทเทรนนิ่ง และสัดส่วนร่างกาย ของวันนั้นทิ้งทั้งหมด และไม่สามารถกู้คืนได้)`)) return;
+
+            try {
+                // คอลเลกชันที่ต้องเคลียร์
+                const collectionsToClear = ["logs", "cardio", "workouts", "metrics"];
+                
+                for (const colName of collectionsToClear) {
+                    const q = query(collection(db, "users", currentUser.uid, colName), where("dateStr", "==", dateStr));
+                    const snap = await getDocs(q);
+                    
+                    const deletePromises = [];
+                    snap.forEach(docSnap => {
+                        deletePromises.push(deleteDoc(doc(db, "users", currentUser.uid, colName, docSnap.id)));
+                    });
+                    await Promise.all(deletePromises);
+                }
+                
+                alert(`✅ ลบข้อมูลวันที่ ${thaiDate} เรียบร้อยแล้ว`);
+                
+                // โหลดหน้า Dashboard ใหม่
+                window.loadMonthlyData(); 
+                
+                // ถ้ายืนอยู่หน้าวันที่ถูกลบ ให้โหลดหน้าแรกใหม่ด้วย
+                if (document.getElementById('datePicker').value === dateStr) {
+                    window.changeDate(); 
+                }
+                
+            } catch (e) {
+                alert("เกิดข้อผิดพลาดในการลบข้อมูล: " + e.message);
+                console.error(e);
+            }
+        };
 
         const foodSearch = document.getElementById('foodSearch');
         const foodList = document.getElementById('foodList');
