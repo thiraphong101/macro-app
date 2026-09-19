@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Theerapong Fitness & Macro Tracker V23</title>
+    <title>Theerapong Fitness & Macro Tracker V24</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --border: #cbd5e1; }
@@ -73,9 +73,9 @@
         .day-stats { flex-grow: 1; font-size: 13px; line-height: 1.4; }
         
         /* Image Popup Modal */
-        .img-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); align-items: center; justify-content: center; flex-direction: column; }
+        .img-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); align-items: center; justify-content: center; flex-direction: column; }
         .img-modal img { max-width: 95%; max-height: 85%; border-radius: 8px; object-fit: contain; }
-        .img-modal-close { color: white; font-size: 35px; font-weight: bold; position: absolute; top: 15px; right: 25px; cursor: pointer; }
+        .img-modal-close { color: white; font-size: 40px; font-weight: bold; position: absolute; top: 15px; right: 25px; cursor: pointer; }
 
         /* Login Screen */
         #loginScreen { position: fixed; top:0; left:0; right:0; bottom:0; background: white; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
@@ -153,18 +153,12 @@
                         <div style="font-size: 10px; color: transparent;">-</div>
                     </div>
 
-                    <!-- กล่องขวา: โปรตีน (ไอคอนกล้ามแขนหันซ้าย) -->
+                    <!-- กล่องขวา: โปรตีน (ไอคอนแท่ง Bar Scale) -->
                     <div class="stat-box" style="margin: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #a7f3d0;">
-                        <svg class="human-svg" viewBox="0 0 24 24" style="background: transparent;">
-                            <defs>
-                                <clipPath id="arm-flex-shape">
-                                    <path d="M 6.19,4.45 C 6.62,4.2 7.11,4 7.69,4 C 9.07,4 10.14,4.69 10.92,5.89 C 12.14,7.77 13.95,8.16 15.98,8 H 16 C 17.11,8 18,8.89 18,10 V 18 C 18,19.11 17.11,20 16,20 H 15.8 C 15.4,20 15.01,20.09 14.65,20.26 L 12.53,21.27 C 11.3,21.86 9.88,21.95 8.6,21.51 L 7,21 C 4.78,20.24 3.27,17.9 3.77,15.54 C 3.99,14.5 4.61,13.54 5.55,12.89 C 7.1,11.82 7.86,10.41 7.12,9.2 C 6.67,8.47 6.65,7.65 7.19,7.02 C 7.49,6.67 7.86,6.48 8.19,6.45 C 7.64,6.45 7.09,6.9 6.54,7.45 L 5.13,6.04 C 5.58,5.59 6.03,5.14 6.19,4.45 Z"/>
-                                </clipPath>
-                            </defs>
-                            <g clip-path="url(#arm-flex-shape)">
-                                <rect x="0" y="0" width="24" height="24" fill="#e2e8f0" />
-                                <rect id="fillProtein" x="0" y="24" width="24" height="0" fill="#10b981" />
-                            </g>
+                        <!-- ใช้เป็นแท่งแนวตั้ง (Bar Scale) แทน -->
+                        <svg style="height: 95px; width: auto; display: block; margin: 0 auto;" viewBox="0 0 24 100">
+                            <rect x="4" y="0" width="16" height="100" rx="6" fill="#e2e8f0" />
+                            <rect id="fillProtein" x="4" y="100" width="16" height="0" rx="6" fill="#10b981" />
                         </svg>
                         <div style="font-size: 11px; font-weight: bold; color: var(--success); margin-top: 10px;">โปรตีนที่ได้</div>
                         <div id="totalProUI" style="font-size: 24px; font-weight: bold; color: var(--success); line-height: 1.1; margin: 4px 0;">0</div>
@@ -172,7 +166,7 @@
                     </div>
                 </div>
 
-                <!-- แถบย่อย (In / Burn) -->
+                <!-- แถบย่อย (In / Burn) จัดให้อยู่ด้านล่างสุด พร้อมเป้าหมายมาไว้ที่ In -->
                 <div class="two-col" style="gap: 15px;">
                     <div class="stat-box" style="margin: 0; padding: 10px;">
                         <div style="font-size: 11px; color: #64748b;">กิน (In) / เป้า <span id="uiTargetCal">2000</span></div>
@@ -344,25 +338,25 @@
             </div>
         </div>
 
-        <!-- 5. DASHBOARD MONTHLY TAB (V23 Updated) -->
+        <!-- 5. DASHBOARD MONTHLY TAB -->
         <div id="tab-dashboard" class="tab-content">
             <div class="card" style="background: var(--primary); color: white;">
                 <h2 style="color: white; margin-bottom: 5px;">📊 สรุปภาพรวมรายเดือน</h2>
-                <p style="font-size: 12px; margin-top: 0; opacity: 0.8;">เลือกเดือนเพื่อดูสถิติและรูปภาพพัฒนาการ</p>
+                <p style="font-size: 12px; margin-top: 0; opacity: 0.8;">เลือกเดือนเพื่อดูสถิติแคลอรีสุทธิ (Net Calories) และรูปภาพ</p>
                 <input type="month" id="monthPicker" class="date-input" style="width: 100%; margin-top: 10px;" onchange="window.loadMonthlyData()">
             </div>
             
             <div style="padding: 0 15px;">
                 <p id="dashStatus" style="font-size: 13px; color: #64748b; text-align: center;">เลือกเดือนที่ต้องการดูข้อมูลครับ</p>
                 
-                <!-- แกลเลอรีวิวัฒนาการรูปร่างแบบปฏิทิน -->
+                <!-- แกลเลอรีรูปภาพแบบปฏิทิน 4 คอลัมน์ -->
                 <h3 style="font-size: 15px; color: var(--primary); margin-top: 20px; border-bottom: 2px solid var(--border); padding-bottom: 5px;">📷 วิวัฒนาการรูปร่าง</h3>
-                <div id="monthlyGallery" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-bottom: 25px;">
+                <div id="monthlyGallery" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 25px;">
                     <!-- รูปจะมาเรียงตรงนี้ -->
                 </div>
 
-                <!-- ข้อมูลสรุปรายวันแบบไม่มีรูปกวนใจ -->
-                <h3 style="font-size: 15px; color: var(--primary); border-bottom: 2px solid var(--border); padding-bottom: 5px;">📉 สรุปแคลอรีรายวัน</h3>
+                <!-- ข้อมูลสรุปรายวัน -->
+                <h3 style="font-size: 15px; color: var(--primary); border-bottom: 2px solid var(--border); padding-bottom: 5px;">📉 สรุปข้อมูลรายวัน</h3>
                 <div class="monthly-grid" id="monthlyGrid"></div>
             </div>
         </div>
@@ -850,11 +844,10 @@
             document.getElementById('fillBurn').setAttribute('y', yBurn);
             document.getElementById('fillBurn').setAttribute('height', hBurn);
             
+            // ใช้เป็นแบบแท่ง Vertical Bar (ความสูง 100px)
             let proPct = Math.min((totalPro / userSettings.targetPro) * 100, 100);
-            let yPro = 24 - (24 * (proPct / 100));
-            let hPro = 24 * (proPct / 100);
-            document.getElementById('fillProtein').setAttribute('y', yPro);
-            document.getElementById('fillProtein').setAttribute('height', hPro);
+            document.getElementById('fillProtein').setAttribute('y', 100 - proPct);
+            document.getElementById('fillProtein').setAttribute('height', proPct);
             
             const container = document.getElementById('mealLogs'); container.innerHTML = ''; let hasData = false;
             for (const [mealName, items] of Object.entries(mealGroups)) {
@@ -870,7 +863,6 @@
             if(!hasData) container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 30px 0; font-size:14px;">ยังไม่มีข้อมูลอาหารวันนี้</div>';
         }
 
-        // 🔴 โหลดข้อมูลสรุปเดือน (จัดรูปแบบ Gallery และ List แยกกัน) 🔴
         window.loadMonthlyData = async () => {
             const monthStr = document.getElementById('monthPicker').value; 
             if (!monthStr || !currentUser) return;
@@ -880,7 +872,6 @@
             
             document.getElementById('dashStatus').innerText = "⏳ กำลังโหลดข้อมูลสรุปรายเดือน...";
             document.getElementById('monthlyGrid').innerHTML = "";
-            document.getElementById('monthlyGallery').innerHTML = "";
 
             try {
                 const qLogs = query(collection(db, "users", currentUser.uid, "logs"), where("dateStr", ">=", startStr), where("dateStr", "<=", endStr));
@@ -912,7 +903,6 @@
                     if(!dailyStats[d.dateStr]) dailyStats[d.dateStr] = { cal: 0, pro: 0, burn: 0, weight: "-", fat: "-", imageUrl: "" };
                     dailyStats[d.dateStr].weight = d.weight || "-";
                     dailyStats[d.dateStr].fat = d.bodyFat || "-";
-                    // ป้องกันการทับซ้อนถ้ารูปอัปโหลดหลายครั้งใน 1 วัน (เอารูปล่าสุด)
                     if(d.imageUrl) dailyStats[d.dateStr].imageUrl = d.imageUrl;
                 });
 
@@ -943,7 +933,6 @@
                     let yBurn = yIntake;
                     let hBurn = 24 * (burnPct / 100);
 
-                    // วาดกราฟรูปร่างกายย่อส่วน
                     const svgHtml = `
                         <svg class="day-svg" viewBox="0 0 24 24">
                             <defs>
@@ -959,34 +948,32 @@
                         </svg>
                     `;
 
-                    // หากมีรูป ให้สร้างบล็อกรูปภาพขึ้นไปไว้ในส่วน Gallery
+                    // สร้างแกลเลอรีรูปแยกออกมาด้านบน
                     if (stat.imageUrl) {
                         galleryHtml += `
-                            <div style="position: relative; cursor: pointer; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); background: #fff;" onclick="window.openImageModal('${stat.imageUrl}')">
-                                <img src="${stat.imageUrl}" style="width: 100%; height: 85px; object-fit: cover; display: block;">
-                                <div style="position: absolute; top: 4px; right: 4px; background: rgba(37, 99, 235, 0.9); color: white; padding: 2px 6px; font-size: 11px; font-weight: bold; border-radius: 4px;">วันที่ ${dayNum}</div>
+                            <div style="position: relative; cursor: pointer; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); background: #000;" onclick="window.openImageModal('${stat.imageUrl}')">
+                                <img src="${stat.imageUrl}" style="width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; opacity: 0.95;">
+                                <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0, 0, 0, 0.7); color: white; text-align: center; padding: 3px 0; font-size: 10px; font-weight: bold;">วันที่ ${dayNum}</div>
                             </div>
                         `;
                     }
 
-                    // ข้อมูลสรุปตัวเลขแบบไม่มีรูปรบกวน
+                    // สร้างกริดสรุปตัวเลขแบบไม่มีรูปรบกวนด้านล่าง
                     gridHtml += `
-                        <div class="day-card" style="flex-direction: row;">
-                            <div style="display:flex; align-items:center; width:100%;">
-                                <div class="day-date">${dayNum}<span>วันที่</span></div>
-                                ${svgHtml}
-                                <div class="day-stats">
-                                    <div style="display:flex; justify-content:space-between; gap:10px;">
-                                        <div>
-                                            <div style="color:var(--primary); font-weight:bold; font-size:12px;">กิน: ${stat.cal.toFixed(0)}</div>
-                                            <div style="color:var(--danger); font-weight:bold; font-size:12px; margin: 2px 0;">เผา: ${stat.burn.toFixed(0)}</div>
-                                            <div style="color:#0284c7; font-weight:bold; font-size:12px; margin: 2px 0;">สุทธิ: ${netCal.toFixed(0)} <span style="font-weight:normal; font-size:10px; color:#64748b;">/ ${userSettings.targetCal}</span></div>
-                                        </div>
-                                        <div style="text-align:right;">
-                                            <div style="color:var(--text); font-weight:bold; font-size:12px;">นน: ${stat.weight !== "-" ? stat.weight + " kg" : "-"}</div>
-                                            <div style="color:#64748b; font-weight:bold; font-size:12px; margin: 2px 0;">ไขมัน: ${stat.fat !== "-" ? stat.fat + "%" : "-"}</div>
-                                            <div style="color:var(--success); font-size:11px; margin: 2px 0;">โปร: ${stat.pro.toFixed(1)}g</div>
-                                        </div>
+                        <div class="day-card" style="flex-direction: row; align-items: center; padding: 12px;">
+                            <div class="day-date" style="width: 40px; font-size: 16px;">${dayNum}<span>วันที่</span></div>
+                            ${svgHtml}
+                            <div class="day-stats" style="flex-grow: 1;">
+                                <div style="display:flex; justify-content:space-between; gap:5px;">
+                                    <div>
+                                        <div style="color:var(--primary); font-weight:bold; font-size:12px;">กิน: ${stat.cal.toFixed(0)}</div>
+                                        <div style="color:var(--danger); font-weight:bold; font-size:12px; margin: 2px 0;">เผา: ${stat.burn.toFixed(0)}</div>
+                                        <div style="color:#0284c7; font-weight:bold; font-size:12px; margin: 2px 0;">สุทธิ: ${netCal.toFixed(0)} <span style="font-weight:normal; font-size:10px; color:#64748b;">/ ${userSettings.targetCal}</span></div>
+                                    </div>
+                                    <div style="text-align:right;">
+                                        <div style="color:var(--text); font-weight:bold; font-size:12px;">นน: ${stat.weight !== "-" ? stat.weight + " kg" : "-"}</div>
+                                        <div style="color:#64748b; font-weight:bold; font-size:12px; margin: 2px 0;">ไขมัน: ${stat.fat !== "-" ? stat.fat + "%" : "-"}</div>
+                                        <div style="color:var(--success); font-size:11px; margin: 2px 0;">โปร: ${stat.pro.toFixed(1)}g</div>
                                     </div>
                                 </div>
                             </div>
