@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Theerapong Fitness & Macro Tracker V19 (Ultimate Dashboard)</title>
+    <title>Theerapong Fitness & Macro Tracker V20 (Pro Dashboard)</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --border: #cbd5e1; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; padding-bottom: 90px; }
@@ -23,10 +24,9 @@
         .date-input { background: transparent; border: 1px solid rgba(255,255,255,0.4); color: white; padding: 8px 12px; border-radius: 8px; font-size: 16px; font-weight: bold; width: 140px; color-scheme: dark; outline: none; }
         
         /* Form Inputs & Visuals */
-        .visual-container { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 15px; }
-        .human-svg { width: 95px; height: auto; drop-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .stats-col { text-align: left; flex: 1; display: grid; grid-template-columns: 1fr; gap: 8px; }
-        .stat-box { background: var(--bg); padding: 8px 12px; border-radius: 10px; }
+        .visual-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .human-svg { width: 100%; height: 95px; drop-shadow: 0 4px 6px rgba(0,0,0,0.1); display: block; margin: 0 auto; }
+        .stat-box { background: var(--bg); padding: 12px 10px; border-radius: 12px; text-align: center; }
         .stat-val { font-size: 18px; font-weight: bold; line-height: 1; margin: 4px 0; }
         label { font-weight: 600; font-size: 14px; display: block; margin: 15px 0 6px; }
         select, input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; box-sizing: border-box; background: white; outline: none; }
@@ -65,7 +65,7 @@
         .log-cal { font-size: 13px; color: #64748b; margin-top: 4px; }
         
         /* Dashboard Tab Specifics */
-        .monthly-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 15px; }
+        .monthly-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
         .day-card { display: flex; flex-direction: column; background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
         .day-date { width: 50px; text-align: center; font-weight: bold; color: var(--text); font-size: 18px; }
         .day-date span { display: block; font-size: 11px; font-weight: normal; color: #64748b; }
@@ -76,6 +76,7 @@
         #loginScreen { position: fixed; top:0; left:0; right:0; bottom:0; background: white; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
         #appContent { display: none; }
         .user-profile { font-size: 12px; text-align: center; padding: 10px; background: #e2e8f0; margin-bottom: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .chart-container { position: relative; width: 100%; height: 280px; }
     </style>
 </head>
 <body>
@@ -119,46 +120,60 @@
         <!-- 1. TRACKER TAB -->
         <div id="tab-tracker" class="tab-content active">
             <div class="card" style="text-align: center;">
-                <h2 style="font-size: 18px; margin-bottom: 20px;">📊 สรุปแคลอรีรายวัน (Net)</h2>
+                <h2 style="font-size: 18px; margin-bottom: 20px;">📊 ภาพรวมร่างกายรายวัน</h2>
+                
                 <div class="visual-container">
-                    
-                    <svg class="human-svg" viewBox="0 0 24 24" style="background: transparent;">
-                        <defs>
-                            <clipPath id="person-shape-main">
-                                <path d="M12,2 A2.5,2.5 0 0,1 14.5,4.5 A2.5,2.5 0 0,1 12,7 A2.5,2.5 0 0,1 9.5,4.5 A2.5,2.5 0 0,1 12,2 M9,8 L15,8 C16.5,8 17.5,9 18,10.5 L16.5,16 L14.5,16 L14.5,22 L9.5,22 L9.5,16 L7.5,16 L6,10.5 C6.5,9 7.5,8 9,8 Z"/>
-                            </clipPath>
-                        </defs>
-                        <g clip-path="url(#person-shape-main)">
-                            <rect x="0" y="0" width="24" height="24" fill="#e2e8f0" />
-                            <rect id="fillIntake" x="0" y="24" width="24" height="0" fill="#2563eb" />
-                            <rect id="fillBurn" x="0" y="24" width="24" height="0" fill="#ef4444" />
-                        </g>
-                    </svg>
+                    <!-- กล่องซ้าย: แคลอรีสุทธิ (ไอคอนคน) -->
+                    <div class="stat-box" style="margin: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #bae6fd;">
+                        <svg class="human-svg" viewBox="0 0 24 24" style="background: transparent;">
+                            <defs>
+                                <clipPath id="person-shape-main">
+                                    <path d="M12,2 A2.5,2.5 0 0,1 14.5,4.5 A2.5,2.5 0 0,1 12,7 A2.5,2.5 0 0,1 9.5,4.5 A2.5,2.5 0 0,1 12,2 M9,8 L15,8 C16.5,8 17.5,9 18,10.5 L16.5,16 L14.5,16 L14.5,22 L9.5,22 L9.5,16 L7.5,16 L6,10.5 C6.5,9 7.5,8 9,8 Z"/>
+                                </clipPath>
+                            </defs>
+                            <g clip-path="url(#person-shape-main)">
+                                <rect x="0" y="0" width="24" height="24" fill="#e2e8f0" />
+                                <rect id="fillIntake" x="0" y="24" width="24" height="0" fill="#2563eb" />
+                                <rect id="fillBurn" x="0" y="24" width="24" height="0" fill="#ef4444" />
+                            </g>
+                        </svg>
+                        <div style="font-size: 11px; font-weight: bold; color: #0284c7; margin-top: 10px;">แคลอรีสุทธิ (Net)</div>
+                        <div id="netCalUI" style="font-size: 24px; font-weight: bold; color: #0284c7; line-height: 1.1; margin: 4px 0;">0</div>
+                        <div style="font-size: 10px; color: #64748b;">เป้า <span id="uiTargetCal">2000</span></div>
+                    </div>
 
-                    <div class="stats-col">
-                        <div class="two-col" style="gap: 8px;">
-                            <div class="stat-box">
-                                <div style="font-size: 11px; color: #64748b;">กิน (In) / เป้า <span id="uiTargetCal">2000</span></div>
-                                <div class="stat-val" id="totalCalUI" style="color: var(--primary); font-size:16px;">0</div>
-                            </div>
-                            <div class="stat-box">
-                                <div style="font-size: 11px; color: #64748b;">เผาผลาญ (Burn)</div>
-                                <div class="stat-val" id="totalBurnUI" style="color: var(--danger); font-size:16px;">0</div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-box" style="background: #e0f2fe; border: 1px solid #bae6fd;">
-                            <div style="font-size: 11px; color: #0284c7; font-weight: bold;">แคลอรีสุทธิ (Net)</div>
-                            <div class="stat-val" id="netCalUI" style="color: #0284c7; font-size:24px;">0</div>
-                            <div style="font-size: 11px; color: #64748b; margin-top:2px;" id="calStatus">สถานะ: รอโหลด...</div>
-                        </div>
-                        
-                        <div class="stat-box">
-                            <div style="font-size: 11px; color: #64748b;">โปรตีนที่ได้ / เป้า <span id="uiTargetPro">140</span>g</div>
-                            <div class="stat-val" id="totalProUI" style="color: var(--success); font-size:16px;">0</div>
-                        </div>
+                    <!-- กล่องขวา: โปรตีน (ไอคอนกล้าม) -->
+                    <div class="stat-box" style="margin: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #a7f3d0;">
+                        <svg class="human-svg" viewBox="0 0 24 24" style="background: transparent;">
+                            <defs>
+                                <clipPath id="muscle-shape-main">
+                                    <path d="M21.2 8.2C20.6 6.8 19.1 5.9 17.6 6c-1 .1-1.9.5-2.6 1.2-.6-1-1.6-1.7-2.8-1.9-1.3-.2-2.5.2-3.4 1.1-.9.9-1.3 2.1-1.1 3.4.1.8.5 1.5 1 2.1-.8.1-1.6 0-2.3-.3-1.2-.5-2.1-1.5-2.5-2.7-.4-1.2-.2-2.5.5-3.6.4-.6 1.1-.9 1.8-.9h.2c.6 0 1.1-.5 1.1-1.1S17 2 16.4 2h-.4C14.7 2 13 2.8 11.9 4.1 11 5.4 10.6 7 10.9 8.5c.2 1.3.8 2.4 1.7 3.3 1 1 2.3 1.5 3.6 1.6h.4c.5 0 1-.2 1.3-.5.4-.4.7-.9.8-1.4.1-.7-.1-1.3-.5-1.8-.4-.5-.9-.8-1.5-.9-.5-.1-.9.1-1.3.4-.6.5-1.4.5-2 .1-.6-.4-.8-1.2-.4-1.8.3-.5 1-1 1.7-1 1.2.1 2.2 1.1 2.3 2.3 0 .7-.3 1.3-.8 1.8-.6.5-1.4.6-2 .3-.6-.3-.9-1-1-1.6 0-.5-.5-.9-1.1-.8-.5.1-.9.6-.8 1.1.1 1.1.7 2.1 1.5 2.7 1 .7 2.3.9 3.5.6 1.3-.4 2.3-1.3 2.8-2.5.4-1.2.3-2.5-.4-3.6-.5-.8-1.3-1.3-2.2-1.4z"/>
+                                </clipPath>
+                            </defs>
+                            <g clip-path="url(#muscle-shape-main)">
+                                <rect x="0" y="0" width="24" height="24" fill="#e2e8f0" />
+                                <rect id="fillProtein" x="0" y="24" width="24" height="0" fill="#10b981" />
+                            </g>
+                        </svg>
+                        <div style="font-size: 11px; font-weight: bold; color: var(--success); margin-top: 10px;">โปรตีนที่ได้</div>
+                        <div id="totalProUI" style="font-size: 24px; font-weight: bold; color: var(--success); line-height: 1.1; margin: 4px 0;">0</div>
+                        <div style="font-size: 10px; color: #64748b;">เป้า <span id="uiTargetPro">140</span>g</div>
                     </div>
                 </div>
+
+                <!-- แถบย่อย (In / Burn) จัดให้อยู่ด้านล่างสุด -->
+                <div class="two-col" style="gap: 15px;">
+                    <div class="stat-box" style="margin: 0; padding: 10px;">
+                        <div style="font-size: 11px; color: #64748b;">กินเข้าไป (In)</div>
+                        <div class="stat-val" id="totalCalUI" style="color: var(--primary); font-size: 18px;">0</div>
+                    </div>
+                    <div class="stat-box" style="margin: 0; padding: 10px;">
+                        <div style="font-size: 11px; color: #64748b;">เบิร์นออก (Burn)</div>
+                        <div class="stat-val" id="totalBurnUI" style="color: var(--danger); font-size: 18px;">0</div>
+                    </div>
+                </div>
+                
+                <div style="font-size: 12px; color: #64748b; margin-top: 15px;" id="calStatus">สถานะ: รอโหลด...</div>
             </div>
 
             <div class="card">
@@ -337,7 +352,6 @@
 
                 <button id="btnSaveBody" onclick="window.saveBodyMetrics()" style="background: var(--success);">💾 บันทึกสัดส่วน (ดูได้ที่สรุปเดือน)</button>
             </div>
-            <!-- ตัดกราฟและประวัติออกจากหน้านี้ ย้ายไป Dashboard -->
         </div>
 
         <!-- 5. DASHBOARD MONTHLY TAB -->
@@ -511,7 +525,6 @@
             document.getElementById('uiTargetPro').innerText = userSettings.targetPro;
         }
 
-        // 🔴 ระบบเครื่องคิดเลข TDEE / BMR 🔴
         window.calculateTDEE = () => {
             const gender = document.getElementById('calcGender').value;
             const age = parseFloat(document.getElementById('calcAge').value);
@@ -782,20 +795,20 @@
             document.getElementById('totalBurnUI').innerText = totalBurn.toFixed(0);
             document.getElementById('netCalUI').innerText = netCal.toFixed(0);
 
-            let statusText = "แคลอรีสุทธิอยู่ในเกณฑ์ดี"; let color = "var(--primary)"; 
+            // อัปเดตสถานะแคลอรีสุทธิ
+            let statusText = "แคลอรีสุทธิอยู่ในเกณฑ์ดี"; let color = "#0284c7"; 
             if(netCal >= userSettings.targetCal) { 
                 color = "var(--danger)"; 
                 statusText = "⚠️ แคลอรีสุทธิเกินโควตาวันนี้แล้ว!"; 
             } else if (netCal > userSettings.targetCal * 0.85) { 
                 statusText = "แคลอรีสุทธิใกล้ครบโควตาวันนี้แล้ว"; 
             }
-            
             document.getElementById('netCalUI').style.color = color; 
             document.getElementById('calStatus').innerText = statusText;
 
+            // --- 1. วาดแถบแคลอรีสุทธิ (ไอคอนคน) ---
             let intakePct = Math.min((totalCal / userSettings.targetCal) * 100, 100);
             let burnPct = Math.min((totalBurn / userSettings.targetCal) * 100, intakePct); 
-
             let yIntake = 24 - (24 * (intakePct / 100)); 
             let hIntake = 24 * (intakePct / 100);
             let yBurn = yIntake; 
@@ -805,6 +818,14 @@
             document.getElementById('fillIntake').setAttribute('height', hIntake);
             document.getElementById('fillBurn').setAttribute('y', yBurn);
             document.getElementById('fillBurn').setAttribute('height', hBurn);
+            
+            // --- 2. วาดแถบโปรตีน (ไอคอนกล้าม) ---
+            let proPct = Math.min((totalPro / userSettings.targetPro) * 100, 100);
+            let yPro = 24 - (24 * (proPct / 100));
+            let hPro = 24 * (proPct / 100);
+            
+            document.getElementById('fillProtein').setAttribute('y', yPro);
+            document.getElementById('fillProtein').setAttribute('height', hPro);
             
             const container = document.getElementById('mealLogs'); container.innerHTML = ''; let hasData = false;
             for (const [mealName, items] of Object.entries(mealGroups)) {
@@ -820,7 +841,6 @@
             if(!hasData) container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 30px 0; font-size:14px;">ยังไม่มีข้อมูลอาหารวันนี้</div>';
         }
 
-        // 🔴 โหลดข้อมูลสรุปเดือนรวมถึง "น้ำหนัก ไขมัน รูปภาพ" 🔴
         window.loadMonthlyData = async () => {
             const monthStr = document.getElementById('monthPicker').value; 
             if (!monthStr || !currentUser) return;
@@ -903,7 +923,6 @@
                         </svg>
                     `;
 
-                    // เพิ่มการแสดงผลรูปภาพและข้อมูลร่างกาย
                     const imgSection = stat.imageUrl 
                         ? `<img src="${stat.imageUrl}" style="width: 100%; max-height: 250px; object-fit: cover; border-radius: 8px; margin-top: 15px; border: 1px solid var(--border);">` 
                         : '';
