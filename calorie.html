@@ -239,6 +239,7 @@
                     <!-- ----- AI SCANNER SECTION ----- -->
                     <div class="ai-scan-container">
                         <label style="margin-top:0; color:#0369a1;">🤖 สแกนอาหารด้วย AI</label>
+                        <!-- type="file" accept="image/*" จะเปิดแอปกล้องและแกลอรี่บนมือถือได้อัตโนมัติ -->
                         <input type="file" id="aiFoodImage" accept="image/*" style="border: 1px dashed #38bdf8;">
                         <button id="btnAiScan" onclick="window.scanFoodWithAI()" style="background: #38bdf8; margin-top: 8px;">🔍 สแกนรูปภาพ</button>
                         <div id="aiProgressBar" class="ai-progress-bar">
@@ -535,25 +536,24 @@
             btnScan.disabled = true;
             progressBar.style.display = 'block';
             statusText.style.display = 'block';
+            statusText.innerText = "กำลังวิเคราะห์ภาพ...";
+            statusText.style.color = "#0284c7";
             
-            // ใส่ API Key ของ Gemini ตรงนี้
+            // 🔴 ใส่ API Key ของคุณเรียบร้อย 🔴
             const GEMINI_API_KEY = "AQ.Ab8RN6IzMgriRW1pLzns91yG8SZeU-PdXGj2cUv2gJgf3aoG2Q"; 
             
             try {
-                // จำลองหลอดโหลด (Progress Bar Animation)
+                // จำลองหลอดโหลด (Progress Bar)
                 let progress = 0;
                 const interval = setInterval(() => {
                     progress += 10;
                     if(progress <= 90) progressFill.style.width = progress + '%';
                 }, 200);
 
-                // แปลงไฟล์ภาพเป็น Base64
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = async () => {
                     const base64Data = reader.result.split(',')[1];
-
-                    // เตรียม Prompt ส่งให้ Gemini
                     const promptText = `Analyze this food image. Reply ONLY with a JSON object containing these EXACT keys (no markdown, no extra text): {"name": "Thai food name", "cal": estimated_calories_as_number, "pro": estimated_protein_as_number}`;
 
                     const requestBody = {
@@ -582,27 +582,29 @@
                         clearInterval(interval);
                         progressFill.style.width = '100%';
                         
+                        // 🟢 ดักจับ Error จากฝั่ง Google
+                        if (!response.ok || data.error) {
+                            const errorMsg = data.error ? data.error.message : "HTTP Error " + response.status;
+                            throw new Error("ข้อความจาก Google: " + errorMsg);
+                        }
+                        
                         if (data.candidates && data.candidates.length > 0) {
                             let textResult = data.candidates[0].content.parts[0].text;
-                            // Clean up text format if AI returned markdown
                             textResult = textResult.replace(/```json/g, '').replace(/```/g, '').trim();
-                            
                             const parsed = JSON.parse(textResult);
                             
-                            // นำค่าที่ได้ไปใส่ในช่อง Input อัตโนมัติ
                             document.getElementById('c_name').value = parsed.name || "ตรวจพบอาหาร";
                             document.getElementById('c_cal').value = parsed.cal || 0;
                             document.getElementById('c_pro').value = parsed.pro || 0;
                             
                             statusText.innerText = "✅ วิเคราะห์เสร็จสิ้น กดบันทึกได้เลย!";
                             statusText.style.color = "var(--success)";
-                            
                         } else {
-                            throw new Error("Gemini API ไม่ส่งข้อมูลกลับมา");
+                            throw new Error("Google ไม่ส่งคำตอบกลับมา (ไม่มีข้อมูล JSON)");
                         }
                     } catch (error) {
                         clearInterval(interval);
-                        alert("AI ไม่สามารถวิเคราะห์ภาพนี้ได้: " + error.message);
+                        alert("AI ไม่สามารถวิเคราะห์ภาพนี้ได้:\n\n" + error.message);
                         statusText.innerText = "❌ เกิดข้อผิดพลาด";
                         statusText.style.color = "var(--danger)";
                     } finally {
@@ -614,13 +616,12 @@
                     }
                 };
             } catch (e) {
-                alert("Error: " + e.message);
+                alert("Error ระบบ: " + e.message);
                 btnScan.disabled = false;
                 progressBar.style.display = 'none';
             }
         };
         // ---------------------------------------------
-
 
         window.openImageModal = (index) => {
             if(window.currentMonthImages.length === 0) return;
