@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Theerapong Fitness V39 (Safe Base V31)</title>
+    <title>Theerapong Fitness V39.1 (Safe Upgrades)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --border: #cbd5e1; }
@@ -11,7 +11,7 @@
         .card { background: var(--card); border-radius: 16px; padding: 20px; margin: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         h2, h3 { margin-top: 0; margin-bottom: 15px; color: #334155; }
         
-        /* Tab Navigation - ปรับเป็น 4 คอลัมน์ รองรับ 8 เมนู */
+        /* Tab Navigation - 4 คอลัมน์ 2 แถว */
         .tab-nav { display: grid; grid-template-columns: repeat(4, 1fr); background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
         .tab-btn { padding: 10px 0; text-align: center; font-weight: bold; font-size: 11px; color: #64748b; cursor: pointer; border-bottom: 3px solid transparent; border-right: 1px solid #f8fafc; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .tab-btn:nth-child(n+5) { border-top: 1px solid #f8fafc; }
@@ -66,7 +66,7 @@
         
         /* Dashboard Tab Specifics */
         .monthly-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
-        .day-card { display: flex; align-items: center; background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border); position: relative; }
+        .day-card { display: flex; flex-direction: column; background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border); position: relative; }
         .day-date { width: 50px; text-align: center; font-weight: bold; color: var(--text); font-size: 18px; }
         .day-date span { display: block; font-size: 11px; font-weight: normal; color: #64748b; }
         .day-svg { width: 50px; height: 50px; flex-shrink: 0; margin: 0 15px; border: 1px dashed #cbd5e1; border-radius: 4px; padding: 2px; }
@@ -82,7 +82,7 @@
         .img-modal-nav.left { left: 10px; }
         .img-modal-nav.right { right: 10px; }
 
-        /* Leaderboard & Admin (New) */
+        /* Leaderboard & Admin */
         .rank-card { display: flex; align-items: center; background: white; padding: 12px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px; position: relative; overflow: hidden; }
         .rank-num { width: 30px; font-size: 18px; font-weight: bold; color: #64748b; text-align: center; }
         .rank-avatar { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--border); margin: 0 12px; object-fit: cover; }
@@ -96,7 +96,7 @@
         .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
         .admin-table th, .admin-table td { border-bottom: 1px solid var(--border); padding: 10px 5px; text-align: left; }
         .admin-table th { background: #f8fafc; color: #334155; }
-        .ban-btn { background: #fee2e2; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
+        .ban-btn { background: #fee2e2; color: var(--danger); border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
 
         /* Login Screen */
         #loginScreen { position: fixed; top:0; left:0; right:0; bottom:0; background: white; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
@@ -121,7 +121,7 @@
             <path d="M12,2 A2.5,2.5 0 0,1 14.5,4.5 A2.5,2.5 0 0,1 12,7 A2.5,2.5 0 0,1 9.5,4.5 A2.5,2.5 0 0,1 12,2 M9,8 L15,8 C16.5,8 17.5,9 18,10.5 L16.5,16 L14.5,16 L14.5,22 L9.5,22 L9.5,16 L7.5,16 L6,10.5 C6.5,9 7.5,8 9,8 Z"/>
         </svg>
         <h1 style="color: var(--text);">Fitness & Macro</h1>
-        <p style="color: #64748b;">แอปบันทึกแคลอรีและตารางเวทส่วนตัว</p>
+        <p style="color: #64748b;">ระบบบันทึกสุขภาพแบบมืออาชีพ</p>
         <button id="btnLogin" style="background: white; color: #333; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; gap: 10px;">
             <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" width="20">
             เข้าสู่ระบบด้วย Google
@@ -190,7 +190,7 @@
                         <div style="font-size: 10px; color: #64748b;">เป้า <span id="uiTargetPro">140</span></div>
                     </div>
 
-                    <!-- กล่องขวา: น้ำดื่ม (หลอดแท่ง) -->
+                    <!-- กล่องขวา: น้ำดื่ม (หลอดแท่งสีฟ้า) -->
                     <div class="stat-box" style="margin: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #7dd3fc;">
                         <svg style="height: 85px; width: auto; display: block; margin: 0 auto;" viewBox="0 0 24 100">
                             <rect x="4" y="0" width="16" height="100" rx="6" fill="#e2e8f0" />
@@ -254,6 +254,7 @@
                     <button onclick="window.addCustomEntry()" style="background: var(--success);">+ บันทึกเมนูนี้</button>
                 </div>
 
+                <!-- 💧 ปุ่มบันทึกน้ำดื่ม -->
                 <button class="btn-outline" onclick="window.toggleWaterBox()" style="color: #0ea5e9; border-color: #0ea5e9;">💧 บันทึกน้ำดื่ม</button>
                 <div class="custom-box" id="customWaterBox" style="border-color: #0ea5e9; background: #f0f9ff; display: none;">
                     <label style="margin-top:0; color:#0369a1;">เลือกปริมาณน้ำ:</label>
@@ -268,9 +269,10 @@
                         <option value="custom">ระบุตัวเลขเอง...</option>
                     </select>
                     <input type="number" id="waterCustomAmount" placeholder="ระบุปริมาณ (ml)" inputmode="decimal" style="display:none; margin-top:10px;">
-                    <button onclick="window.addWaterLog()" style="background: #0ea5e9; margin-top: 10px; border: none; color: white;">+ ดื่ม</button>
+                    <button onclick="window.addWaterLog()" style="background: #0ea5e9; margin-top: 10px; color: white; border: none;">+ ดื่ม</button>
                 </div>
 
+                <!-- 💊 ปุ่มบันทึกวิตามิน -->
                 <button class="btn-outline" onclick="window.toggleVitaminBox()" style="color: #b45309; border-color: var(--warning);">💊 บันทึกวิตามิน / อาหารเสริม</button>
                 <div class="custom-box" id="customVitaminBox" style="border-color: var(--warning); background: #fffbeb; display: none;">
                     <label style="margin-top:0; color: #b45309;">เลือกวิตามิน:</label>
@@ -279,8 +281,8 @@
                     </select>
                     <label style="color: #b45309;">จำนวน (เม็ด/ช้อน):</label>
                     <input type="number" id="vitaminAmountInput" placeholder="ใส่จำนวน" inputmode="decimal">
-                    <p style="font-size:11px; color:#b45309; margin-top:8px; margin-bottom: 0;">*ระบบจะบันทึกพร้อมมื้ออาหารที่เลือกไว้ด้านบน</p>
-                    <button onclick="window.addVitaminLog()" style="background: var(--warning); margin-top: 10px; border: none; color: white;">+ ทานเลย</button>
+                    <p style="font-size:11px; color:#b45309; margin-top:8px; margin-bottom: 0;">*บันทึกพร้อมมื้ออาหารที่เลือกไว้ด้านบนสุด</p>
+                    <button onclick="window.addVitaminLog()" style="background: var(--warning); color: white; border: none; margin-top: 10px;">+ ทานเลย</button>
                 </div>
             </div>
 
@@ -427,12 +429,13 @@
         <div id="tab-score" class="tab-content">
             <div class="card" style="background: linear-gradient(135deg, #f59e0b, #ea580c); color: white; text-align: center;">
                 <h2 style="color: white; margin-bottom: 5px;">🏆 จัดอันดับประจำวัน</h2>
-                <p style="font-size: 12px; margin-top: 0; opacity: 0.9;">คะแนนความมีวินัยของ <b id="lbDateDisplay">วันนี้</b></p>
+                <p style="font-size: 12px; margin-top: 0; opacity: 0.9;">คะแนนของ <b id="lbDateDisplay">วันนี้</b> (เต็ม 100%)</p>
                 <div style="font-size: 11px; margin-top: 10px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px; display: inline-block; text-align: left;">
                     <b>เกณฑ์การให้คะแนน:</b><br>
-                    • โปรตีนถึงเป้า (40%)<br>
-                    • แคลอรีสุทธิอยู่ในเกณฑ์ (40%)<br>
-                    • ออกกำลังกาย/คาร์ดิโอ (20%)
+                    • โปรตีนถึงเป้า (30%)<br>
+                    • แคลอรีอยู่ในเกณฑ์ (30%)<br>
+                    • ออกกำลังกาย/คาร์ดิโอ (20%)<br>
+                    • น้ำดื่มถึงเป้า (20%)
                 </div>
             </div>
             
@@ -440,7 +443,7 @@
                 <p style="font-size: 13px; color: #64748b; text-align: center;">กำลังโหลดตารางคะแนน...</p>
             </div>
 
-            <!-- กล่องสถิติแชมป์ประจำเดือน (Hall of Fame) -->
+            <!-- Hall of Fame -->
             <div class="card" style="margin-top: 30px; border: 2px solid var(--warning); background: #fffbeb;">
                 <h3 style="font-size: 16px; color: var(--warning); text-align: center; margin-bottom: 5px;">👑 สถิติแชมป์ประจำเดือนนี้</h3>
                 <p style="font-size: 11px; color: #64748b; text-align: center; margin-top: 0; margin-bottom: 15px;">คนที่ได้ที่ 1 ของวันบ่อยที่สุด</p>
@@ -544,13 +547,10 @@
         const ADMIN_EMAIL = "deathnoreason101@gmail.com";
         let foodDB = [];
         let selectedFoodIndex = -1;
-        
-        // 🔴 ค่าเริ่มต้น ป้องกันโค้ดพัง
         let userSettings = { targetCal: 2000, targetPro: 140, targetWater: 3000, vitamins: ["วิตามินซี", "น้ำมันปลา"] };
         let customRoutines = []; 
-        window.tempCalculatedTDEE = 0; 
         
-        // ตัวแปร Slider รูปภาพ
+        window.tempCalculatedTDEE = 0; 
         window.currentMonthImages = [];
         window.currentImageIndex = 0;
 
@@ -560,7 +560,6 @@
             window.updateModalContent();
             document.getElementById('imageModal').style.display = 'flex';
         }
-
         window.updateModalContent = () => {
             const imgData = window.currentMonthImages[window.currentImageIndex];
             document.getElementById('modalImgSrc').src = imgData.url;
@@ -568,7 +567,6 @@
             if(dateParts.length === 3) { document.getElementById('modalDate').innerText = `วันที่ ${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`; } 
             else { document.getElementById('modalDate').innerText = `วันที่ ${imgData.date}`; }
         }
-
         window.closeImageModal = () => { document.getElementById('imageModal').style.display = 'none'; }
         window.prevImage = (e) => { if(e) e.stopPropagation(); if(window.currentMonthImages.length === 0) return; window.currentImageIndex = (window.currentImageIndex - 1 + window.currentMonthImages.length) % window.currentMonthImages.length; window.updateModalContent(); }
         window.nextImage = (e) => { if(e) e.stopPropagation(); if(window.currentMonthImages.length === 0) return; window.currentImageIndex = (window.currentImageIndex + 1) % window.currentMonthImages.length; window.updateModalContent(); }
@@ -582,14 +580,12 @@
             }
         }
 
-        // 🔴 เปิด/ปิดกล่องน้ำและวิตามิน
         window.toggleWaterBox = () => { const box = document.getElementById('customWaterBox'); box.style.display = box.style.display === 'block' ? 'none' : 'block'; }
         window.checkCustomWater = () => { const sel = document.getElementById('waterSelect').value; document.getElementById('waterCustomAmount').style.display = sel === 'custom' ? 'block' : 'none'; }
         window.toggleVitaminBox = () => { const box = document.getElementById('customVitaminBox'); box.style.display = box.style.display === 'block' ? 'none' : 'block'; }
 
         window.switchTab = (tabId) => {
             document.getElementById('globalDateHeader').style.display = (tabId === 'dashboard' || tabId === 'score' || tabId === 'settings' || tabId === 'admin') ? 'none' : 'flex';
-            
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             event.currentTarget.classList.add('active');
@@ -613,7 +609,6 @@
 
                     const userRef = doc(db, "users", user.uid);
                     const userSnap = await getDoc(userRef);
-
                     let dName = user.displayName || (user.email ? user.email.split('@')[0] : "ไม่ระบุชื่อ");
 
                     if (!userSnap.exists()) {
@@ -633,7 +628,7 @@
                         });
                     } else {
                         if (userSnap.data().isBanned && user.email !== ADMIN_EMAIL) {
-                            alert("🚫 บัญชีของคุณถูกผู้ดูแลระบบระงับการใช้งาน");
+                            alert("🚫 บัญชีของคุณถูกระงับการใช้งาน");
                             signOut(auth);
                             return;
                         }
@@ -658,10 +653,7 @@
                     
                     window.changeDate(); 
                     window.calcCardioBurn(); 
-                } catch (error) {
-                    console.error("Auth Error:", error);
-                    alert("เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้");
-                }
+                } catch (error) { console.error("Auth Error:", error); }
             } else {
                 currentUser = null;
                 document.getElementById('loginScreen').style.display = 'flex';
@@ -675,7 +667,7 @@
             }
         });
 
-        // 🔴 ระบบ Leaderboard รายวัน 🔴
+        // 🔴 โหลดตารางอันดับรายวัน 🔴
         window.loadDailyLeaderboard = async () => {
             const container = document.getElementById('leaderboardContainer');
             const hofContainer = document.getElementById('hallOfFameContainer');
@@ -698,7 +690,6 @@
                         let todayScore = 0;
                         if (data.scores) {
                             if (data.scores[dateStr] !== undefined) todayScore = data.scores[dateStr];
-                            
                             Object.keys(data.scores).forEach(dKey => {
                                 if (dKey.startsWith(monthPrefix) && data.scores[dKey] > 0) {
                                     if(!monthlyWinners[dKey]) monthlyWinners[dKey] = { score: -1, users: [] };
@@ -772,14 +763,10 @@
                         `;
                     });
                     hofContainer.innerHTML = hofHtml;
-                } else {
-                    hofContainer.innerHTML = '<p style="text-align:center; font-size:13px; color:#94a3b8;">ยังไม่มีข้อมูลแชมป์ในเดือนนี้</p>';
-                }
-
+                } else { hofContainer.innerHTML = '<p style="text-align:center; font-size:13px; color:#94a3b8;">ยังไม่มีข้อมูลแชมป์ในเดือนนี้</p>'; }
             } catch (e) { container.innerHTML = '<p style="text-align:center; color:red;">โหลดล้มเหลว</p>'; }
         };
 
-        // 🔴 ระบบ Admin
         window.loadAdminPanel = async () => {
             try {
                 let maxAllowedUsers = 10;
@@ -787,7 +774,6 @@
                     const configSnap = await getDoc(doc(db, "app_config", "settings"));
                     if(configSnap.exists()) { maxAllowedUsers = configSnap.data().maxUsers || 10; }
                 } catch(e){}
-                
                 document.getElementById('adminMaxUsers').value = maxAllowedUsers;
 
                 const usersSnap = await getDocs(collection(db, "users"));
@@ -797,8 +783,7 @@
                 tbody.innerHTML = '';
                 
                 usersSnap.forEach(userDoc => {
-                    const u = userDoc.data();
-                    const uid = userDoc.id;
+                    const u = userDoc.data(); const uid = userDoc.id;
                     const photo = u.photoURL || "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png";
                     const isBannedStr = u.isBanned ? '<span style="color:red;">[ถูกแบน]</span>' : '';
                     const btnLabel = u.isBanned ? 'ปลดแบน' : 'เตะออก';
@@ -835,7 +820,6 @@
             } catch (e) { alert("Error: " + e.message); }
         };
 
-        // --- Core Application Logic ---
         async function loadFoodDB() {
             try {
                 const response = await fetch('./food-db.json', { cache: 'no-store' });
@@ -870,7 +854,6 @@
             } catch (err) {}
         }
 
-        // 🔴 แยกระบบ Save 3 ปุ่มอิสระ (ไม่มีบัคเซฟทับอีกต่อไป) 🔴
         window.saveGoals = async () => {
             userSettings.targetCal = parseFloat(document.getElementById('setCal').value) || 2000;
             userSettings.targetPro = parseFloat(document.getElementById('setPro').value) || 140;
@@ -939,7 +922,6 @@
             vits.forEach(vit => { select.innerHTML += `<option value="${vit}">${vit}</option>`; });
         }
 
-        // 🔴 บันทึกน้ำและวิตามิน
         window.addWaterLog = async () => {
             const sel = document.getElementById('waterSelect').value;
             let amt = sel === 'custom' ? parseFloat(document.getElementById('waterCustomAmount').value) : parseFloat(sel);
@@ -985,7 +967,7 @@
         window.saveCalculatedTDEE = async () => {
             if (!window.tempCalculatedTDEE) return;
             document.getElementById('setCal').value = window.tempCalculatedTDEE;
-            await window.saveGoals(); // ใช้ saveGoals ของปุ่มใหม่
+            await window.saveGoals(); 
         };
 
         window.calcCardioBurn = () => {
@@ -1094,12 +1076,12 @@
             document.getElementById('workoutFormContainer').style.display = 'none';
         }
 
-        // 🔴 โหลดสถิติยกน้ำหนักสูงสุดแบบปลอดภัย (ไม่แฮงค์แม้ไม่มีข้อมูล)
+        // 🔴 โหลดฟอร์มเวท (แก้ Layout ท่าทางให้อ่านง่าย) 🔴
         window.loadWorkoutForm = async () => {
             const rIndex = document.getElementById('routineSelect').value; const container = document.getElementById('workoutFormContainer'); const listDiv = document.getElementById('exerciseList');
             if(rIndex === "") { container.style.display = 'none'; return; }
-            
             const routine = customRoutines[rIndex]; document.getElementById('routineTitle').innerText = routine.dayName; 
+            
             listDiv.innerHTML = '<p style="text-align:center; font-size:13px; color:#64748b; padding:15px;">⏳ กำลังโหลดสถิติสูงสุด...</p>';
             container.style.display = 'block';
 
@@ -1121,20 +1103,22 @@
 
             listDiv.innerHTML = '';
             routine.exercises.forEach((ex) => {
-                let imgHtml = ex.img ? `<img src="${ex.img}" class="exercise-img" onerror="this.style.display='none'">` : '';
+                let imgHtml = ex.img ? `<img src="${ex.img}" style="width: 80px; height: 80px; object-fit: contain; border-radius: 8px; border: 1px solid var(--border); background: white; margin-bottom: 8px;" onerror="this.style.display='none'">` : '';
                 let maxW = maxWeights[ex.name] || 0;
+                
+                // เลย์เอาต์ใหม่: ชื่ออยู่บนสุด รูปและอินพุตอยู่ด้านล่าง
                 listDiv.innerHTML += `
-                    <div class="exercise-item" data-name="${ex.name}" data-img="${ex.img || ''}">
-                        <div class="exercise-name">💪 ${ex.name}</div>
-                        <div class="exercise-layout">
+                    <div class="exercise-item" data-name="${ex.name}" data-img="${ex.img || ''}" style="display: flex; flex-direction: column;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 10px;">
+                            <div class="exercise-name" style="margin-bottom:0; font-size:16px;">💪 ${ex.name}</div>
+                            <div style="font-size:11px; color:var(--primary); font-weight:bold; background:#e0f2fe; padding:4px 8px; border-radius:4px; flex-shrink:0;">🏆 Max: ${maxW} kg</div>
+                        </div>
+                        <div style="display: flex; gap: 12px; align-items: center;">
                             ${imgHtml}
-                            <div style="flex-grow:1;">
-                                <div style="font-size:11px; color:var(--primary); font-weight:bold; margin-bottom:8px; background:#e0f2fe; padding:4px 8px; border-radius:4px; display:inline-block;">🏆 สถิติสูงสุด: ${maxW} kg</div>
-                                <div class="ex-inputs">
-                                    <div><label>เซ็ต</label><input type="number" class="w-sets" placeholder="Set" inputmode="numeric"></div>
-                                    <div><label>ครั้ง</label><input type="number" class="w-reps" placeholder="Reps" inputmode="numeric"></div>
-                                    <div><label>น้ำหนัก</label><input type="number" class="w-kg" placeholder="Kg" inputmode="decimal"></div>
-                                </div>
+                            <div class="ex-inputs" style="flex-grow:1; display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px;">
+                                <div><label style="margin:0 0 4px 0; font-size:12px; text-align:center; color:#64748b; display:block;">เซ็ต</label><input type="number" class="w-sets" placeholder="Set" inputmode="numeric" style="width:100%; padding:8px 4px; font-size:14px; text-align:center; box-sizing:border-box; border:1px solid var(--border); border-radius:6px;"></div>
+                                <div><label style="margin:0 0 4px 0; font-size:12px; text-align:center; color:#64748b; display:block;">ครั้ง</label><input type="number" class="w-reps" placeholder="Reps" inputmode="numeric" style="width:100%; padding:8px 4px; font-size:14px; text-align:center; box-sizing:border-box; border:1px solid var(--border); border-radius:6px;"></div>
+                                <div><label style="margin:0 0 4px 0; font-size:12px; text-align:center; color:#64748b; display:block;">น้ำหนัก</label><input type="number" class="w-kg" placeholder="Kg" inputmode="decimal" style="width:100%; padding:8px 4px; font-size:14px; text-align:center; box-sizing:border-box; border:1px solid var(--border); border-radius:6px;"></div>
                             </div>
                         </div>
                     </div>`;
@@ -1192,13 +1176,15 @@
             });
         }
 
-        // 🔴 ระบบเรนเดอร์คำนวณกราฟและคะแนนรายวัน 🔴
+        // 🔴 ระบบคำนวณกราฟ เปลี่ยนสีแคลอรี และเซฟคะแนนจัดอันดับ 🔴
         function renderDashboard() {
             let totalCal = 0; let totalPro = 0; 
             const mealGroups = { "มื้อเช้า (หลังเวท)": [], "มื้อเที่ยง": [], "มื้อเย็น": [], "ของว่าง/เครื่องดื่ม": [], "ก่อนนอน": [] };
             currentDayLogs.forEach(item => { totalCal += item.cal; totalPro += item.pro; if(mealGroups[item.meal]) mealGroups[item.meal].push(item); });
             
             let totalBurn = 0; currentDayCardio.forEach(item => { totalBurn += item.burn; });
+            
+            // ใช้ "แคลอรีที่กิน (In)" เป็นตัวเปลี่ยนสี ตามที่ผู้ใช้รีเควส
             let netCal = totalCal - totalBurn; if(netCal < 0) netCal = 0;
             let totalWater = 0; currentDayWater.forEach(item => { totalWater += item.amount; });
 
@@ -1212,11 +1198,20 @@
             let safeTargetPro = parseFloat(userSettings.targetPro) || 140;
             let safeTargetWater = parseFloat(userSettings.targetWater) || 3000;
 
-            // 🔴 ระบบเปลี่ยนสีแคลอรีสุทธิ 🔴
-            let statusText = "✅ แคลอรีอยู่ในเกณฑ์เป้าหมาย"; let color = "var(--success)"; 
-            let netPct = (netCal / safeTargetCal) * 100;
-            if(netPct < 80) { color = "var(--danger)"; statusText = "⚠️ แคลอรีต่ำเกินไป (< 80%)"; } 
-            else if (netPct < 100) { color = "var(--warning)"; statusText = "⚡ แคลอรีใกล้ถึงเป้าหมาย"; }
+            // 🔴 เปลี่ยนสีโดยอิงจาก "แคลอรีที่กินเข้าไป (totalCal)"
+            let statusText = "แคลอรีอยู่ในเกณฑ์เป้าหมาย"; let color = "var(--success)"; 
+            let calInPct = (totalCal / safeTargetCal) * 100;
+            
+            if (calInPct < 80) {
+                color = "var(--danger)";
+                statusText = "แจ้งเตือน: ทานน้อยเกินไป";
+            } else if (calInPct < 100) {
+                color = "var(--warning)";
+                statusText = "ใกล้ถึงเป้าหมายแคลอรีแล้ว";
+            } else {
+                color = "var(--success)";
+                statusText = "ทานครบเป้าหมายแล้ว";
+            }
             
             if(nCalUI) nCalUI.style.color = color; 
             const calStat = document.getElementById('calStatus'); const nCalLabel = document.getElementById('netCalLabel');
@@ -1237,19 +1232,24 @@
             let waterPct = Math.min((totalWater / safeTargetWater) * 100, 100); if(isNaN(waterPct)) waterPct = 0;
             const fillWat = document.getElementById('fillWater'); if(fillWat) { fillWat.setAttribute('y', 100 - waterPct); fillWat.setAttribute('height', waterPct); }
             
-            // คำนวณคะแนนและเซฟลงคลาวด์อัตโนมัติ
-            let proScore = (totalPro / safeTargetPro) * 100; if(isNaN(proScore)) proScore = 0; proScore = Math.min(proScore, 100) * 0.4;
-            let calScore = 0;
-            if (netCal <= safeTargetCal) { calScore = 40; } else { let overPct = ((netCal - safeTargetCal) / safeTargetCal); calScore = Math.max(40 - (overPct * 40 * 2), 0); }
+            // 🔴 เกณฑ์ให้คะแนน Leaderboard แบบใหม่ (รวมน้ำ) 🔴
+            let proScore = (totalPro / safeTargetPro) * 100; if(isNaN(proScore)) proScore = 0; proScore = Math.min(proScore, 100) * 0.3; // 30%
+            
+            let calScore = 0; // 30%
+            if (netCal <= safeTargetCal) { calScore = 30; } else { let overPct = ((netCal - safeTargetCal) / safeTargetCal); calScore = Math.max(30 - (overPct * 30 * 2), 0); }
             if(isNaN(calScore)) calScore = 0;
-            let burnScore = (totalBurn / 300) * 100; if(isNaN(burnScore)) burnScore = 0; burnScore = Math.min(burnScore, 100) * 0.2;
+            
+            let burnScore = (totalBurn / 300) * 100; if(isNaN(burnScore)) burnScore = 0; burnScore = Math.min(burnScore, 100) * 0.2; // 20%
+            
+            let waterScore = (totalWater / safeTargetWater) * 100; if(isNaN(waterScore)) waterScore = 0; waterScore = Math.min(waterScore, 100) * 0.2; // 20%
 
-            let dailyScore = proScore + calScore + burnScore; if(isNaN(dailyScore)) dailyScore = 0;
+            let dailyScore = proScore + calScore + burnScore + waterScore; if(isNaN(dailyScore)) dailyScore = 0;
             const dateStr = document.getElementById('datePicker').value;
             if (currentUser && dateStr) {
                 setDoc(doc(db, "users", currentUser.uid), { scores: { [dateStr]: dailyScore } }, { merge: true }).catch(e => console.log(e));
             }
 
+            // เรนเดอร์ประวัติ
             const container = document.getElementById('mealLogs'); 
             if(container) {
                 container.innerHTML = ''; let hasData = false;
@@ -1276,7 +1276,7 @@
                     hasData = true;
                     let html = `<div class="meal-section"><div class="meal-header" style="background:#fef3c7; color:#b45309;"><span>💊 วิตามิน/อาหารเสริม</span><span></span></div>`;
                     currentDayVitamins.sort((a,b) => b.timestamp - a.timestamp).forEach(item => {
-                        html += `<div class="log-item"><div><div class="log-name" style="color:var(--warning);">${item.name}</div><div class="log-cal">${item.amount} ชิ้น/เม็ด (มื้อ: ${item.meal || '-'})</div></div><button class="del-btn" onclick="deleteLog('${item.id}', 'vitamins')">ลบ</button></div>`;
+                        html += `<div class="log-item"><div><div class="log-name" style="color:var(--warning);">${item.name}</div><div class="log-cal">${item.amount} ชิ้น/เม็ด (ช่วง: ${item.meal || '-'})</div></div><button class="del-btn" onclick="deleteLog('${item.id}', 'vitamins')">ลบ</button></div>`;
                     }); html += `</div>`; container.innerHTML += html;
                 }
 
@@ -1310,7 +1310,7 @@
                 snapCardio.forEach(doc => { const d = doc.data(); initStat(d.dateStr); dailyStats[d.dateStr].burn += d.burn; });
                 snapMetrics.forEach(doc => { const d = doc.data(); initStat(d.dateStr); dailyStats[d.dateStr].weight = d.weight || "-"; dailyStats[d.dateStr].fat = d.bodyFat || "-"; if(d.imageUrl) dailyStats[d.dateStr].imageUrl = d.imageUrl; });
                 snapWater.forEach(doc => { const d = doc.data(); initStat(d.dateStr); dailyStats[d.dateStr].water += d.amount; });
-                snapVits.forEach(doc => { const d = doc.data(); initStat(d.dateStr); dailyStats[d.dateStr].vits.push(`${d.name} (${d.amount})`); });
+                snapVits.forEach(doc => { const d = doc.data(); initStat(d.dateStr); dailyStats[d.dateStr].vits.push(`${d.name}`); });
                 snapWorkouts.forEach(doc => { const d = doc.data(); initStat(d.dateStr); dailyStats[d.dateStr].workouts.push(d.routine); });
 
                 const dates = Object.keys(dailyStats).sort((a,b) => b.localeCompare(a)); 
@@ -1341,8 +1341,13 @@
                         galleryHtml += `<div style="position: relative; cursor: pointer; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); background: #000;" onclick="window.openImageModal(${currentIndex})"><img src="${stat.imageUrl}" style="width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; opacity: 0.95;"><div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0, 0, 0, 0.7); color: white; text-align: center; padding: 3px 0; font-size: 10px; font-weight: bold;">วันที่ ${dayNum}</div></div>`;
                     }
 
-                    let vitsText = stat.vits.length > 0 ? stat.vits.join(', ') : '-';
-                    let workoutText = stat.workouts.length > 0 ? stat.workouts.join(', ') : '-';
+                    // เอาแค่ชื่อวิตามินแบบไม่ซ้ำ
+                    let uniqueVits = [...new Set(stat.vits)];
+                    let vitsText = uniqueVits.length > 0 ? uniqueVits.join(', ') : '-';
+                    
+                    let uniqueWorkouts = [...new Set(stat.workouts)];
+                    let workoutText = uniqueWorkouts.length > 0 ? uniqueWorkouts.join(', ') : '-';
+                    
                     let extraInfoHtml = `<div style="background: #f8fafc; padding: 8px 10px; border-radius: 6px; margin-top: 10px; font-size: 11px; border: 1px solid var(--border);"><div style="color:var(--primary); margin-bottom:4px;"><b>💪 เวท:</b> ${workoutText}</div><div style="color:#0ea5e9; margin-bottom:4px;"><b>💧 น้ำ:</b> ${stat.water} / ${safeTargetWater} ml</div><div style="color:var(--warning);"><b>💊 วิตามิน:</b> ${vitsText}</div></div>`;
 
                     gridHtml += `<div class="day-card" style="flex-direction: column; align-items: stretch; padding: 12px; position: relative;"><div onclick="window.deleteWholeDay('${date}')" style="position: absolute; top: 8px; right: 10px; cursor: pointer; font-size: 14px; opacity: 0.4; transition: 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'" title="ลบข้อมูลวันนี้ทั้งหมด">🗑️</div><div style="display:flex; align-items:center;"><div class="day-date" style="width: 40px; font-size: 16px;">${dayNum}<span>วันที่</span></div>${svgHtml}<div class="day-stats" style="flex-grow: 1;"><div style="display:flex; justify-content:space-between; gap:5px;"><div><div style="color:var(--primary); font-weight:bold; font-size:12px;">กิน: ${stat.cal.toFixed(0)}</div><div style="color:var(--danger); font-weight:bold; font-size:12px; margin: 2px 0;">เผา: ${stat.burn.toFixed(0)}</div><div style="color:#0284c7; font-weight:bold; font-size:12px; margin: 2px 0;">สุทธิ: ${netCal.toFixed(0)} <span style="font-weight:normal; font-size:10px; color:#64748b;">/ ${safeTargetCal}</span></div></div><div style="text-align:right;"><div style="color:var(--text); font-weight:bold; font-size:12px;">นน: ${stat.weight !== "-" ? stat.weight + " kg" : "-"}</div><div style="color:#64748b; font-weight:bold; font-size:12px; margin: 2px 0;">ไขมัน: ${stat.fat !== "-" ? stat.fat + "%" : "-"}</div><div style="color:var(--success); font-size:11px; margin: 2px 0;">โปร: ${stat.pro.toFixed(1)}g</div></div></div></div></div>${extraInfoHtml}</div>`;
@@ -1373,26 +1378,6 @@
             } catch (e) { alert("เกิดข้อผิดพลาดในการลบข้อมูล: " + e.message); console.error(e); }
         };
 
-        const foodSearch = document.getElementById('foodSearch');
-        const foodList = document.getElementById('foodList');
-        foodSearch.oninput = (e) => {
-            const filter = e.target.value.toLowerCase(); foodList.innerHTML = ''; if(!filter) { foodList.style.display = 'none'; return; }
-            const filtered = foodDB.filter(f => f.name.toLowerCase().includes(filter) || f.cat.toLowerCase().includes(filter));
-            if(filtered.length === 0) { foodList.innerHTML = '<div class="search-item" style="color:red;">ไม่พบเมนูนี้ (กดปุ่มคีย์เองได้เลย)</div>'; foodList.style.display = 'block'; return; }
-            filtered.forEach(f => {
-                const div = document.createElement('div'); div.className = 'search-item';
-                div.innerHTML = `<div><span class="cat-tag">${f.cat}</span> ${f.name}</div> <div style="color:#64748b; font-size:12px;">${f.cal} kcal / ${f.base}${f.unit}</div>`;
-                div.onclick = () => { selectedFoodIndex = foodDB.indexOf(f); foodSearch.value = f.name; foodList.style.display = 'none'; document.getElementById('unitHint').innerHTML = `(<b style="color:var(--primary);">ใส่ ${f.base}</b> หากทานปริมาณ ${f.base} ${f.unit})`; };
-                foodList.appendChild(div);
-            });
-            foodList.style.display = 'block';
-        };
-
-        window.toggleCustomBox = () => { const box = document.getElementById('customFoodBox'); box.style.display = box.style.display === 'block' ? 'none' : 'block'; }
-        window.addEntry = async () => { if (selectedFoodIndex === -1) return alert("กรุณาเลือกเมนูจากลิสต์ครับ"); const amount = parseFloat(document.getElementById('foodAmount').value); if (!amount || amount <= 0) return alert("กรุณาใส่ปริมาณ"); const f = foodDB[selectedFoodIndex]; await addDoc(collection(db, "users", currentUser.uid, "logs"), { dateStr: document.getElementById('datePicker').value, meal: document.getElementById('mealTime').value, name: f.name, amount: amount, unit: f.unit, cal: (f.cal/f.base)*amount, pro: (f.pro/f.base)*amount, timestamp: Date.now() }); foodSearch.value = ''; document.getElementById('foodAmount').value = ''; selectedFoodIndex = -1; document.getElementById('unitHint').innerText = "กรุณาเลือกอาหารก่อนครับ"; }
-        window.addCustomEntry = async () => { const meal = document.getElementById('mealTime').value; const name = document.getElementById('c_name').value; const unit = document.getElementById('c_unit').value || "ที่ทาน"; const cal = parseFloat(document.getElementById('c_cal').value); const pro = parseFloat(document.getElementById('c_pro').value) || 0; if (!name || isNaN(cal)) return alert("กรุณาใส่ชื่อเมนูและแคลอรี"); await addDoc(collection(db, "users", currentUser.uid, "logs"), { dateStr: document.getElementById('datePicker').value, meal: meal, name: name, amount: 1, unit: unit, cal: cal, pro: pro, timestamp: Date.now() }); document.getElementById('customFoodBox').style.display = 'none'; document.getElementById('c_name').value = ''; document.getElementById('c_unit').value = '1 ที่'; document.getElementById('c_cal').value = ''; document.getElementById('c_pro').value = ''; }
-        window.deleteLog = async (docId, type) => { if(confirm("ต้องการลบรายการนี้ใช่ไหม?")) await deleteDoc(doc(db, "users", currentUser.uid, type, docId)); }
-        
         window.saveBodyMetrics = async () => {
             const weight = document.getElementById('bodyWeight').value; const fat = document.getElementById('bodyFat').value; const fileInput = document.getElementById('bodyImage'); const file = fileInput.files[0];
             if(!weight && !fat && !file) return alert("กรุณากรอกน้ำหนัก ไขมัน หรือเลือกรูปภาพก่อนครับ");
@@ -1404,7 +1389,7 @@
                     const data = await response.json(); if(data.success) { imageUrl = data.data.url; } else { throw new Error("ImgBB Upload Failed"); }
                 }
                 await addDoc(collection(db, "users", currentUser.uid, "metrics"), { dateStr: document.getElementById('datePicker').value, weight: weight || "-", bodyFat: fat || "-", imageUrl: imageUrl, timestamp: Date.now() });
-                document.getElementById('bodyWeight').value = ''; document.getElementById('bodyFat').value = ''; fileInput.value = ''; alert('✅ บันทึกสัดส่วนและรูปภาพเรียบร้อยครับ! (สามารถดูสถิติได้ที่แท็บ สรุปเดือน)');
+                document.getElementById('bodyWeight').value = ''; document.getElementById('bodyFat').value = ''; fileInput.value = ''; alert('✅ บันทึกสัดส่วนและรูปภาพเรียบร้อยครับ!');
             } catch (e) { alert("เกิดข้อผิดพลาดในการอัปโหลดรูป: " + e.message); } 
             finally { document.getElementById('uploadStatus').style.display = 'none'; document.getElementById('btnSaveBody').disabled = false; }
         }
