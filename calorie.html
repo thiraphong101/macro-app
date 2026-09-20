@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Theerapong Fitness V39 (Safe Base V31)</title>
+    <title>Theerapong Fitness V31 (Ultimate Stable)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --border: #cbd5e1; }
@@ -23,10 +23,10 @@
         .header-date { display: flex; justify-content: space-between; align-items: center; background: var(--primary); padding: 15px; border-radius: 12px; color: white; margin-bottom: 15px; }
         .date-input { background: transparent; border: 1px solid rgba(255,255,255,0.4); color: white; padding: 8px 12px; border-radius: 8px; font-size: 16px; font-weight: bold; width: 140px; color-scheme: dark; outline: none; }
         
-        /* Form Inputs & Visuals - ปรับเป็น 3 คอลัมน์ รองรับน้ำดื่ม */
-        .visual-container { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .human-svg { width: 100%; height: 85px; drop-shadow: 0 4px 6px rgba(0,0,0,0.1); display: block; margin: 0 auto; }
-        .stat-box { background: var(--bg); padding: 10px 8px; border-radius: 12px; text-align: center; }
+        /* Form Inputs & Visuals */
+        .visual-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .human-svg { width: 100%; height: 95px; drop-shadow: 0 4px 6px rgba(0,0,0,0.1); display: block; margin: 0 auto; }
+        .stat-box { background: var(--bg); padding: 12px 10px; border-radius: 12px; text-align: center; }
         .stat-val { font-size: 18px; font-weight: bold; line-height: 1; margin: 4px 0; }
         label { font-weight: 600; font-size: 14px; display: block; margin: 15px 0 6px; }
         select, input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; box-sizing: border-box; background: white; outline: none; }
@@ -96,7 +96,7 @@
         .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
         .admin-table th, .admin-table td { border-bottom: 1px solid var(--border); padding: 10px 5px; text-align: left; }
         .admin-table th { background: #f8fafc; color: #334155; }
-        .ban-btn { background: #fee2e2; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
+        .ban-btn { background: #fee2e2; color: var(--danger); border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
 
         /* Login Screen */
         #loginScreen { position: fixed; top:0; left:0; right:0; bottom:0; background: white; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
@@ -174,31 +174,20 @@
                                 <rect id="fillBurn" x="0" y="24" width="24" height="0" fill="#ef4444" />
                             </g>
                         </svg>
-                        <div id="netCalLabel" style="font-size: 10px; font-weight: bold; color: #0284c7; margin-top: 10px;">แคลอรีสุทธิ</div>
-                        <div id="netCalUI" style="font-size: 20px; font-weight: bold; color: #0284c7; line-height: 1.1; margin: 4px 0;">0</div>
+                        <div style="font-size: 11px; font-weight: bold; color: #0284c7; margin-top: 10px;">แคลอรีสุทธิ (Net)</div>
+                        <div id="netCalUI" style="font-size: 24px; font-weight: bold; color: #0284c7; line-height: 1.1; margin: 4px 0;">0</div>
                         <div style="font-size: 10px; color: transparent;">-</div>
                     </div>
 
-                    <!-- กล่องกลาง: โปรตีน (หลอดแท่ง) -->
+                    <!-- กล่องขวา: โปรตีน (ไอคอนแท่ง Bar Scale เดิม V26) -->
                     <div class="stat-box" style="margin: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #a7f3d0;">
-                        <svg style="height: 85px; width: auto; display: block; margin: 0 auto;" viewBox="0 0 24 100">
+                        <svg style="height: 95px; width: auto; display: block; margin: 0 auto;" viewBox="0 0 24 100">
                             <rect x="4" y="0" width="16" height="100" rx="6" fill="#e2e8f0" />
                             <rect id="fillProtein" x="4" y="100" width="16" height="0" rx="6" fill="#10b981" />
                         </svg>
-                        <div style="font-size: 10px; font-weight: bold; color: var(--success); margin-top: 10px;">โปรตีน (g)</div>
-                        <div id="totalProUI" style="font-size: 20px; font-weight: bold; color: var(--success); line-height: 1.1; margin: 4px 0;">0</div>
-                        <div style="font-size: 10px; color: #64748b;">เป้า <span id="uiTargetPro">140</span></div>
-                    </div>
-
-                    <!-- กล่องขวา: น้ำดื่ม (หลอดแท่ง) -->
-                    <div class="stat-box" style="margin: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #7dd3fc;">
-                        <svg style="height: 85px; width: auto; display: block; margin: 0 auto;" viewBox="0 0 24 100">
-                            <rect x="4" y="0" width="16" height="100" rx="6" fill="#e2e8f0" />
-                            <rect id="fillWater" x="4" y="100" width="16" height="0" rx="6" fill="#0ea5e9" />
-                        </svg>
-                        <div style="font-size: 10px; font-weight: bold; color: #0ea5e9; margin-top: 10px;">น้ำ (ml)</div>
-                        <div id="totalWaterUI" style="font-size: 20px; font-weight: bold; color: #0ea5e9; line-height: 1.1; margin: 4px 0;">0</div>
-                        <div style="font-size: 10px; color: #64748b;">เป้า <span id="uiTargetWater">3000</span></div>
+                        <div style="font-size: 11px; font-weight: bold; color: var(--success); margin-top: 10px;">โปรตีนที่ได้</div>
+                        <div id="totalProUI" style="font-size: 24px; font-weight: bold; color: var(--success); line-height: 1.1; margin: 4px 0;">0</div>
+                        <div style="font-size: 10px; color: #64748b;">เป้า <span id="uiTargetPro">140</span>g</div>
                     </div>
                 </div>
 
@@ -214,22 +203,21 @@
                     </div>
                 </div>
                 
-                <div style="font-size: 13px; font-weight: bold; margin-top: 15px;" id="calStatus">สถานะ: รอโหลด...</div>
+                <div style="font-size: 12px; color: #64748b; margin-top: 15px;" id="calStatus">สถานะ: รอโหลด...</div>
             </div>
 
             <div class="card">
-                <h3 style="font-size: 16px; border-bottom: 2px solid var(--bg); padding-bottom: 10px;">🍽️ เพิ่มรายการ</h3>
-                <label>มื้ออาหาร / ช่วงเวลา:</label>
+                <h3 style="font-size: 16px; border-bottom: 2px solid var(--bg); padding-bottom: 10px;">🍽️ เพิ่มรายการอาหาร</h3>
+                <label>มื้ออาหาร:</label>
                 <select id="mealTime">
                     <option value="มื้อเช้า (หลังเวท)">มื้อเช้า (หลังเวท)</option>
                     <option value="มื้อเที่ยง">มื้อเที่ยง</option>
                     <option value="มื้อเย็น">มื้อเย็น</option>
                     <option value="ของว่าง/เครื่องดื่ม">ของว่าง/เครื่องดื่ม</option>
-                    <option value="ก่อนนอน">ก่อนนอน</option>
                 </select>
 
                 <div id="standardEntry">
-                    <label>ค้นหาเมนูอาหาร:</label>
+                    <label>ค้นหาเมนูอาหาร (จากไฟล์ JSON):</label>
                     <div class="search-container">
                         <input type="text" id="foodSearch" placeholder="พิมพ์ชื่ออาหาร..." autocomplete="off">
                         <div class="search-list" id="foodList"></div>
@@ -252,35 +240,6 @@
                         <div><label>โปรตีน (g):</label><input type="number" id="c_pro" inputmode="decimal"></div>
                     </div>
                     <button onclick="window.addCustomEntry()" style="background: var(--success);">+ บันทึกเมนูนี้</button>
-                </div>
-
-                <button class="btn-outline" onclick="window.toggleWaterBox()" style="color: #0ea5e9; border-color: #0ea5e9;">💧 บันทึกน้ำดื่ม</button>
-                <div class="custom-box" id="customWaterBox" style="border-color: #0ea5e9; background: #f0f9ff; display: none;">
-                    <label style="margin-top:0; color:#0369a1;">เลือกปริมาณน้ำ:</label>
-                    <select id="waterSelect" onchange="window.checkCustomWater()">
-                        <option value="250">น้ำ 1 แก้ว (250 ml)</option>
-                        <option value="200">200 ml</option>
-                        <option value="300">300 ml</option>
-                        <option value="350">350 ml</option>
-                        <option value="400">400 ml</option>
-                        <option value="500">500 ml</option>
-                        <option value="1000">1000 ml</option>
-                        <option value="custom">ระบุตัวเลขเอง...</option>
-                    </select>
-                    <input type="number" id="waterCustomAmount" placeholder="ระบุปริมาณ (ml)" inputmode="decimal" style="display:none; margin-top:10px;">
-                    <button onclick="window.addWaterLog()" style="background: #0ea5e9; margin-top: 10px; border: none; color: white;">+ ดื่ม</button>
-                </div>
-
-                <button class="btn-outline" onclick="window.toggleVitaminBox()" style="color: #b45309; border-color: var(--warning);">💊 บันทึกวิตามิน / อาหารเสริม</button>
-                <div class="custom-box" id="customVitaminBox" style="border-color: var(--warning); background: #fffbeb; display: none;">
-                    <label style="margin-top:0; color: #b45309;">เลือกวิตามิน:</label>
-                    <select id="vitaminSelect">
-                        <option value="">-- เลือกรายการ --</option>
-                    </select>
-                    <label style="color: #b45309;">จำนวน (เม็ด/ช้อน):</label>
-                    <input type="number" id="vitaminAmountInput" placeholder="ใส่จำนวน" inputmode="decimal">
-                    <p style="font-size:11px; color:#b45309; margin-top:8px; margin-bottom: 0;">*ระบบจะบันทึกพร้อมมื้ออาหารที่เลือกไว้ด้านบน</p>
-                    <button onclick="window.addVitaminLog()" style="background: var(--warning); margin-top: 10px; border: none; color: white;">+ ทานเลย</button>
                 </div>
             </div>
 
@@ -415,19 +374,23 @@
             <div style="padding: 0 15px;">
                 <p id="dashStatus" style="font-size: 13px; color: #64748b; text-align: center;">เลือกเดือนที่ต้องการดูข้อมูลครับ</p>
                 
+                <!-- แกลเลอรีรูปภาพแบบ 4 คอลัมน์ -->
                 <h3 style="font-size: 15px; color: var(--primary); margin-top: 20px; border-bottom: 2px solid var(--border); padding-bottom: 5px;">📷 วิวัฒนาการรูปร่าง</h3>
-                <div id="monthlyGallery" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 25px;"></div>
+                <div id="monthlyGallery" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 25px;">
+                    <!-- รูปจะมาเรียงตรงนี้ -->
+                </div>
 
+                <!-- ข้อมูลสรุปรายวัน -->
                 <h3 style="font-size: 15px; color: var(--primary); border-bottom: 2px solid var(--border); padding-bottom: 5px;">📉 สรุปข้อมูลรายวัน</h3>
                 <div class="monthly-grid" id="monthlyGrid"></div>
             </div>
         </div>
 
-        <!-- 6. SCORE LEADERBOARD TAB (รายวัน + สถิติแชมป์) -->
+        <!-- 6. SCORE LEADERBOARD TAB -->
         <div id="tab-score" class="tab-content">
             <div class="card" style="background: linear-gradient(135deg, #f59e0b, #ea580c); color: white; text-align: center;">
-                <h2 style="color: white; margin-bottom: 5px;">🏆 จัดอันดับประจำวัน</h2>
-                <p style="font-size: 12px; margin-top: 0; opacity: 0.9;">คะแนนความมีวินัยของ <b id="lbDateDisplay">วันนี้</b></p>
+                <h2 style="color: white; margin-bottom: 5px;">🏆 จัดอันดับความมีวินัย</h2>
+                <p style="font-size: 12px; margin-top: 0; opacity: 0.9;">คะแนนสะสมประจำเดือนนี้ (เต็ม 100%)</p>
                 <div style="font-size: 11px; margin-top: 10px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px; display: inline-block; text-align: left;">
                     <b>เกณฑ์การให้คะแนน:</b><br>
                     • โปรตีนถึงเป้า (40%)<br>
@@ -439,18 +402,9 @@
             <div style="padding: 0 15px;" id="leaderboardContainer">
                 <p style="font-size: 13px; color: #64748b; text-align: center;">กำลังโหลดตารางคะแนน...</p>
             </div>
-
-            <!-- กล่องสถิติแชมป์ประจำเดือน (Hall of Fame) -->
-            <div class="card" style="margin-top: 30px; border: 2px solid var(--warning); background: #fffbeb;">
-                <h3 style="font-size: 16px; color: var(--warning); text-align: center; margin-bottom: 5px;">👑 สถิติแชมป์ประจำเดือนนี้</h3>
-                <p style="font-size: 11px; color: #64748b; text-align: center; margin-top: 0; margin-bottom: 15px;">คนที่ได้ที่ 1 ของวันบ่อยที่สุด</p>
-                <div id="hallOfFameContainer" style="display: flex; flex-direction: column; gap: 8px;">
-                    <p style="text-align:center; font-size:13px; color:#94a3b8;">รอโหลดข้อมูล...</p>
-                </div>
-            </div>
         </div>
 
-        <!-- 7. SETTINGS TAB (แยกปุ่มบันทึก) -->
+        <!-- 7. SETTINGS TAB -->
         <div id="tab-settings" class="tab-content">
             <div class="card">
                 <h2>⚙️ เป้าหมายหลัก</h2>
@@ -458,24 +412,15 @@
                 <input type="number" id="setCal" inputmode="decimal">
                 <label>เป้าหมายโปรตีน (Protein - กรัม):</label>
                 <input type="number" id="setPro" inputmode="decimal">
-                <label>เป้าหมายน้ำดื่ม (Water - มิลลิลิตร):</label>
-                <input type="number" id="setWater" inputmode="decimal" placeholder="เช่น 3000">
-                <button onclick="window.saveGoals()">💾 บันทึกเป้าหมาย</button>
-            </div>
-
-            <div class="card">
-                <h3 style="font-size: 16px; margin-top: 0; border-bottom: 2px solid var(--border); padding-bottom: 5px;">💊 รายการวิตามิน (ที่ทานประจำ)</h3>
-                <div id="vitaminSettingsContainer"></div>
-                <button class="btn-outline" onclick="window.addVitaminSetting()">+ เพิ่มวิตามิน</button>
-                <button onclick="window.saveVitamins()" style="background: var(--warning); margin-top: 10px; color: white; border: none;">💾 บันทึกวิตามิน</button>
+                <button onclick="window.saveSettings()">💾 บันทึกเป้าหมาย</button>
             </div>
 
             <div class="card">
                 <h2>🛠️ สร้างตารางเวทส่วนตัว</h2>
-                <p style="font-size: 12px; color: #64748b; margin-top:-10px;">สร้างวันเล่นเวท และเพิ่มชื่อท่า พร้อมแนบชื่อไฟล์รูปภาพ</p>
+                <p style="font-size: 12px; color: #64748b; margin-top:-10px;">สร้างวันเล่นเวท และเพิ่มชื่อท่า พร้อมแนบชื่อไฟล์รูปภาพ (เช่น 1.jpg)</p>
                 <div id="routineBuilderContainer"></div>
                 <button class="btn-outline" onclick="window.addRoutineDay()">+ เพิ่มวัน (New Day)</button>
-                <button onclick="window.saveRoutines()" style="background: var(--success); margin-top: 10px;">💾 บันทึกตารางเวท</button>
+                <button onclick="window.saveSettings()" style="background: var(--success); margin-top: 10px;">💾 บันทึกตารางเวท</button>
             </div>
         </div>
 
@@ -510,7 +455,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 
     <!-- โค้ดเชื่อมต่อ Firebase & Logic -->
@@ -538,19 +482,16 @@
         let unsubscribeMeals = null;
         let unsubscribeWorkouts = null;
         let unsubscribeCardio = null;
-        let unsubscribeWater = null;
-        let unsubscribeVitamins = null;
         
         const ADMIN_EMAIL = "deathnoreason101@gmail.com";
         let foodDB = [];
         let selectedFoodIndex = -1;
+        let userSettings = { targetCal: 2000, targetPro: 140 };
         
-        // 🔴 ค่าเริ่มต้น ป้องกันโค้ดพัง
-        let userSettings = { targetCal: 2000, targetPro: 140, targetWater: 3000, vitamins: ["วิตามินซี", "น้ำมันปลา"] };
         let customRoutines = []; 
         window.tempCalculatedTDEE = 0; 
         
-        // ตัวแปร Slider รูปภาพ
+        // ตัวแปรสำหรับระบบ Slider รูปภาพ
         window.currentMonthImages = [];
         window.currentImageIndex = 0;
 
@@ -582,12 +523,8 @@
             }
         }
 
-        // 🔴 เปิด/ปิดกล่องน้ำและวิตามิน
-        window.toggleWaterBox = () => { const box = document.getElementById('customWaterBox'); box.style.display = box.style.display === 'block' ? 'none' : 'block'; }
-        window.checkCustomWater = () => { const sel = document.getElementById('waterSelect').value; document.getElementById('waterCustomAmount').style.display = sel === 'custom' ? 'block' : 'none'; }
-        window.toggleVitaminBox = () => { const box = document.getElementById('customVitaminBox'); box.style.display = box.style.display === 'block' ? 'none' : 'block'; }
-
         window.switchTab = (tabId) => {
+            // ซ่อนกล่องวันที่เมื่อไม่ได้อยู่ในหน้าแรกๆ
             document.getElementById('globalDateHeader').style.display = (tabId === 'dashboard' || tabId === 'score' || tabId === 'settings' || tabId === 'admin') ? 'none' : 'flex';
             
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -596,7 +533,7 @@
             document.getElementById('tab-' + tabId).classList.add('active');
             
             if(tabId === 'dashboard') { window.loadMonthlyData(); }
-            if(tabId === 'score') { window.loadDailyLeaderboard(); }
+            if(tabId === 'score') { window.loadLeaderboard(); }
             if(tabId === 'admin' && currentUser && currentUser.email === ADMIN_EMAIL) { window.loadAdminPanel(); }
         };
 
@@ -628,8 +565,8 @@
                             displayName: dName,
                             photoURL: user.photoURL || "",
                             isBanned: false,
-                            role: user.email === ADMIN_EMAIL ? "admin" : "user",
-                            scores: {} 
+                            monthlyScore: 0,
+                            role: user.email === ADMIN_EMAIL ? "admin" : "user"
                         });
                     } else {
                         if (userSnap.data().isBanned && user.email !== ADMIN_EMAIL) {
@@ -637,6 +574,7 @@
                             signOut(auth);
                             return;
                         }
+                        // อัปเดตข้อมูลเผื่อมีการเปลี่ยนชื่อ
                         await setDoc(userRef, { displayName: dName, photoURL: user.photoURL || "" }, { merge: true });
                     }
 
@@ -645,7 +583,9 @@
                     document.getElementById('appContent').style.display = 'block';
                     document.getElementById('userNameDisplay').innerText = `ผู้ใช้: ${dName}`;
                     
-                    if (user.email === ADMIN_EMAIL) { document.getElementById('adminTabBtn').style.display = 'flex'; }
+                    if (user.email === ADMIN_EMAIL) {
+                        document.getElementById('adminTabBtn').style.display = 'flex';
+                    }
                     
                     await loadFoodDB();
                     await loadSettings();
@@ -670,125 +610,109 @@
                 if(unsubscribeMeals) unsubscribeMeals();
                 if(unsubscribeWorkouts) unsubscribeWorkouts();
                 if(unsubscribeCardio) unsubscribeCardio();
-                if(unsubscribeWater) unsubscribeWater();
-                if(unsubscribeVitamins) unsubscribeVitamins();
             }
         });
 
-        // 🔴 ระบบ Leaderboard รายวัน 🔴
-        window.loadDailyLeaderboard = async () => {
+        // 🔴 โหลดตารางอันดับ
+        window.loadLeaderboard = async () => {
             const container = document.getElementById('leaderboardContainer');
-            const hofContainer = document.getElementById('hallOfFameContainer');
-            const dateStr = document.getElementById('datePicker').value; 
-            if(!dateStr) { container.innerHTML = '<p style="text-align:center;">กรุณาเลือกวันที่ก่อน</p>'; return; }
-
-            const monthPrefix = dateStr.slice(0, 7); 
-            const dateParts = dateStr.split('-');
-            document.getElementById('lbDateDisplay').innerText = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
             container.innerHTML = '<p style="text-align:center; font-size:13px;">กำลังโหลดตารางคะแนน...</p>';
             
             try {
                 const usersSnap = await getDocs(collection(db, "users"));
                 let usersList = [];
-                let monthlyWinners = {}; 
-
+                
                 usersSnap.forEach(doc => {
                     const data = doc.data();
                     if (data.isBanned !== true) { 
-                        let todayScore = 0;
-                        if (data.scores) {
-                            if (data.scores[dateStr] !== undefined) todayScore = data.scores[dateStr];
-                            
-                            Object.keys(data.scores).forEach(dKey => {
-                                if (dKey.startsWith(monthPrefix) && data.scores[dKey] > 0) {
-                                    if(!monthlyWinners[dKey]) monthlyWinners[dKey] = { score: -1, users: [] };
-                                    if (data.scores[dKey] > monthlyWinners[dKey].score) {
-                                        monthlyWinners[dKey].score = data.scores[dKey];
-                                        monthlyWinners[dKey].users = [{ name: data.displayName, photo: data.photoURL }];
-                                    } else if (data.scores[dKey] === monthlyWinners[dKey].score) {
-                                        monthlyWinners[dKey].users.push({ name: data.displayName, photo: data.photoURL });
-                                    }
-                                }
-                            });
-                        }
-                        usersList.push({ id: doc.id, ...data, displayScore: todayScore });
+                        usersList.push({ id: doc.id, ...data });
                     }
                 });
                 
-                usersList.sort((a, b) => b.displayScore - a.displayScore);
+                usersList.sort((a, b) => (b.monthlyScore || 0) - (a.monthlyScore || 0));
 
                 if (usersList.length === 0) {
                     container.innerHTML = '<p style="text-align:center; font-size:13px;">ยังไม่มีสมาชิกในระบบ</p>';
-                } else {
-                    let html = '';
-                    usersList.forEach((u, idx) => {
-                        const rank = idx + 1;
-                        let medal = '';
-                        if(rank === 1 && u.displayScore > 0) medal = '🥇'; else if(rank === 2 && u.displayScore > 0) medal = '🥈'; else if(rank === 3 && u.displayScore > 0) medal = '🥉';
-                        
-                        const scoreStr = u.displayScore.toFixed(1);
-                        const photo = u.photoURL || "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png";
-                        const isMe = (currentUser && u.email === currentUser.email) ? 'border: 2px solid var(--primary); background: #f0fdf4;' : '';
-                        const dName = u.displayName || 'ไม่ระบุชื่อ';
+                    return;
+                }
 
-                        html += `
-                            <div class="rank-card" style="${isMe}">
-                                <div class="rank-medal">${medal}</div>
-                                <div class="rank-num">#${rank}</div>
-                                <img src="${photo}" class="rank-avatar" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png'">
-                                <div class="rank-info">
-                                    <div class="rank-name">${dName} ${(currentUser && u.email === currentUser.email) ? '(คุณ)' : ''}</div>
-                                    <div class="rank-bar-bg"><div class="rank-bar-fill" style="width: ${scoreStr}%"></div></div>
+                let html = '';
+                usersList.forEach((u, idx) => {
+                    const rank = idx + 1;
+                    let medal = '';
+                    if(rank === 1) medal = '🥇'; else if(rank === 2) medal = '🥈'; else if(rank === 3) medal = '🥉';
+                    
+                    const score = (u.monthlyScore || 0).toFixed(1);
+                    const photo = u.photoURL || "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png";
+                    const isMe = (currentUser && u.email === currentUser.email) ? 'border: 2px solid var(--primary); background: #f0fdf4;' : '';
+                    const dName = u.displayName || 'ไม่ระบุชื่อ';
+
+                    html += `
+                        <div class="rank-card" style="${isMe}">
+                            <div class="rank-medal">${medal}</div>
+                            <div class="rank-num">#${rank}</div>
+                            <img src="${photo}" class="rank-avatar" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png'">
+                            <div class="rank-info">
+                                <div class="rank-name">${dName} ${(currentUser && u.email === currentUser.email) ? '(คุณ)' : ''}</div>
+                                <div class="rank-bar-bg">
+                                    <div class="rank-bar-fill" style="width: ${score}%"></div>
                                 </div>
-                                <div class="rank-score">${scoreStr}%</div>
                             </div>
-                        `;
-                    });
-                    container.innerHTML = html;
-                }
-
-                let champCounts = {};
-                Object.keys(monthlyWinners).forEach(dKey => {
-                    monthlyWinners[dKey].users.forEach(u => {
-                        let key = u.name;
-                        if(!champCounts[key]) champCounts[key] = { photo: u.photo, count: 0 };
-                        champCounts[key].count++;
-                    });
+                            <div class="rank-score">${score}%</div>
+                        </div>
+                    `;
                 });
+                container.innerHTML = html;
+            } catch (e) {
+                container.innerHTML = '<p style="text-align:center; color:red;">โหลดล้มเหลว: ' + e.message + '</p>';
+            }
+        };
 
-                let champArray = Object.keys(champCounts).map(name => ({ name, ...champCounts[name] })).sort((a,b) => b.count - a.count);
+        // 🔴 คำนวณคะแนน
+        const updateMyMonthlyScore = async (dailyStatsObject) => {
+            if(!currentUser) return;
+            const dates = Object.keys(dailyStatsObject);
+            if(dates.length === 0) return;
+
+            let totalDailyScores = 0;
+            let safeTargetPro = parseFloat(userSettings.targetPro) || 140;
+            let safeTargetCal = parseFloat(userSettings.targetCal) || 2000;
+
+            dates.forEach(date => {
+                const stat = dailyStatsObject[date];
+                let netCal = stat.cal - stat.burn; if(netCal < 0) netCal = 0;
                 
-                if (champArray.length > 0) {
-                    let hofHtml = '';
-                    champArray.forEach((champ, idx) => {
-                        let p = champ.photo || "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png";
-                        let crown = idx === 0 ? '👑' : '⭐';
-                        hofHtml += `
-                            <div style="display:flex; align-items:center; background: white; padding: 10px; border-radius: 8px; border: 1px solid #fde68a;">
-                                <img src="${p}" style="width:30px; height:30px; border-radius:50%; margin-right:10px; object-fit:cover;" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png'">
-                                <div style="flex-grow:1; font-weight:bold; font-size:14px; color:var(--text);">${champ.name}</div>
-                                <div style="font-weight:bold; color:var(--danger); font-size:14px;">${crown} ชนะ ${champ.count} วัน</div>
-                            </div>
-                        `;
-                    });
-                    hofContainer.innerHTML = hofHtml;
+                let proScore = (stat.pro / safeTargetPro) * 100;
+                if(isNaN(proScore)) proScore = 0;
+                proScore = Math.min(proScore, 100) * 0.4;
+                
+                let calScore = 0;
+                if (netCal <= safeTargetCal) {
+                    calScore = 40; 
                 } else {
-                    hofContainer.innerHTML = '<p style="text-align:center; font-size:13px; color:#94a3b8;">ยังไม่มีข้อมูลแชมป์ในเดือนนี้</p>';
+                    let overPct = ((netCal - safeTargetCal) / safeTargetCal);
+                    calScore = Math.max(40 - (overPct * 40 * 2), 0); 
                 }
+                if(isNaN(calScore)) calScore = 0;
 
-            } catch (e) { container.innerHTML = '<p style="text-align:center; color:red;">โหลดล้มเหลว</p>'; }
+                let burnScore = (stat.burn / 300) * 100;
+                if(isNaN(burnScore)) burnScore = 0;
+                burnScore = Math.min(burnScore, 100) * 0.2;
+
+                totalDailyScores += (proScore + calScore + burnScore);
+            });
+
+            let avgScore = totalDailyScores / dates.length;
+            if(isNaN(avgScore)) avgScore = 0;
+            
+            try { await setDoc(doc(db, "users", currentUser.uid), { monthlyScore: avgScore }, { merge: true }); } catch (e) {}
         };
 
         // 🔴 ระบบ Admin
         window.loadAdminPanel = async () => {
             try {
-                let maxAllowedUsers = 10;
-                try {
-                    const configSnap = await getDoc(doc(db, "app_config", "settings"));
-                    if(configSnap.exists()) { maxAllowedUsers = configSnap.data().maxUsers || 10; }
-                } catch(e){}
-                
-                document.getElementById('adminMaxUsers').value = maxAllowedUsers;
+                const configSnap = await getDoc(doc(db, "app_config", "settings"));
+                if(configSnap.exists()) { document.getElementById('adminMaxUsers').value = configSnap.data().maxUsers || 10; }
 
                 const usersSnap = await getDocs(collection(db, "users"));
                 document.getElementById('adminUserCount').innerText = usersSnap.size;
@@ -804,6 +728,7 @@
                     const btnLabel = u.isBanned ? 'ปลดแบน' : 'เตะออก';
                     const btnColor = u.isBanned ? 'var(--success)' : 'var(--danger)';
                     const disableAdmin = u.email === ADMIN_EMAIL ? 'disabled' : ''; 
+                    
                     const displayName = u.displayName || 'ไม่ระบุชื่อ';
                     const email = u.email || 'ไม่มีอีเมล';
                     
@@ -811,8 +736,11 @@
                         <tr>
                             <td><img src="${photo}" style="width:30px; height:30px; border-radius:50%; object-fit:cover;" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png'"></td>
                             <td><b>${displayName}</b><br><span style="font-size:10px; color:#64748b;">${email} ${isBannedStr}</span></td>
-                            <td><button class="ban-btn" style="background: ${btnColor}; color: white;" onclick="window.toggleBanUser('${uid}', ${!u.isBanned})" ${disableAdmin}>${btnLabel}</button></td>
-                        </tr>`;
+                            <td>
+                                <button class="ban-btn" style="background: ${btnColor}; color: white;" onclick="window.toggleBanUser('${uid}', ${!u.isBanned})" ${disableAdmin}>${btnLabel}</button>
+                            </td>
+                        </tr>
+                    `;
                 });
             } catch (e) { alert("Admin Error: " + e.message); }
         };
@@ -849,51 +777,22 @@
             try {
                 const docSnap = await getDoc(doc(db, "users", currentUser.uid));
                 if (docSnap.exists()) {
-                    if (docSnap.data().settings) {
-                        userSettings.targetCal = docSnap.data().settings.targetCal || 2000;
-                        userSettings.targetPro = docSnap.data().settings.targetPro || 140;
-                        userSettings.targetWater = docSnap.data().settings.targetWater || 3000;
-                        userSettings.vitamins = docSnap.data().settings.vitamins || ["วิตามินซี", "น้ำมันปลา"];
-                    }
+                    if (docSnap.data().settings) userSettings = docSnap.data().settings;
                     if (docSnap.data().routines) customRoutines = docSnap.data().routines;
                 }
-                
-                document.getElementById('setCal').value = userSettings.targetCal;
-                document.getElementById('setPro').value = userSettings.targetPro;
-                document.getElementById('setWater').value = userSettings.targetWater;
-                
+                document.getElementById('setCal').value = userSettings.targetCal || 2000;
+                document.getElementById('setPro').value = userSettings.targetPro || 140;
                 updateTargetsUI();
                 renderRoutineBuilder(); 
                 updateWorkoutDropdown(); 
-                renderVitaminSettings();
-                updateVitaminDropdown();
             } catch (err) {}
         }
 
-        // 🔴 แยกระบบ Save 3 ปุ่มอิสระ (ไม่มีบัคเซฟทับอีกต่อไป) 🔴
-        window.saveGoals = async () => {
-            userSettings.targetCal = parseFloat(document.getElementById('setCal').value) || 2000;
-            userSettings.targetPro = parseFloat(document.getElementById('setPro').value) || 140;
-            userSettings.targetWater = parseFloat(document.getElementById('setWater').value) || 3000;
+        window.saveSettings = async () => {
+            const cal = parseFloat(document.getElementById('setCal').value) || 2000;
+            const pro = parseFloat(document.getElementById('setPro').value) || 140;
+            userSettings = { targetCal: cal, targetPro: pro };
             
-            await setDoc(doc(db, "users", currentUser.uid), { settings: userSettings }, { merge: true });
-            updateTargetsUI();
-            window.changeDate();
-            alert('✅ บันทึกเป้าหมายสำเร็จ!');
-        }
-
-        window.saveVitamins = async () => {
-            const vitElements = document.querySelectorAll('.v-item-input');
-            const vits = [];
-            vitElements.forEach(el => { if(el.value.trim()) vits.push(el.value.trim()); });
-            
-            userSettings.vitamins = vits;
-            await setDoc(doc(db, "users", currentUser.uid), { settings: userSettings }, { merge: true });
-            updateVitaminDropdown();
-            alert('✅ บันทึกรายการวิตามินสำเร็จ!');
-        }
-
-        window.saveRoutines = async () => {
             const routineElements = document.querySelectorAll('.builder-day');
             const newRoutines = [];
             routineElements.forEach((dayEl) => {
@@ -908,57 +807,17 @@
             });
             customRoutines = newRoutines;
 
-            await setDoc(doc(db, "users", currentUser.uid), { routines: customRoutines }, { merge: true });
+            await setDoc(doc(db, "users", currentUser.uid), { settings: userSettings, routines: customRoutines }, { merge: true });
+            
+            updateTargetsUI();
             updateWorkoutDropdown();
-            alert('✅ บันทึกตารางเวทสำเร็จ!');
+            window.changeDate();
+            alert('✅ บันทึกเป้าหมาย และ ตารางเวท ขึ้นคลาวด์สำเร็จ!');
         }
 
         function updateTargetsUI() {
-            const calEl = document.getElementById('uiTargetCal'); if(calEl) calEl.innerText = userSettings.targetCal;
-            const proEl = document.getElementById('uiTargetPro'); if(proEl) proEl.innerText = userSettings.targetPro;
-            const watEl = document.getElementById('uiTargetWater'); if(watEl) watEl.innerText = userSettings.targetWater;
-        }
-
-        function renderVitaminSettings() {
-            const container = document.getElementById('vitaminSettingsContainer'); container.innerHTML = '';
-            let vits = userSettings.vitamins || ["วิตามินซี", "Fish Oil"];
-            vits.forEach((vit, idx) => {
-                container.innerHTML += `
-                    <div style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
-                        <input type="text" class="v-item-input" value="${vit}" placeholder="ชื่อวิตามิน" style="flex-grow:1; padding:10px; border:1px solid #cbd5e1; border-radius:6px;">
-                        <button onclick="window.removeVitaminSetting(${idx})" style="background:var(--danger); width:auto; margin:0; padding:10px;">ลบ</button>
-                    </div>`;
-            });
-        }
-        window.addVitaminSetting = () => { if(!userSettings.vitamins) userSettings.vitamins = []; userSettings.vitamins.push(""); renderVitaminSettings(); }
-        window.removeVitaminSetting = (idx) => { userSettings.vitamins.splice(idx, 1); renderVitaminSettings(); }
-        
-        function updateVitaminDropdown() {
-            const select = document.getElementById('vitaminSelect'); select.innerHTML = '<option value="">-- เลือกรายการ --</option>';
-            let vits = userSettings.vitamins || [];
-            vits.forEach(vit => { select.innerHTML += `<option value="${vit}">${vit}</option>`; });
-        }
-
-        // 🔴 บันทึกน้ำและวิตามิน
-        window.addWaterLog = async () => {
-            const sel = document.getElementById('waterSelect').value;
-            let amt = sel === 'custom' ? parseFloat(document.getElementById('waterCustomAmount').value) : parseFloat(sel);
-            if(!amt || amt <= 0) return alert("กรุณาใส่ปริมาณน้ำ (ml)");
-            try {
-                await addDoc(collection(db, "users", currentUser.uid, "water"), { dateStr: document.getElementById('datePicker').value, amount: amt, timestamp: Date.now() });
-                document.getElementById('waterCustomAmount').value = ''; document.getElementById('customWaterBox').style.display = 'none';
-            } catch (e) { alert("Error: " + e.message); }
-        }
-
-        window.addVitaminLog = async () => {
-            const name = document.getElementById('vitaminSelect').value;
-            const amt = parseFloat(document.getElementById('vitaminAmountInput').value);
-            const meal = document.getElementById('mealTime').value;
-            if(!name || !amt || amt <= 0) return alert("กรุณาเลือกวิตามินและใส่จำนวนให้ถูกต้อง");
-            try {
-                await addDoc(collection(db, "users", currentUser.uid, "vitamins"), { dateStr: document.getElementById('datePicker').value, name: name, amount: amt, meal: meal, timestamp: Date.now() });
-                document.getElementById('vitaminSelect').value = ''; document.getElementById('vitaminAmountInput').value = ''; document.getElementById('customVitaminBox').style.display = 'none';
-            } catch (e) { alert("Error: " + e.message); }
+            const calEl = document.getElementById('uiTargetCal'); if(calEl) calEl.innerText = userSettings.targetCal || 2000;
+            const proEl = document.getElementById('uiTargetPro'); if(proEl) proEl.innerText = userSettings.targetPro || 140;
         }
 
         window.calculateTDEE = () => {
@@ -985,7 +844,7 @@
         window.saveCalculatedTDEE = async () => {
             if (!window.tempCalculatedTDEE) return;
             document.getElementById('setCal').value = window.tempCalculatedTDEE;
-            await window.saveGoals(); // ใช้ saveGoals ของปุ่มใหม่
+            await window.saveSettings();
         };
 
         window.calcCardioBurn = () => {
@@ -1094,51 +953,15 @@
             document.getElementById('workoutFormContainer').style.display = 'none';
         }
 
-        // 🔴 โหลดสถิติยกน้ำหนักสูงสุดแบบปลอดภัย (ไม่แฮงค์แม้ไม่มีข้อมูล)
-        window.loadWorkoutForm = async () => {
+        window.loadWorkoutForm = () => {
             const rIndex = document.getElementById('routineSelect').value; const container = document.getElementById('workoutFormContainer'); const listDiv = document.getElementById('exerciseList');
             if(rIndex === "") { container.style.display = 'none'; return; }
-            
-            const routine = customRoutines[rIndex]; document.getElementById('routineTitle').innerText = routine.dayName; 
-            listDiv.innerHTML = '<p style="text-align:center; font-size:13px; color:#64748b; padding:15px;">⏳ กำลังโหลดสถิติสูงสุด...</p>';
-            container.style.display = 'block';
-
-            let maxWeights = {};
-            try {
-                const snap = await getDocs(collection(db, "users", currentUser.uid, "workouts"));
-                snap.forEach(doc => {
-                    const data = doc.data();
-                    if(data.exercises) {
-                        data.exercises.forEach(ex => {
-                            let w = parseFloat(ex.kg);
-                            if(!isNaN(w)) {
-                                if(maxWeights[ex.name] === undefined || w > maxWeights[ex.name]) { maxWeights[ex.name] = w; }
-                            }
-                        });
-                    }
-                });
-            } catch(e) { console.warn("Failed to load max weights"); }
-
-            listDiv.innerHTML = '';
+            const routine = customRoutines[rIndex]; document.getElementById('routineTitle').innerText = routine.dayName; listDiv.innerHTML = '';
             routine.exercises.forEach((ex) => {
                 let imgHtml = ex.img ? `<img src="${ex.img}" class="exercise-img" onerror="this.style.display='none'">` : '';
-                let maxW = maxWeights[ex.name] || 0;
-                listDiv.innerHTML += `
-                    <div class="exercise-item" data-name="${ex.name}" data-img="${ex.img || ''}">
-                        <div class="exercise-name">💪 ${ex.name}</div>
-                        <div class="exercise-layout">
-                            ${imgHtml}
-                            <div style="flex-grow:1;">
-                                <div style="font-size:11px; color:var(--primary); font-weight:bold; margin-bottom:8px; background:#e0f2fe; padding:4px 8px; border-radius:4px; display:inline-block;">🏆 สถิติสูงสุด: ${maxW} kg</div>
-                                <div class="ex-inputs">
-                                    <div><label>เซ็ต</label><input type="number" class="w-sets" placeholder="Set" inputmode="numeric"></div>
-                                    <div><label>ครั้ง</label><input type="number" class="w-reps" placeholder="Reps" inputmode="numeric"></div>
-                                    <div><label>น้ำหนัก</label><input type="number" class="w-kg" placeholder="Kg" inputmode="decimal"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`;
+                listDiv.innerHTML += `<div class="exercise-item" data-name="${ex.name}" data-img="${ex.img || ''}"><div class="exercise-name">💪 ${ex.name}</div><div class="exercise-layout">${imgHtml}<div class="ex-inputs"><div><label>เซ็ต</label><input type="number" class="w-sets" placeholder="Set" inputmode="numeric"></div><div><label>ครั้ง</label><input type="number" class="w-reps" placeholder="Reps" inputmode="numeric"></div><div><label>น้ำหนัก</label><input type="number" class="w-kg" placeholder="Kg" inputmode="decimal"></div></div></div></div>`;
             });
+            container.style.display = 'block';
         }
 
         window.saveWorkout = async () => {
@@ -1151,14 +974,12 @@
             try { await addDoc(collection(db, "users", currentUser.uid, "workouts"), { dateStr: document.getElementById('datePicker').value, routine: customRoutines[rIndex].dayName, exercises: workoutData, timestamp: Date.now() }); alert('✅ บันทึกตารางเวทวันนี้เรียบร้อยครับ!'); document.querySelectorAll('.w-sets, .w-reps, .w-kg').forEach(i => i.value = ''); } catch (e) { alert("Error: " + e.message); }
         }
 
-        let currentDayLogs = []; let currentDayCardio = []; let currentDayWater = []; let currentDayVitamins = [];
+        let currentDayLogs = []; let currentDayCardio = [];
         window.changeDate = () => {
             const dateStr = document.getElementById('datePicker').value;
             if(unsubscribeMeals) unsubscribeMeals();
             if(unsubscribeWorkouts) unsubscribeWorkouts();
             if(unsubscribeCardio) unsubscribeCardio();
-            if(unsubscribeWater) unsubscribeWater();
-            if(unsubscribeVitamins) unsubscribeVitamins();
             
             unsubscribeMeals = onSnapshot(query(collection(db, "users", currentUser.uid, "logs"), where("dateStr", "==", dateStr)), (snap) => {
                 currentDayLogs = []; snap.forEach(d => currentDayLogs.push({ id: d.id, ...d.data() })); renderDashboard();
@@ -1169,18 +990,15 @@
             unsubscribeWorkouts = onSnapshot(query(collection(db, "users", currentUser.uid, "workouts"), where("dateStr", "==", dateStr)), (snap) => {
                 const data = []; snap.forEach(d => data.push({ id: d.id, ...d.data() })); renderWorkoutLogs(data); 
             });
-            unsubscribeWater = onSnapshot(query(collection(db, "users", currentUser.uid, "water"), where("dateStr", "==", dateStr)), (snap) => {
-                currentDayWater = []; snap.forEach(d => currentDayWater.push({ id: d.id, ...d.data() })); renderDashboard();
-            });
-            unsubscribeVitamins = onSnapshot(query(collection(db, "users", currentUser.uid, "vitamins"), where("dateStr", "==", dateStr)), (snap) => {
-                currentDayVitamins = []; snap.forEach(d => currentDayVitamins.push({ id: d.id, ...d.data() })); renderDashboard();
-            });
         }
 
         function renderWorkoutLogs(data) {
             const container = document.getElementById('workoutLogs'); container.innerHTML = '';
             if(data.length === 0) { container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 20px 0; font-size:14px;">ยังไม่มีประวัติเวทเทรนนิ่งวันนี้</div>'; return; }
-            const imgMap = {}; customRoutines.forEach(r => { r.exercises.forEach(ex => { if(ex.name && ex.img) imgMap[ex.name] = ex.img; }); });
+            
+            const imgMap = {};
+            customRoutines.forEach(r => { r.exercises.forEach(ex => { if(ex.name && ex.img) imgMap[ex.name] = ex.img; }); });
+
             data.sort((a,b) => b.timestamp - a.timestamp).forEach(log => {
                 let exHtml = ''; 
                 log.exercises.forEach(ex => { 
@@ -1192,39 +1010,30 @@
             });
         }
 
-        // 🔴 ระบบเรนเดอร์คำนวณกราฟและคะแนนรายวัน 🔴
         function renderDashboard() {
-            let totalCal = 0; let totalPro = 0; 
-            const mealGroups = { "มื้อเช้า (หลังเวท)": [], "มื้อเที่ยง": [], "มื้อเย็น": [], "ของว่าง/เครื่องดื่ม": [], "ก่อนนอน": [] };
+            let totalCal = 0; let totalPro = 0; const mealGroups = { "มื้อเช้า (หลังเวท)": [], "มื้อเที่ยง": [], "มื้อเย็น": [], "ของว่าง/เครื่องดื่ม": [] };
             currentDayLogs.forEach(item => { totalCal += item.cal; totalPro += item.pro; if(mealGroups[item.meal]) mealGroups[item.meal].push(item); });
-            
             let totalBurn = 0; currentDayCardio.forEach(item => { totalBurn += item.burn; });
             let netCal = totalCal - totalBurn; if(netCal < 0) netCal = 0;
-            let totalWater = 0; currentDayWater.forEach(item => { totalWater += item.amount; });
 
             const tCalUI = document.getElementById('totalCalUI'); if(tCalUI) tCalUI.innerText = totalCal.toFixed(0); 
             const tProUI = document.getElementById('totalProUI'); if(tProUI) tProUI.innerText = totalPro.toFixed(1);
             const tBurnUI = document.getElementById('totalBurnUI'); if(tBurnUI) tBurnUI.innerText = totalBurn.toFixed(0);
             const nCalUI = document.getElementById('netCalUI'); if(nCalUI) nCalUI.innerText = netCal.toFixed(0);
-            const wUI = document.getElementById('totalWaterUI'); if(wUI) wUI.innerText = totalWater.toFixed(0);
 
             let safeTargetCal = parseFloat(userSettings.targetCal) || 2000;
             let safeTargetPro = parseFloat(userSettings.targetPro) || 140;
-            let safeTargetWater = parseFloat(userSettings.targetWater) || 3000;
 
-            // 🔴 ระบบเปลี่ยนสีแคลอรีสุทธิ 🔴
-            let statusText = "✅ แคลอรีอยู่ในเกณฑ์เป้าหมาย"; let color = "var(--success)"; 
-            let netPct = (netCal / safeTargetCal) * 100;
-            if(netPct < 80) { color = "var(--danger)"; statusText = "⚠️ แคลอรีต่ำเกินไป (< 80%)"; } 
-            else if (netPct < 100) { color = "var(--warning)"; statusText = "⚡ แคลอรีใกล้ถึงเป้าหมาย"; }
+            let statusText = "แคลอรีสุทธิอยู่ในเกณฑ์ดี"; let color = "#0284c7"; 
+            if(netCal >= safeTargetCal) { color = "var(--danger)"; statusText = "⚠️ แคลอรีสุทธิเกินโควตาวันนี้แล้ว!"; } 
+            else if (netCal > safeTargetCal * 0.85) { statusText = "แคลอรีสุทธิใกล้ครบโควตาวันนี้แล้ว"; }
             
             if(nCalUI) nCalUI.style.color = color; 
-            const calStat = document.getElementById('calStatus'); const nCalLabel = document.getElementById('netCalLabel');
-            if(calStat) { calStat.innerText = statusText; calStat.style.color = color; }
-            if(nCalLabel) nCalLabel.style.color = color;
+            const calStat = document.getElementById('calStatus'); if(calStat) calStat.innerText = statusText;
 
             let intakePct = Math.min((totalCal / safeTargetCal) * 100, 100); if(isNaN(intakePct)) intakePct = 0;
             let burnPct = Math.min((totalBurn / safeTargetCal) * 100, intakePct); if(isNaN(burnPct)) burnPct = 0;
+
             let yIntake = 24 - (24 * (intakePct / 100)); let hIntake = 24 * (intakePct / 100);
             let yBurn = yIntake; let hBurn = 24 * (burnPct / 100);
 
@@ -1233,23 +1042,7 @@
             
             let proPct = Math.min((totalPro / safeTargetPro) * 100, 100); if(isNaN(proPct)) proPct = 0;
             const fillPro = document.getElementById('fillProtein'); if(fillPro) { fillPro.setAttribute('y', 100 - proPct); fillPro.setAttribute('height', proPct); }
-
-            let waterPct = Math.min((totalWater / safeTargetWater) * 100, 100); if(isNaN(waterPct)) waterPct = 0;
-            const fillWat = document.getElementById('fillWater'); if(fillWat) { fillWat.setAttribute('y', 100 - waterPct); fillWat.setAttribute('height', waterPct); }
             
-            // คำนวณคะแนนและเซฟลงคลาวด์อัตโนมัติ
-            let proScore = (totalPro / safeTargetPro) * 100; if(isNaN(proScore)) proScore = 0; proScore = Math.min(proScore, 100) * 0.4;
-            let calScore = 0;
-            if (netCal <= safeTargetCal) { calScore = 40; } else { let overPct = ((netCal - safeTargetCal) / safeTargetCal); calScore = Math.max(40 - (overPct * 40 * 2), 0); }
-            if(isNaN(calScore)) calScore = 0;
-            let burnScore = (totalBurn / 300) * 100; if(isNaN(burnScore)) burnScore = 0; burnScore = Math.min(burnScore, 100) * 0.2;
-
-            let dailyScore = proScore + calScore + burnScore; if(isNaN(dailyScore)) dailyScore = 0;
-            const dateStr = document.getElementById('datePicker').value;
-            if (currentUser && dateStr) {
-                setDoc(doc(db, "users", currentUser.uid), { scores: { [dateStr]: dailyScore } }, { merge: true }).catch(e => console.log(e));
-            }
-
             const container = document.getElementById('mealLogs'); 
             if(container) {
                 container.innerHTML = ''; let hasData = false;
@@ -1263,24 +1056,7 @@
                         }); html += `</div>`; container.innerHTML += html;
                     }
                 }
-                
-                if (currentDayWater.length > 0) {
-                    hasData = true;
-                    let html = `<div class="meal-section"><div class="meal-header" style="background:#e0f2fe; color:#0369a1;"><span>💧 น้ำดื่ม</span><span>รวม ${totalWater.toFixed(0)} ml</span></div>`;
-                    currentDayWater.sort((a,b) => b.timestamp - a.timestamp).forEach(item => {
-                        html += `<div class="log-item"><div><div class="log-name" style="color:#0ea5e9;">ดื่มน้ำ</div><div class="log-cal">${item.amount} ml</div></div><button class="del-btn" onclick="deleteLog('${item.id}', 'water')">ลบ</button></div>`;
-                    }); html += `</div>`; container.innerHTML += html;
-                }
-
-                if (currentDayVitamins.length > 0) {
-                    hasData = true;
-                    let html = `<div class="meal-section"><div class="meal-header" style="background:#fef3c7; color:#b45309;"><span>💊 วิตามิน/อาหารเสริม</span><span></span></div>`;
-                    currentDayVitamins.sort((a,b) => b.timestamp - a.timestamp).forEach(item => {
-                        html += `<div class="log-item"><div><div class="log-name" style="color:var(--warning);">${item.name}</div><div class="log-cal">${item.amount} ชิ้น/เม็ด (มื้อ: ${item.meal || '-'})</div></div><button class="del-btn" onclick="deleteLog('${item.id}', 'vitamins')">ลบ</button></div>`;
-                    }); html += `</div>`; container.innerHTML += html;
-                }
-
-                if(!hasData) container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 30px 0; font-size:14px;">ยังไม่มีข้อมูลบันทึกในวันนี้</div>';
+                if(!hasData) container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 30px 0; font-size:14px;">ยังไม่มีข้อมูลอาหารวันนี้</div>';
             }
         }
 
@@ -1288,30 +1064,48 @@
             const monthStr = document.getElementById('monthPicker').value; 
             if (!monthStr || !currentUser) return;
             
-            const startStr = `${monthStr}-01`; const endStr = `${monthStr}-31`;
-            const dashStatus = document.getElementById('dashStatus'); const monthlyGrid = document.getElementById('monthlyGrid'); const monthlyGallery = document.getElementById('monthlyGallery');
+            const startStr = `${monthStr}-01`;
+            const endStr = `${monthStr}-31`;
+            
+            const dashStatus = document.getElementById('dashStatus');
+            const monthlyGrid = document.getElementById('monthlyGrid');
+            const monthlyGallery = document.getElementById('monthlyGallery');
 
             if(dashStatus) dashStatus.innerText = "⏳ กำลังโหลดข้อมูลสรุปรายเดือน...";
-            if(monthlyGrid) monthlyGrid.innerHTML = ""; if(monthlyGallery) monthlyGallery.innerHTML = "";
+            if(monthlyGrid) monthlyGrid.innerHTML = "";
+            if(monthlyGallery) monthlyGallery.innerHTML = "";
             window.currentMonthImages = [];
 
             try {
-                const qLogs = query(collection(db, "users", currentUser.uid, "logs"), where("dateStr", ">=", startStr), where("dateStr", "<=", endStr)); const snapLogs = await getDocs(qLogs);
-                const qCardio = query(collection(db, "users", currentUser.uid, "cardio"), where("dateStr", ">=", startStr), where("dateStr", "<=", endStr)); const snapCardio = await getDocs(qCardio);
-                const qMetrics = query(collection(db, "users", currentUser.uid, "metrics"), where("dateStr", ">=", startStr), where("dateStr", "<=", endStr)); const snapMetrics = await getDocs(qMetrics);
-                const qWater = query(collection(db, "users", currentUser.uid, "water"), where("dateStr", ">=", startStr), where("dateStr", "<=", endStr)); const snapWater = await getDocs(qWater);
-                const qVits = query(collection(db, "users", currentUser.uid, "vitamins"), where("dateStr", ">=", startStr), where("dateStr", "<=", endStr)); const snapVits = await getDocs(qVits);
-                const qWorkouts = query(collection(db, "users", currentUser.uid, "workouts"), where("dateStr", ">=", startStr), where("dateStr", "<=", endStr)); const snapWorkouts = await getDocs(qWorkouts);
+                const qLogs = query(collection(db, "users", currentUser.uid, "logs"), where("dateStr", ">=", startStr), where("dateStr", "<=", endStr));
+                const snapLogs = await getDocs(qLogs);
+                const qCardio = query(collection(db, "users", currentUser.uid, "cardio"), where("dateStr", ">=", startStr), where("dateStr", "<=", endStr));
+                const snapCardio = await getDocs(qCardio);
+                const qMetrics = query(collection(db, "users", currentUser.uid, "metrics"), where("dateStr", ">=", startStr), where("dateStr", "<=", endStr));
+                const snapMetrics = await getDocs(qMetrics);
 
                 const dailyStats = {};
-                const initStat = (date) => { if(!dailyStats[date]) dailyStats[date] = { cal: 0, pro: 0, burn: 0, weight: "-", fat: "-", imageUrl: "", water: 0, vits: [], workouts: [] }; };
                 
-                snapLogs.forEach(doc => { const d = doc.data(); initStat(d.dateStr); dailyStats[d.dateStr].cal += d.cal; dailyStats[d.dateStr].pro += d.pro; });
-                snapCardio.forEach(doc => { const d = doc.data(); initStat(d.dateStr); dailyStats[d.dateStr].burn += d.burn; });
-                snapMetrics.forEach(doc => { const d = doc.data(); initStat(d.dateStr); dailyStats[d.dateStr].weight = d.weight || "-"; dailyStats[d.dateStr].fat = d.bodyFat || "-"; if(d.imageUrl) dailyStats[d.dateStr].imageUrl = d.imageUrl; });
-                snapWater.forEach(doc => { const d = doc.data(); initStat(d.dateStr); dailyStats[d.dateStr].water += d.amount; });
-                snapVits.forEach(doc => { const d = doc.data(); initStat(d.dateStr); dailyStats[d.dateStr].vits.push(`${d.name} (${d.amount})`); });
-                snapWorkouts.forEach(doc => { const d = doc.data(); initStat(d.dateStr); dailyStats[d.dateStr].workouts.push(d.routine); });
+                snapLogs.forEach(doc => {
+                    const d = doc.data();
+                    if(!dailyStats[d.dateStr]) dailyStats[d.dateStr] = { cal: 0, pro: 0, burn: 0, weight: "-", fat: "-", imageUrl: "" };
+                    dailyStats[d.dateStr].cal += d.cal;
+                    dailyStats[d.dateStr].pro += d.pro;
+                });
+                snapCardio.forEach(doc => {
+                    const d = doc.data();
+                    if(!dailyStats[d.dateStr]) dailyStats[d.dateStr] = { cal: 0, pro: 0, burn: 0, weight: "-", fat: "-", imageUrl: "" };
+                    dailyStats[d.dateStr].burn += d.burn;
+                });
+                snapMetrics.forEach(doc => {
+                    const d = doc.data();
+                    if(!dailyStats[d.dateStr]) dailyStats[d.dateStr] = { cal: 0, pro: 0, burn: 0, weight: "-", fat: "-", imageUrl: "" };
+                    dailyStats[d.dateStr].weight = d.weight || "-";
+                    dailyStats[d.dateStr].fat = d.bodyFat || "-";
+                    if(d.imageUrl) dailyStats[d.dateStr].imageUrl = d.imageUrl;
+                });
+
+                updateMyMonthlyScore(dailyStats);
 
                 const dates = Object.keys(dailyStats).sort((a,b) => b.localeCompare(a)); 
                 if(dates.length === 0) {
@@ -1324,10 +1118,10 @@
                 
                 let gridHtml = ""; let galleryHtml = ""; let imgIndexCounter = 0; 
                 let safeTargetCal = parseFloat(userSettings.targetCal) || 2000;
-                let safeTargetWater = parseFloat(userSettings.targetWater) || 3000;
 
                 dates.forEach(date => {
-                    const stat = dailyStats[date]; const dayNum = date.split('-')[2];
+                    const stat = dailyStats[date];
+                    const dayNum = date.split('-')[2];
                     let netCal = stat.cal - stat.burn; if(netCal < 0) netCal = 0;
                     let intakePct = Math.min((stat.cal / safeTargetCal) * 100, 100); if(isNaN(intakePct)) intakePct = 0;
                     let burnPct = Math.min((stat.burn / safeTargetCal) * 100, intakePct); if(isNaN(burnPct)) burnPct = 0;
@@ -1337,15 +1131,31 @@
                     const svgHtml = `<svg class="day-svg" viewBox="0 0 24 24"><defs><clipPath id="shape-${date}"><path d="M12,2 A2.5,2.5 0 0,1 14.5,4.5 A2.5,2.5 0 0,1 12,7 A2.5,2.5 0 0,1 9.5,4.5 A2.5,2.5 0 0,1 12,2 M9,8 L15,8 C16.5,8 17.5,9 18,10.5 L16.5,16 L14.5,16 L14.5,22 L9.5,22 L9.5,16 L7.5,16 L6,10.5 C6.5,9 7.5,8 9,8 Z"/></clipPath></defs><g clip-path="url(#shape-${date})"><rect x="0" y="0" width="24" height="24" fill="#e2e8f0" /><rect x="0" y="${yIntake}" width="24" height="${hIntake}" fill="#2563eb" /><rect x="0" y="${yBurn}" width="24" height="${hBurn}" fill="#ef4444" /></g></svg>`;
 
                     if (stat.imageUrl) {
-                        window.currentMonthImages.push({ url: stat.imageUrl, date: date }); let currentIndex = imgIndexCounter++;
+                        window.currentMonthImages.push({ url: stat.imageUrl, date: date });
+                        let currentIndex = imgIndexCounter++;
                         galleryHtml += `<div style="position: relative; cursor: pointer; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); background: #000;" onclick="window.openImageModal(${currentIndex})"><img src="${stat.imageUrl}" style="width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; opacity: 0.95;"><div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0, 0, 0, 0.7); color: white; text-align: center; padding: 3px 0; font-size: 10px; font-weight: bold;">วันที่ ${dayNum}</div></div>`;
                     }
 
-                    let vitsText = stat.vits.length > 0 ? stat.vits.join(', ') : '-';
-                    let workoutText = stat.workouts.length > 0 ? stat.workouts.join(', ') : '-';
-                    let extraInfoHtml = `<div style="background: #f8fafc; padding: 8px 10px; border-radius: 6px; margin-top: 10px; font-size: 11px; border: 1px solid var(--border);"><div style="color:var(--primary); margin-bottom:4px;"><b>💪 เวท:</b> ${workoutText}</div><div style="color:#0ea5e9; margin-bottom:4px;"><b>💧 น้ำ:</b> ${stat.water} / ${safeTargetWater} ml</div><div style="color:var(--warning);"><b>💊 วิตามิน:</b> ${vitsText}</div></div>`;
-
-                    gridHtml += `<div class="day-card" style="flex-direction: column; align-items: stretch; padding: 12px; position: relative;"><div onclick="window.deleteWholeDay('${date}')" style="position: absolute; top: 8px; right: 10px; cursor: pointer; font-size: 14px; opacity: 0.4; transition: 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'" title="ลบข้อมูลวันนี้ทั้งหมด">🗑️</div><div style="display:flex; align-items:center;"><div class="day-date" style="width: 40px; font-size: 16px;">${dayNum}<span>วันที่</span></div>${svgHtml}<div class="day-stats" style="flex-grow: 1;"><div style="display:flex; justify-content:space-between; gap:5px;"><div><div style="color:var(--primary); font-weight:bold; font-size:12px;">กิน: ${stat.cal.toFixed(0)}</div><div style="color:var(--danger); font-weight:bold; font-size:12px; margin: 2px 0;">เผา: ${stat.burn.toFixed(0)}</div><div style="color:#0284c7; font-weight:bold; font-size:12px; margin: 2px 0;">สุทธิ: ${netCal.toFixed(0)} <span style="font-weight:normal; font-size:10px; color:#64748b;">/ ${safeTargetCal}</span></div></div><div style="text-align:right;"><div style="color:var(--text); font-weight:bold; font-size:12px;">นน: ${stat.weight !== "-" ? stat.weight + " kg" : "-"}</div><div style="color:#64748b; font-weight:bold; font-size:12px; margin: 2px 0;">ไขมัน: ${stat.fat !== "-" ? stat.fat + "%" : "-"}</div><div style="color:var(--success); font-size:11px; margin: 2px 0;">โปร: ${stat.pro.toFixed(1)}g</div></div></div></div></div>${extraInfoHtml}</div>`;
+                    gridHtml += `
+                        <div class="day-card" style="flex-direction: row; align-items: center; padding: 12px; position: relative;">
+                            <div onclick="window.deleteWholeDay('${date}')" style="position: absolute; top: 8px; right: 10px; cursor: pointer; font-size: 14px; opacity: 0.4; transition: 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'" title="ลบข้อมูลวันนี้ทั้งหมด">🗑️</div>
+                            <div class="day-date" style="width: 40px; font-size: 16px;">${dayNum}<span>วันที่</span></div>
+                            ${svgHtml}
+                            <div class="day-stats" style="flex-grow: 1;">
+                                <div style="display:flex; justify-content:space-between; gap:5px; margin-top: 10px;">
+                                    <div>
+                                        <div style="color:var(--primary); font-weight:bold; font-size:12px;">กิน: ${stat.cal.toFixed(0)}</div>
+                                        <div style="color:var(--danger); font-weight:bold; font-size:12px; margin: 2px 0;">เผา: ${stat.burn.toFixed(0)}</div>
+                                        <div style="color:#0284c7; font-weight:bold; font-size:12px; margin: 2px 0;">สุทธิ: ${netCal.toFixed(0)} <span style="font-weight:normal; font-size:10px; color:#64748b;">/ ${safeTargetCal}</span></div>
+                                    </div>
+                                    <div style="text-align:right;">
+                                        <div style="color:var(--text); font-weight:bold; font-size:12px;">นน: ${stat.weight !== "-" ? stat.weight + " kg" : "-"}</div>
+                                        <div style="color:#64748b; font-weight:bold; font-size:12px; margin: 2px 0;">ไขมัน: ${stat.fat !== "-" ? stat.fat + "%" : "-"}</div>
+                                        <div style="color:var(--success); font-size:11px; margin: 2px 0;">โปร: ${stat.pro.toFixed(1)}g</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
                 });
 
                 if(galleryHtml === "") galleryHtml = '<div style="color:#64748b; font-size:12px; grid-column:1/-1; text-align:center; padding:10px 0;">ยังไม่มีรูปถ่ายในเดือนนี้</div>';
@@ -1359,14 +1169,14 @@
             const dateParts = dateStr.split('-'); const thaiDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
             if(!confirm(`⚠️ คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลทั้งหมดของวันที่ ${thaiDate}?`)) return;
             try {
-                const collectionsToClear = ["logs", "cardio", "workouts", "metrics", "water", "vitamins"];
+                const collectionsToClear = ["logs", "cardio", "workouts", "metrics"];
                 for (const colName of collectionsToClear) {
                     const q = query(collection(db, "users", currentUser.uid, colName), where("dateStr", "==", dateStr));
-                    const snap = await getDocs(q); const deletePromises = [];
+                    const snap = await getDocs(q);
+                    const deletePromises = [];
                     snap.forEach(docSnap => { deletePromises.push(deleteDoc(doc(db, "users", currentUser.uid, colName, docSnap.id))); });
                     await Promise.all(deletePromises);
                 }
-                await setDoc(doc(db, "users", currentUser.uid), { scores: { [dateStr]: deleteDoc() } }, { merge: true });
                 alert(`✅ ลบข้อมูลวันที่ ${thaiDate} เรียบร้อยแล้ว`);
                 window.loadMonthlyData(); 
                 if (document.getElementById('datePicker') && document.getElementById('datePicker').value === dateStr) { window.changeDate(); }
