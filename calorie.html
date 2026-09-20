@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Theerapong Fitness V31 (Ultimate Stable)</title>
+    <title>Theerapong Fitness V31 (Workout Builder Fix)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --border: #cbd5e1; }
@@ -66,7 +66,7 @@
         
         /* Dashboard Tab Specifics */
         .monthly-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
-        .day-card { display: flex; align-items: center; background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border); position: relative; }
+        .day-card { display: flex; align-items: center; background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
         .day-date { width: 50px; text-align: center; font-weight: bold; color: var(--text); font-size: 18px; }
         .day-date span { display: block; font-size: 11px; font-weight: normal; color: #64748b; }
         .day-svg { width: 50px; height: 50px; flex-shrink: 0; margin: 0 15px; border: 1px dashed #cbd5e1; border-radius: 4px; padding: 2px; }
@@ -146,7 +146,7 @@
             <button id="btnLogout" style="background: #ef4444; padding: 6px 12px; margin: 0; width: auto; font-size: 12px;">ออกจากระบบ</button>
         </div>
 
-        <div class="card header-date" style="margin-top: 0;" id="globalDateHeader">
+        <div class="card header-date" style="margin-top: 0;">
             <div>
                 <div style="font-size: 12px; opacity: 0.8;">วันที่บันทึกข้อมูล</div>
                 <div style="font-size: 18px; font-weight: bold;">Daily Record</div>
@@ -179,7 +179,7 @@
                         <div style="font-size: 10px; color: transparent;">-</div>
                     </div>
 
-                    <!-- กล่องขวา: โปรตีน (ไอคอนแท่ง Bar Scale เดิม V26) -->
+                    <!-- กล่องขวา: โปรตีน (ไอคอนแท่ง Bar Scale) -->
                     <div class="stat-box" style="margin: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #a7f3d0;">
                         <svg style="height: 95px; width: auto; display: block; margin: 0 auto;" viewBox="0 0 24 100">
                             <rect x="4" y="0" width="16" height="100" rx="6" fill="#e2e8f0" />
@@ -374,13 +374,9 @@
             <div style="padding: 0 15px;">
                 <p id="dashStatus" style="font-size: 13px; color: #64748b; text-align: center;">เลือกเดือนที่ต้องการดูข้อมูลครับ</p>
                 
-                <!-- แกลเลอรีรูปภาพแบบ 4 คอลัมน์ -->
                 <h3 style="font-size: 15px; color: var(--primary); margin-top: 20px; border-bottom: 2px solid var(--border); padding-bottom: 5px;">📷 วิวัฒนาการรูปร่าง</h3>
-                <div id="monthlyGallery" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 25px;">
-                    <!-- รูปจะมาเรียงตรงนี้ -->
-                </div>
+                <div id="monthlyGallery" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 25px;"></div>
 
-                <!-- ข้อมูลสรุปรายวัน -->
                 <h3 style="font-size: 15px; color: var(--primary); border-bottom: 2px solid var(--border); padding-bottom: 5px;">📉 สรุปข้อมูลรายวัน</h3>
                 <div class="monthly-grid" id="monthlyGrid"></div>
             </div>
@@ -404,7 +400,7 @@
             </div>
         </div>
 
-        <!-- 7. SETTINGS TAB -->
+        <!-- 7. SETTINGS TAB (แยกปุ่มบันทึก) -->
         <div id="tab-settings" class="tab-content">
             <div class="card">
                 <h2>⚙️ เป้าหมายหลัก</h2>
@@ -420,7 +416,7 @@
                 <p style="font-size: 12px; color: #64748b; margin-top:-10px;">สร้างวันเล่นเวท และเพิ่มชื่อท่า พร้อมแนบชื่อไฟล์รูปภาพ (เช่น 1.jpg)</p>
                 <div id="routineBuilderContainer"></div>
                 <button class="btn-outline" onclick="window.addRoutineDay()">+ เพิ่มวัน (New Day)</button>
-                <button onclick="window.saveSettings()" style="background: var(--success); margin-top: 10px;">💾 บันทึกตารางเวท</button>
+                <button onclick="window.saveRoutines()" style="background: var(--success); margin-top: 10px;">💾 บันทึกตารางเวท</button>
             </div>
         </div>
 
@@ -455,6 +451,7 @@
                 </div>
             </div>
         </div>
+
     </div>
 
     <!-- โค้ดเชื่อมต่อ Firebase & Logic -->
@@ -491,7 +488,6 @@
         let customRoutines = []; 
         window.tempCalculatedTDEE = 0; 
         
-        // ตัวแปรสำหรับระบบ Slider รูปภาพ
         window.currentMonthImages = [];
         window.currentImageIndex = 0;
 
@@ -524,7 +520,6 @@
         }
 
         window.switchTab = (tabId) => {
-            // ซ่อนกล่องวันที่เมื่อไม่ได้อยู่ในหน้าแรกๆ
             document.getElementById('globalDateHeader').style.display = (tabId === 'dashboard' || tabId === 'score' || tabId === 'settings' || tabId === 'admin') ? 'none' : 'flex';
             
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -574,7 +569,6 @@
                             signOut(auth);
                             return;
                         }
-                        // อัปเดตข้อมูลเผื่อมีการเปลี่ยนชื่อ
                         await setDoc(userRef, { displayName: dName, photoURL: user.photoURL || "" }, { merge: true });
                     }
 
@@ -613,7 +607,6 @@
             }
         });
 
-        // 🔴 โหลดตารางอันดับ
         window.loadLeaderboard = async () => {
             const container = document.getElementById('leaderboardContainer');
             container.innerHTML = '<p style="text-align:center; font-size:13px;">กำลังโหลดตารางคะแนน...</p>';
@@ -668,7 +661,6 @@
             }
         };
 
-        // 🔴 คำนวณคะแนน
         const updateMyMonthlyScore = async (dailyStatsObject) => {
             if(!currentUser) return;
             const dates = Object.keys(dailyStatsObject);
@@ -708,7 +700,6 @@
             try { await setDoc(doc(db, "users", currentUser.uid), { monthlyScore: avgScore }, { merge: true }); } catch (e) {}
         };
 
-        // 🔴 ระบบ Admin
         window.loadAdminPanel = async () => {
             try {
                 const configSnap = await getDoc(doc(db, "app_config", "settings"));
@@ -763,7 +754,6 @@
             } catch (e) { alert("Error: " + e.message); }
         };
 
-        // --- Core Application Logic ---
         async function loadFoodDB() {
             try {
                 const response = await fetch('./food-db.json', { cache: 'no-store' });
@@ -773,13 +763,48 @@
             }
         }
 
+        // 🔴 โหลดและกู้คืนตารางเวท (Auto-Recovery)
         async function loadSettings() {
             try {
                 const docSnap = await getDoc(doc(db, "users", currentUser.uid));
+                
+                // กู้คืนตารางเวทแบบอัตโนมัติถ้าของเก่าหายไป
+                let isDataRecovered = false;
+                
                 if (docSnap.exists()) {
                     if (docSnap.data().settings) userSettings = docSnap.data().settings;
-                    if (docSnap.data().routines) customRoutines = docSnap.data().routines;
+                    if (docSnap.data().routines && docSnap.data().routines.length > 0) {
+                        customRoutines = docSnap.data().routines;
+                    } else {
+                        // ถ้าไม่มี routines ในตั้งค่า ให้ไปกวาดมาจากประวัติการเล่นเวทเก่า
+                        const workoutHistory = await getDocs(collection(db, "users", currentUser.uid, "workouts"));
+                        const recoveredRoutines = {};
+                        workoutHistory.forEach(wDoc => {
+                            const d = wDoc.data();
+                            if(d.routine && d.exercises) {
+                                if(!recoveredRoutines[d.routine]) recoveredRoutines[d.routine] = [];
+                                d.exercises.forEach(ex => {
+                                    // เพิ่มท่าที่ไม่ซ้ำ
+                                    if(!recoveredRoutines[d.routine].some(e => e.name === ex.name)) {
+                                        recoveredRoutines[d.routine].push({name: ex.name, img: ex.img || ""});
+                                    }
+                                });
+                            }
+                        });
+                        
+                        for (const [rName, exList] of Object.entries(recoveredRoutines)) {
+                            customRoutines.push({ dayName: rName, exercises: exList });
+                        }
+                        
+                        if(customRoutines.length > 0) isDataRecovered = true;
+                    }
                 }
+                
+                // เซฟข้อมูลที่กู้มาได้ลงคลาวด์แบบเงียบๆ
+                if(isDataRecovered) {
+                    await setDoc(doc(db, "users", currentUser.uid), { routines: customRoutines }, { merge: true });
+                }
+
                 document.getElementById('setCal').value = userSettings.targetCal || 2000;
                 document.getElementById('setPro').value = userSettings.targetPro || 140;
                 updateTargetsUI();
@@ -792,7 +817,13 @@
             const cal = parseFloat(document.getElementById('setCal').value) || 2000;
             const pro = parseFloat(document.getElementById('setPro').value) || 140;
             userSettings = { targetCal: cal, targetPro: pro };
-            
+            await setDoc(doc(db, "users", currentUser.uid), { settings: userSettings }, { merge: true });
+            updateTargetsUI();
+            window.changeDate();
+            alert('✅ บันทึกเป้าหมายสำเร็จ!');
+        }
+        
+        window.saveRoutines = async () => {
             const routineElements = document.querySelectorAll('.builder-day');
             const newRoutines = [];
             routineElements.forEach((dayEl) => {
@@ -807,12 +838,9 @@
             });
             customRoutines = newRoutines;
 
-            await setDoc(doc(db, "users", currentUser.uid), { settings: userSettings, routines: customRoutines }, { merge: true });
-            
-            updateTargetsUI();
+            await setDoc(doc(db, "users", currentUser.uid), { routines: customRoutines }, { merge: true });
             updateWorkoutDropdown();
-            window.changeDate();
-            alert('✅ บันทึกเป้าหมาย และ ตารางเวท ขึ้นคลาวด์สำเร็จ!');
+            alert('✅ บันทึกตารางเวทส่วนตัวสำเร็จ!');
         }
 
         function updateTargetsUI() {
@@ -953,15 +981,56 @@
             document.getElementById('workoutFormContainer').style.display = 'none';
         }
 
-        window.loadWorkoutForm = () => {
-            const rIndex = document.getElementById('routineSelect').value; const container = document.getElementById('workoutFormContainer'); const listDiv = document.getElementById('exerciseList');
+        // 🔴 โหลดฟอร์มเวท พร้อมดึงค่า Max Weight สูงสุด 🔴
+        window.loadWorkoutForm = async () => {
+            const rIndex = document.getElementById('routineSelect').value; 
+            const container = document.getElementById('workoutFormContainer'); 
+            const listDiv = document.getElementById('exerciseList');
             if(rIndex === "") { container.style.display = 'none'; return; }
-            const routine = customRoutines[rIndex]; document.getElementById('routineTitle').innerText = routine.dayName; listDiv.innerHTML = '';
+            const routine = customRoutines[rIndex]; 
+            document.getElementById('routineTitle').innerText = routine.dayName; 
+            
+            listDiv.innerHTML = '<p style="text-align:center; font-size:13px; color:#64748b; padding:15px;">⏳ กำลังโหลดสถิติสูงสุด...</p>';
+            container.style.display = 'block';
+
+            let maxWeights = {};
+            try {
+                // ค้นประวัติการเล่นเวทเก่าเพื่อหา Max Weight ของแต่ละท่า
+                const snap = await getDocs(collection(db, "users", currentUser.uid, "workouts"));
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    if(data.exercises) {
+                        data.exercises.forEach(ex => {
+                            let w = parseFloat(ex.kg);
+                            if(!isNaN(w)) {
+                                if(maxWeights[ex.name] === undefined || w > maxWeights[ex.name]) { maxWeights[ex.name] = w; }
+                            }
+                        });
+                    }
+                });
+            } catch(e) { console.warn("Failed to fetch max weights", e); }
+
+            listDiv.innerHTML = '';
             routine.exercises.forEach((ex) => {
                 let imgHtml = ex.img ? `<img src="${ex.img}" class="exercise-img" onerror="this.style.display='none'">` : '';
-                listDiv.innerHTML += `<div class="exercise-item" data-name="${ex.name}" data-img="${ex.img || ''}"><div class="exercise-name">💪 ${ex.name}</div><div class="exercise-layout">${imgHtml}<div class="ex-inputs"><div><label>เซ็ต</label><input type="number" class="w-sets" placeholder="Set" inputmode="numeric"></div><div><label>ครั้ง</label><input type="number" class="w-reps" placeholder="Reps" inputmode="numeric"></div><div><label>น้ำหนัก</label><input type="number" class="w-kg" placeholder="Kg" inputmode="decimal"></div></div></div></div>`;
+                let maxW = maxWeights[ex.name] || 0; // ดึงค่าที่หาได้มาแสดง
+                
+                listDiv.innerHTML += `
+                    <div class="exercise-item" data-name="${ex.name}" data-img="${ex.img || ''}">
+                        <div class="exercise-name">💪 ${ex.name}</div>
+                        <div class="exercise-layout">
+                            ${imgHtml}
+                            <div style="flex-grow:1;">
+                                <div style="font-size:11px; color:var(--primary); font-weight:bold; margin-bottom:8px; background:#e0f2fe; padding:4px 8px; border-radius:4px; display:inline-block;">🏆 สถิติสูงสุด: ${maxW} kg</div>
+                                <div class="ex-inputs">
+                                    <div><label>เซ็ต</label><input type="number" class="w-sets" placeholder="Set" inputmode="numeric"></div>
+                                    <div><label>ครั้ง</label><input type="number" class="w-reps" placeholder="Reps" inputmode="numeric"></div>
+                                    <div><label>น้ำหนัก</label><input type="number" class="w-kg" placeholder="Kg" inputmode="decimal"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
             });
-            container.style.display = 'block';
         }
 
         window.saveWorkout = async () => {
@@ -995,10 +1064,7 @@
         function renderWorkoutLogs(data) {
             const container = document.getElementById('workoutLogs'); container.innerHTML = '';
             if(data.length === 0) { container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 20px 0; font-size:14px;">ยังไม่มีประวัติเวทเทรนนิ่งวันนี้</div>'; return; }
-            
-            const imgMap = {};
-            customRoutines.forEach(r => { r.exercises.forEach(ex => { if(ex.name && ex.img) imgMap[ex.name] = ex.img; }); });
-
+            const imgMap = {}; customRoutines.forEach(r => { r.exercises.forEach(ex => { if(ex.name && ex.img) imgMap[ex.name] = ex.img; }); });
             data.sort((a,b) => b.timestamp - a.timestamp).forEach(log => {
                 let exHtml = ''; 
                 log.exercises.forEach(ex => { 
@@ -1033,7 +1099,6 @@
 
             let intakePct = Math.min((totalCal / safeTargetCal) * 100, 100); if(isNaN(intakePct)) intakePct = 0;
             let burnPct = Math.min((totalBurn / safeTargetCal) * 100, intakePct); if(isNaN(burnPct)) burnPct = 0;
-
             let yIntake = 24 - (24 * (intakePct / 100)); let hIntake = 24 * (intakePct / 100);
             let yBurn = yIntake; let hBurn = 24 * (burnPct / 100);
 
@@ -1064,48 +1129,24 @@
             const monthStr = document.getElementById('monthPicker').value; 
             if (!monthStr || !currentUser) return;
             
-            const startStr = `${monthStr}-01`;
-            const endStr = `${monthStr}-31`;
-            
-            const dashStatus = document.getElementById('dashStatus');
-            const monthlyGrid = document.getElementById('monthlyGrid');
-            const monthlyGallery = document.getElementById('monthlyGallery');
+            const startStr = `${monthStr}-01`; const endStr = `${monthStr}-31`;
+            const dashStatus = document.getElementById('dashStatus'); const monthlyGrid = document.getElementById('monthlyGrid'); const monthlyGallery = document.getElementById('monthlyGallery');
 
             if(dashStatus) dashStatus.innerText = "⏳ กำลังโหลดข้อมูลสรุปรายเดือน...";
-            if(monthlyGrid) monthlyGrid.innerHTML = "";
-            if(monthlyGallery) monthlyGallery.innerHTML = "";
+            if(monthlyGrid) monthlyGrid.innerHTML = ""; if(monthlyGallery) monthlyGallery.innerHTML = "";
             window.currentMonthImages = [];
 
             try {
-                const qLogs = query(collection(db, "users", currentUser.uid, "logs"), where("dateStr", ">=", startStr), where("dateStr", "<=", endStr));
-                const snapLogs = await getDocs(qLogs);
-                const qCardio = query(collection(db, "users", currentUser.uid, "cardio"), where("dateStr", ">=", startStr), where("dateStr", "<=", endStr));
-                const snapCardio = await getDocs(qCardio);
-                const qMetrics = query(collection(db, "users", currentUser.uid, "metrics"), where("dateStr", ">=", startStr), where("dateStr", "<=", endStr));
-                const snapMetrics = await getDocs(qMetrics);
+                const qLogs = query(collection(db, "users", currentUser.uid, "logs"), where("dateStr", ">=", startStr), where("dateStr", "<=", endStr)); const snapLogs = await getDocs(qLogs);
+                const qCardio = query(collection(db, "users", currentUser.uid, "cardio"), where("dateStr", ">=", startStr), where("dateStr", "<=", endStr)); const snapCardio = await getDocs(qCardio);
+                const qMetrics = query(collection(db, "users", currentUser.uid, "metrics"), where("dateStr", ">=", startStr), where("dateStr", "<=", endStr)); const snapMetrics = await getDocs(qMetrics);
 
                 const dailyStats = {};
+                const initStat = (date) => { if(!dailyStats[date]) dailyStats[date] = { cal: 0, pro: 0, burn: 0, weight: "-", fat: "-", imageUrl: "" }; };
                 
-                snapLogs.forEach(doc => {
-                    const d = doc.data();
-                    if(!dailyStats[d.dateStr]) dailyStats[d.dateStr] = { cal: 0, pro: 0, burn: 0, weight: "-", fat: "-", imageUrl: "" };
-                    dailyStats[d.dateStr].cal += d.cal;
-                    dailyStats[d.dateStr].pro += d.pro;
-                });
-                snapCardio.forEach(doc => {
-                    const d = doc.data();
-                    if(!dailyStats[d.dateStr]) dailyStats[d.dateStr] = { cal: 0, pro: 0, burn: 0, weight: "-", fat: "-", imageUrl: "" };
-                    dailyStats[d.dateStr].burn += d.burn;
-                });
-                snapMetrics.forEach(doc => {
-                    const d = doc.data();
-                    if(!dailyStats[d.dateStr]) dailyStats[d.dateStr] = { cal: 0, pro: 0, burn: 0, weight: "-", fat: "-", imageUrl: "" };
-                    dailyStats[d.dateStr].weight = d.weight || "-";
-                    dailyStats[d.dateStr].fat = d.bodyFat || "-";
-                    if(d.imageUrl) dailyStats[d.dateStr].imageUrl = d.imageUrl;
-                });
-
-                updateMyMonthlyScore(dailyStats);
+                snapLogs.forEach(doc => { const d = doc.data(); initStat(d.dateStr); dailyStats[d.dateStr].cal += d.cal; dailyStats[d.dateStr].pro += d.pro; });
+                snapCardio.forEach(doc => { const d = doc.data(); initStat(d.dateStr); dailyStats[d.dateStr].burn += d.burn; });
+                snapMetrics.forEach(doc => { const d = doc.data(); initStat(d.dateStr); dailyStats[d.dateStr].weight = d.weight || "-"; dailyStats[d.dateStr].fat = d.bodyFat || "-"; if(d.imageUrl) dailyStats[d.dateStr].imageUrl = d.imageUrl; });
 
                 const dates = Object.keys(dailyStats).sort((a,b) => b.localeCompare(a)); 
                 if(dates.length === 0) {
@@ -1120,8 +1161,7 @@
                 let safeTargetCal = parseFloat(userSettings.targetCal) || 2000;
 
                 dates.forEach(date => {
-                    const stat = dailyStats[date];
-                    const dayNum = date.split('-')[2];
+                    const stat = dailyStats[date]; const dayNum = date.split('-')[2];
                     let netCal = stat.cal - stat.burn; if(netCal < 0) netCal = 0;
                     let intakePct = Math.min((stat.cal / safeTargetCal) * 100, 100); if(isNaN(intakePct)) intakePct = 0;
                     let burnPct = Math.min((stat.burn / safeTargetCal) * 100, intakePct); if(isNaN(burnPct)) burnPct = 0;
@@ -1131,8 +1171,7 @@
                     const svgHtml = `<svg class="day-svg" viewBox="0 0 24 24"><defs><clipPath id="shape-${date}"><path d="M12,2 A2.5,2.5 0 0,1 14.5,4.5 A2.5,2.5 0 0,1 12,7 A2.5,2.5 0 0,1 9.5,4.5 A2.5,2.5 0 0,1 12,2 M9,8 L15,8 C16.5,8 17.5,9 18,10.5 L16.5,16 L14.5,16 L14.5,22 L9.5,22 L9.5,16 L7.5,16 L6,10.5 C6.5,9 7.5,8 9,8 Z"/></clipPath></defs><g clip-path="url(#shape-${date})"><rect x="0" y="0" width="24" height="24" fill="#e2e8f0" /><rect x="0" y="${yIntake}" width="24" height="${hIntake}" fill="#2563eb" /><rect x="0" y="${yBurn}" width="24" height="${hBurn}" fill="#ef4444" /></g></svg>`;
 
                     if (stat.imageUrl) {
-                        window.currentMonthImages.push({ url: stat.imageUrl, date: date });
-                        let currentIndex = imgIndexCounter++;
+                        window.currentMonthImages.push({ url: stat.imageUrl, date: date }); let currentIndex = imgIndexCounter++;
                         galleryHtml += `<div style="position: relative; cursor: pointer; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); background: #000;" onclick="window.openImageModal(${currentIndex})"><img src="${stat.imageUrl}" style="width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; opacity: 0.95;"><div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0, 0, 0, 0.7); color: white; text-align: center; padding: 3px 0; font-size: 10px; font-weight: bold;">วันที่ ${dayNum}</div></div>`;
                     }
 
@@ -1172,8 +1211,7 @@
                 const collectionsToClear = ["logs", "cardio", "workouts", "metrics"];
                 for (const colName of collectionsToClear) {
                     const q = query(collection(db, "users", currentUser.uid, colName), where("dateStr", "==", dateStr));
-                    const snap = await getDocs(q);
-                    const deletePromises = [];
+                    const snap = await getDocs(q); const deletePromises = [];
                     snap.forEach(docSnap => { deletePromises.push(deleteDoc(doc(db, "users", currentUser.uid, colName, docSnap.id))); });
                     await Promise.all(deletePromises);
                 }
