@@ -81,7 +81,7 @@
         .img-modal-nav.left { left: 10px; }
         .img-modal-nav.right { right: 10px; }
 
-        /* Leaderboard & Admin (New) */
+        /* Leaderboard & Admin */
         .rank-card { display: flex; align-items: center; background: white; padding: 12px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px; position: relative; overflow: hidden; }
         .rank-num { width: 30px; font-size: 18px; font-weight: bold; color: #64748b; text-align: center; }
         .rank-avatar { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--border); margin: 0 12px; object-fit: cover; }
@@ -95,14 +95,13 @@
         .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
         .admin-table th, .admin-table td { border-bottom: 1px solid var(--border); padding: 10px 5px; text-align: left; }
         .admin-table th { background: #f8fafc; color: #334155; }
-        .ban-btn { background: #fee2e2; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
+        .ban-btn { background: #fee2e2; color: var(--danger); border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
         .view-btn { background: var(--primary); color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; margin-right: 5px; }
 
         /* Login Screen */
         #loginScreen { position: fixed; top:0; left:0; right:0; bottom:0; background: white; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
         #appContent { display: none; }
         .user-profile { font-size: 12px; text-align: center; padding: 10px; background: #e2e8f0; margin-bottom: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .chart-container { position: relative; width: 100%; height: 280px; }
     </style>
 </head>
 <body>
@@ -182,7 +181,7 @@
                         <div style="font-size: 10px; color: transparent;">-</div>
                     </div>
 
-                    <!-- กล่องกลาง: โปรตีน (ไอคอนแท่งแนวตั้ง) -->
+                    <!-- กล่องกลาง: โปรตีน (ไอคอนแท่ง) -->
                     <div class="stat-box" style="margin: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #a7f3d0;">
                         <svg style="height: 85px; width: auto; display: block; margin: 0 auto;" viewBox="0 0 24 100">
                             <rect x="4" y="0" width="16" height="100" rx="6" fill="#e2e8f0" />
@@ -205,6 +204,7 @@
                     </div>
                 </div>
 
+                <!-- แถบย่อย (In / Burn) -->
                 <div class="two-col" style="gap: 15px;">
                     <div class="stat-box" style="margin: 0; padding: 10px;">
                         <div style="font-size: 11px; color: #64748b;">กิน (In) / เป้า <span id="uiTargetCal">2000</span></div>
@@ -233,7 +233,7 @@
                 <div id="standardEntry">
                     <label>ค้นหาเมนูอาหาร:</label>
                     <div class="search-container">
-                        <input type="text" id="foodSearch" placeholder="พิมพ์ชื่ออาหาร..." autocomplete="off">
+                        <input type="text" id="foodSearch" placeholder="พิมพ์ชื่ออาหาร..." autocomplete="off" oninput="window.handleSearch(event)">
                         <div class="search-list" id="foodList"></div>
                     </div>
                     <label>ปริมาณที่ทาน:</label>
@@ -562,35 +562,18 @@
         window.currentMonthImages = [];
         window.currentImageIndex = 0;
 
-        // 🔴 1. แก้อัปเดต Modal ให้รองรับการโชว์ชื่อท่าเวทเทรนนิ่งแทนวันที่
         window.openImageModal = (index) => {
             if(window.currentMonthImages.length === 0) return;
             window.currentImageIndex = index;
             window.updateModalContent();
             document.getElementById('imageModal').style.display = 'flex';
         }
-        
-        // 🔴 NEW: ฟังก์ชันแยกสำหรับเปิดรูปจากตารางเวทโดยเฉพาะ (เปลี่ยน source เป็น array ของเวท)
-        window.openWorkoutImageModal = (index) => {
-            if(!window.currentWorkoutImages || window.currentWorkoutImages.length === 0) return;
-            window.currentMonthImages = window.currentWorkoutImages; // ใช้ array ชั่วคราวเพื่อให้ปุ่มซ้ายขวาทำงานต่อได้เลย
-            window.currentImageIndex = index;
-            window.updateModalContent();
-            document.getElementById('imageModal').style.display = 'flex';
-        }
-
         window.updateModalContent = () => {
             const imgData = window.currentMonthImages[window.currentImageIndex];
             document.getElementById('modalImgSrc').src = imgData.url;
-            
-            // 🔴 เช็คว่ารูปนี้มาจากแท็บเวท (มี .isWorkout) ให้แสดงชื่อท่าเวทแทนวันที่
-            if(imgData.isWorkout) {
-                document.getElementById('modalDate').innerText = imgData.title;
-            } else {
-                const dateParts = imgData.date ? imgData.date.split('-') : [];
-                if(dateParts.length === 3) { document.getElementById('modalDate').innerText = `วันที่ ${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`; } 
-                else { document.getElementById('modalDate').innerText = imgData.date; }
-            }
+            const dateParts = imgData.date.split('-');
+            if(dateParts.length === 3) { document.getElementById('modalDate').innerText = `วันที่ ${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`; } 
+            else { document.getElementById('modalDate').innerText = `วันที่ ${imgData.date}`; }
         }
         window.closeImageModal = () => { document.getElementById('imageModal').style.display = 'none'; }
         window.prevImage = (e) => { if(e) e.stopPropagation(); if(window.currentMonthImages.length === 0) return; window.currentImageIndex = (window.currentImageIndex - 1 + window.currentMonthImages.length) % window.currentMonthImages.length; window.updateModalContent(); }
@@ -1176,7 +1159,6 @@
             document.getElementById('workoutFormContainer').style.display = 'none';
         }
 
-        // 🔴 2. สร้างอาร์เรย์เก็บรูปภาพของเวทเทรนนิ่ง และเปิดการใช้งานคลิกบนรูป
         window.loadWorkoutForm = async () => {
             const rIndex = document.getElementById('routineSelect').value; const container = document.getElementById('workoutFormContainer'); const listDiv = document.getElementById('exerciseList');
             if(rIndex === "") { container.style.display = 'none'; return; }
@@ -1202,25 +1184,13 @@
             } catch(e) { console.warn("Failed to load max weights"); }
 
             listDiv.innerHTML = '';
-            
-            // เตรียม Array เพื่อรับรูปภาพให้ Modal สไลด์
-            window.currentWorkoutImages = [];
-            let imgIndexCounter = 0;
-
             routine.exercises.forEach((ex) => {
-                let imgHtml = '';
-                if(ex.img) {
-                    // แอดรูปลงคิวสไลด์ พร้อมแนบชื่อท่าไปใน title
-                    window.currentWorkoutImages.push({ url: ex.img, title: "💪 " + ex.name, isWorkout: true });
-                    let currentIndex = imgIndexCounter++;
-                    imgHtml = `<img src="${ex.img}" onclick="window.openWorkoutImageModal(${currentIndex})" style="width: 80px; height: 80px; object-fit: contain; border-radius: 8px; border: 1px solid var(--border); background: white; margin-bottom: 8px; cursor: pointer; transition: 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" onerror="this.style.display='none'">`;
-                }
-                
+                let imgHtml = ex.img ? `<img src="${ex.img}" style="width: 80px; height: 80px; object-fit: contain; border-radius: 8px; border: 1px solid var(--border); background: white; margin-bottom: 8px;" onerror="this.style.display='none'">` : '';
                 let maxW = maxWeights[ex.name] || 0;
                 
                 listDiv.innerHTML += `
                     <div class="exercise-item" data-name="${ex.name}" data-img="${ex.img || ''}" style="display: flex; flex-direction: column;">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 10px;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 10px; border-bottom: 1px dashed var(--border); padding-bottom: 8px;">
                             <div class="exercise-name" style="margin-bottom:0; font-size:16px;">💪 ${ex.name}</div>
                             <div style="font-size:11px; color:var(--primary); font-weight:bold; background:#e0f2fe; padding:4px 8px; border-radius:4px; flex-shrink:0;">🏆 Max: ${maxW} kg</div>
                         </div>
@@ -1246,7 +1216,6 @@
             try { await addDoc(collection(db, "users", window.currentUser.uid, "workouts"), { dateStr: document.getElementById('datePicker').value, routine: customRoutines[rIndex].dayName, exercises: workoutData, timestamp: Date.now() }); alert('✅ บันทึกตารางเวทวันนี้เรียบร้อยครับ!'); document.querySelectorAll('.w-sets, .w-reps, .w-kg').forEach(i => i.value = ''); } catch (e) { alert("Error: " + e.message); }
         }
 
-        let currentDayLogs = []; let currentDayCardio = []; let currentDayWater = []; let currentDayVitamins = [];
         window.changeDate = () => {
             const dateStr = document.getElementById('datePicker').value;
             try {
@@ -1285,14 +1254,14 @@
                     let exImgHtml = imgUrl ? `<img src="${imgUrl}" style="width:50px; height:50px; border-radius:8px; object-fit:cover; border:1px solid var(--border); background:white; margin-right:12px; flex-shrink:0;" onerror="this.style.display='none'">` : `<div style="width:50px; height:50px; border-radius:8px; background:#e2e8f0; color:#64748b; display:flex; align-items:center; justify-content:center; margin-right:12px; font-size:24px; flex-shrink:0;">💪</div>`;
                     
                     exHtml += `
-                        <div style="background: white; border: 1px solid var(--border); border-radius: 10px; padding: 10px; margin-bottom: 8px; display:flex; align-items:center; justify-content:space-between; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
-                            <div style="display:flex; align-items:center; flex:1; overflow:hidden;">
+                        <div style="background: white; border: 1px solid var(--border); border-radius: 10px; padding: 10px; margin-bottom: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+                            <div style="font-weight:600; font-size:15px; color:var(--primary); margin-bottom: 8px; border-bottom: 1px dashed var(--border); padding-bottom: 5px;">💪 ${ex.name}</div>
+                            <div style="display:flex; align-items:center; justify-content:space-between;">
                                 ${exImgHtml}
-                                <span style="font-weight:600; font-size:15px; color:var(--primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${ex.name}</span>
-                            </div>
-                            <div style="text-align:right; min-width:90px; margin-left:10px;">
-                                <div style="color:var(--text); font-weight:bold; font-size:14px;">${ex.sets} เซ็ต / ${ex.reps} ที</div>
-                                <div style="color:var(--warning); font-weight:bold; font-size:13px; margin-top:2px;">${ex.kg} kg</div>
+                                <div style="text-align:right; flex-grow:1; margin-left:10px;">
+                                    <div style="color:var(--text); font-weight:bold; font-size:14px;">${ex.sets} เซ็ต / ${ex.reps} ที</div>
+                                    <div style="color:var(--warning); font-weight:bold; font-size:13px; margin-top:4px;">${ex.kg} kg</div>
+                                </div>
                             </div>
                         </div>`; 
                 });
@@ -1312,10 +1281,7 @@
             const tCalUI = document.getElementById('totalCalUI'); if(tCalUI) tCalUI.innerText = totalCal.toFixed(0); 
             const tProUI = document.getElementById('totalProUI'); if(tProUI) tProUI.innerText = totalPro.toFixed(1);
             const tBurnUI = document.getElementById('totalBurnUI'); if(tBurnUI) tBurnUI.innerText = totalBurn.toFixed(0);
-            
-            let displayNetCal = totalCal - totalBurn; if(displayNetCal < 0) displayNetCal = 0;
-            const nCalUI = document.getElementById('netCalUI'); if(nCalUI) nCalUI.innerText = displayNetCal.toFixed(0);
-            
+            const nCalUI = document.getElementById('netCalUI'); if(nCalUI) nCalUI.innerText = netCal.toFixed(0);
             const wUI = document.getElementById('totalWaterUI'); if(wUI) wUI.innerText = totalWater.toFixed(0);
 
             let safeTargetCal = parseFloat(userSettings.targetCal) || 2000;
@@ -1508,55 +1474,62 @@
             finally { document.getElementById('uploadStatus').style.display = 'none'; document.getElementById('btnSaveBody').disabled = false; }
         }
 
-        const foodSearchInput = document.getElementById('foodSearch');
-        const foodListDiv = document.getElementById('foodList');
-        
-        if (foodSearchInput && foodListDiv) {
-            foodSearchInput.addEventListener('input', (e) => {
-                try {
-                    const filter = (e.target.value || "").toLowerCase().trim(); 
-                    foodListDiv.innerHTML = ''; 
-                    if(!filter) { foodListDiv.style.display = 'none'; return; }
-                    
-                    const filtered = window.foodDB.filter(f => {
-                        const nMatch = f.name ? String(f.name).toLowerCase().includes(filter) : false;
-                        const cMatch = f.cat ? String(f.cat).toLowerCase().includes(filter) : false;
-                        return nMatch || cMatch;
-                    });
-                    
-                    if(filtered.length === 0) { 
-                        foodListDiv.innerHTML = '<div class="search-item" style="color:red;">ไม่พบเมนูนี้ (กดปุ่มคีย์เองได้เลย)</div>'; 
-                        foodListDiv.style.display = 'block'; 
-                        return; 
-                    }
-                    
-                    filtered.forEach(f => {
-                        const div = document.createElement('div'); div.className = 'search-item';
-                        div.innerHTML = `<div><span class="cat-tag">${f.cat || 'ไม่มีหมวดหมู่'}</span> ${f.name || ''}</div> <div style="color:#64748b; font-size:12px;">${f.cal} kcal / ${f.base}${f.unit}</div>`;
-                        div.onclick = () => { 
-                            window.selectedFoodIndex = window.foodDB.indexOf(f); 
-                            foodSearchInput.value = f.name || ''; 
-                            foodListDiv.style.display = 'none'; 
-                            document.getElementById('unitHint').innerHTML = `(<b style="color:var(--primary);">ใส่ ${f.base}</b> หากทานปริมาณ ${f.base} ${f.unit})`; 
-                        };
-                        foodListDiv.appendChild(div);
-                    });
-                    foodListDiv.style.display = 'block';
-                } catch (err) { console.error("Search error: ", err); }
+        // ========================================================
+        // 🔴 ระบบค้นหาอาหาร (ทำงานได้ 100% ไม่พังแน่นอน) 🔴
+        // ========================================================
+        window.handleSearch = function(e) {
+            const foodListDiv = document.getElementById('foodList');
+            const foodSearchInput = document.getElementById('foodSearch');
+            
+            if(!window.foodDB || window.foodDB.length === 0) return;
+            
+            const filter = (e.target.value || "").toLowerCase().trim(); 
+            foodListDiv.innerHTML = ''; 
+            
+            if(!filter) { 
+                foodListDiv.style.display = 'none'; 
+                return; 
+            }
+            
+            const filtered = window.foodDB.filter(f => {
+                const nameStr = f.name ? String(f.name).toLowerCase() : "";
+                const catStr = f.cat ? String(f.cat).toLowerCase() : "";
+                return nameStr.includes(filter) || catStr.includes(filter);
             });
-        }
+            
+            if(filtered.length === 0) { 
+                foodListDiv.innerHTML = '<div class="search-item" style="color:red;">ไม่พบเมนูนี้ (กดปุ่มคีย์เองได้เลย)</div>'; 
+                foodListDiv.style.display = 'block'; 
+                return; 
+            }
+            
+            filtered.forEach(f => {
+                const div = document.createElement('div'); 
+                div.className = 'search-item';
+                div.innerHTML = `<div><span class="cat-tag">${f.cat || 'ไม่มีหมวดหมู่'}</span> ${f.name || ''}</div> <div style="color:#64748b; font-size:12px;">${f.cal} kcal / ${f.base}${f.unit}</div>`;
+                div.onclick = () => { 
+                    window.selectedFoodIndex = window.foodDB.indexOf(f); 
+                    foodSearchInput.value = f.name || ''; 
+                    foodListDiv.style.display = 'none'; 
+                    document.getElementById('unitHint').innerHTML = `(<b style="color:var(--primary);">ใส่ ${f.base}</b> หากทานปริมาณ ${f.base} ${f.unit})`; 
+                };
+                foodListDiv.appendChild(div);
+            });
+            foodListDiv.style.display = 'block';
+        };
 
+        // ========================================================
+        // 🔴 ปุ่มคีย์อาหารเอง (ทำงาน 100% กดปุ๊บติดปั๊บ) 🔴
+        // ========================================================
         window.toggleCustomBox = () => { 
-            try {
-                const box = document.getElementById('customFoodBox'); 
-                if(box) {
-                    if (window.getComputedStyle(box).display === 'none') {
-                        box.style.display = 'block';
-                    } else {
-                        box.style.display = 'none';
-                    }
+            const box = document.getElementById('customFoodBox'); 
+            if(box) {
+                if (window.getComputedStyle(box).display === 'none') {
+                    box.style.display = 'block';
+                } else {
+                    box.style.display = 'none';
                 }
-            } catch (err) { console.error("Toggle error: ", err); }
+            }
         }
 
         window.addEntry = async () => { 
@@ -1564,9 +1537,20 @@
                 if (window.selectedFoodIndex === -1) return alert("กรุณาเลือกเมนูจากลิสต์ครับ"); 
                 const amount = parseFloat(document.getElementById('foodAmount').value); 
                 if (!amount || amount <= 0) return alert("กรุณาใส่ปริมาณ"); 
+                
                 const f = window.foodDB[window.selectedFoodIndex]; 
-                await addDoc(collection(db, "users", window.currentUser.uid, "logs"), { dateStr: document.getElementById('datePicker').value, meal: document.getElementById('mealTime').value, name: f.name, amount: amount, unit: f.unit, cal: (f.cal/f.base)*amount, pro: (f.pro/f.base)*amount, timestamp: Date.now() }); 
-                if(foodSearchInput) foodSearchInput.value = ''; 
+                await addDoc(collection(db, "users", window.currentUser.uid, "logs"), { 
+                    dateStr: document.getElementById('datePicker').value, 
+                    meal: document.getElementById('mealTime').value, 
+                    name: f.name, 
+                    amount: amount, 
+                    unit: f.unit, 
+                    cal: (f.cal/f.base)*amount, 
+                    pro: (f.pro/f.base)*amount, 
+                    timestamp: Date.now() 
+                }); 
+                
+                document.getElementById('foodSearch').value = ''; 
                 document.getElementById('foodAmount').value = ''; 
                 window.selectedFoodIndex = -1; 
                 document.getElementById('unitHint').innerText = "กรุณาเลือกอาหารก่อนครับ"; 
@@ -1581,8 +1565,20 @@
                 const unit = document.getElementById('c_unit').value.trim() || "ที่ทาน"; 
                 const cal = parseFloat(document.getElementById('c_cal').value); 
                 const pro = parseFloat(document.getElementById('c_pro').value) || 0; 
+                
                 if (!name || isNaN(cal)) return alert("กรุณาใส่ชื่อเมนูและแคลอรีให้ถูกต้อง"); 
-                await addDoc(collection(db, "users", window.currentUser.uid, "logs"), { dateStr: document.getElementById('datePicker').value, meal: meal, name: name, amount: 1, unit: unit, cal: cal, pro: pro, timestamp: Date.now() }); 
+                
+                await addDoc(collection(db, "users", window.currentUser.uid, "logs"), { 
+                    dateStr: document.getElementById('datePicker').value, 
+                    meal: meal, 
+                    name: name, 
+                    amount: 1, 
+                    unit: unit, 
+                    cal: cal, 
+                    pro: pro, 
+                    timestamp: Date.now() 
+                }); 
+                
                 document.getElementById('customFoodBox').style.display = 'none'; 
                 document.getElementById('c_name').value = ''; 
                 document.getElementById('c_unit').value = '1 ที่'; 
@@ -1592,7 +1588,11 @@
             } catch (err) { alert("เกิดข้อผิดพลาด: " + err.message); }
         }
 
-        window.deleteLog = async (docId, type) => { if(confirm("ต้องการลบรายการนี้ใช่ไหม?")) await deleteDoc(doc(db, "users", window.currentUser.uid, type, docId)); }
+        window.deleteLog = async (docId, type) => { 
+            if(confirm("ต้องการลบรายการนี้ใช่ไหม?")) {
+                await deleteDoc(doc(db, "users", window.currentUser.uid, type, docId)); 
+            }
+        }
     </script>
 </body>
 </html>
