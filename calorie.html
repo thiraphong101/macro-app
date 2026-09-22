@@ -174,12 +174,11 @@
                             <g clip-path="url(#person-shape-main)">
                                 <rect x="0" y="0" width="24" height="24" fill="#e2e8f0" />
                                 <rect id="fillIntake" x="0" y="24" width="24" height="0" fill="#2563eb" />
-                                <rect id="fillBurn" x="0" y="24" width="24" height="0" fill="#ef4444" />
                             </g>
                         </svg>
-                        <div id="netCalLabel" style="font-size: 10px; font-weight: bold; color: #0284c7; margin-top: 10px;">แคลอรีสุทธิ</div>
-                        <div id="netCalUI" style="font-size: 20px; font-weight: bold; color: #0284c7; line-height: 1.1; margin: 4px 0;">0</div>
-                        <div style="font-size: 10px; color: transparent;">-</div>
+                        <div id="netCalLabel" style="font-size: 10px; font-weight: bold; color: #0284c7; margin-top: 10px;">แคลอรีที่กิน (In)</div>
+                        <div id="totalCalUI" style="font-size: 20px; font-weight: bold; color: #0284c7; line-height: 1.1; margin: 4px 0;">0</div>
+                        <div style="font-size: 10px; color: #64748b;">เป้า <span id="uiTargetCal">2000</span></div>
                     </div>
 
                     <!-- กล่องกลาง: โปรตีน (ไอคอนแท่ง) -->
@@ -208,8 +207,8 @@
                 <!-- แถบย่อย (In / Burn) -->
                 <div class="two-col" style="gap: 15px;">
                     <div class="stat-box" style="margin: 0; padding: 10px;">
-                        <div style="font-size: 11px; color: #64748b;">กิน (In) / เป้า <span id="uiTargetCal">2000</span></div>
-                        <div class="stat-val" id="totalCalUI" style="color: var(--primary); font-size: 18px;">0</div>
+                        <div style="font-size: 11px; color: #64748b;">แคลอรีสุทธิ (Net)</div>
+                        <div class="stat-val" id="netCalUI" style="color: var(--primary); font-size: 18px;">0</div>
                     </div>
                     <div class="stat-box" style="margin: 0; padding: 10px;">
                         <div style="font-size: 11px; color: #64748b;">เผาผลาญ (Burn)</div>
@@ -563,11 +562,10 @@
         window.currentMonthImages = [];
         window.currentImageIndex = 0;
 
-        // 🔴 เพิ่มฟังก์ชันรับคิวรูปภาพจากหน้าเวทเทรนนิ่ง
         window.currentWorkoutImages = [];
         window.openWorkoutImageModal = (index) => {
             if(!window.currentWorkoutImages || window.currentWorkoutImages.length === 0) return;
-            window.currentMonthImages = window.currentWorkoutImages; // โหลดใส่ Modal ตัวเดิมให้สไลด์ได้
+            window.currentMonthImages = window.currentWorkoutImages; 
             window.currentImageIndex = index;
             window.updateModalContent();
             document.getElementById('imageModal').style.display = 'flex';
@@ -584,7 +582,6 @@
             const imgData = window.currentMonthImages[window.currentImageIndex];
             document.getElementById('modalImgSrc').src = imgData.url;
             
-            // 🔴 เช็คว่ารูปมาจากหน้าเวทไหม ถ้าใช่ ให้โชว์ชื่อท่า แทนวันที่
             if(imgData.isWorkout) {
                 document.getElementById('modalDate').innerText = imgData.title;
             } else {
@@ -1196,7 +1193,6 @@
             document.getElementById('workoutFormContainer').style.display = 'none';
         }
 
-        // 🔴 3. โหลดฟอร์มเวทเทรนนิ่ง และดึงรูปเข้าอาร์เรย์ของสไลด์ Modal
         window.loadWorkoutForm = async () => {
             const rIndex = document.getElementById('routineSelect').value; 
             const container = document.getElementById('workoutFormContainer'); 
@@ -1227,16 +1223,12 @@
             } catch(e) { console.warn("Failed to load max weights"); }
 
             listDiv.innerHTML = '';
-            
-            // เตรียมอาร์เรย์รูปภาพไว้รองรับ Modal Slider
             window.currentWorkoutImages = [];
             let imgIndexCounter = 0;
 
             routine.exercises.forEach((ex) => {
                 let imgHtml = '';
-                
-                // ตรวจสอบรูปภาพ แล้วใส่คำสั่ง onClick ให้สไลด์
-                if (ex.img) {
+                if(ex.img) {
                     window.currentWorkoutImages.push({ url: ex.img, title: "💪 " + ex.name, isWorkout: true });
                     let currentIndex = imgIndexCounter++;
                     imgHtml = `<img src="${ex.img}" onclick="window.openWorkoutImageModal(${currentIndex})" class="exercise-img" onerror="this.style.display='none'">`;
@@ -1310,14 +1302,14 @@
                     let exImgHtml = imgUrl ? `<img src="${imgUrl}" style="width:50px; height:50px; border-radius:8px; object-fit:cover; border:1px solid var(--border); background:white; margin-right:12px; flex-shrink:0;" onerror="this.style.display='none'">` : `<div style="width:50px; height:50px; border-radius:8px; background:#e2e8f0; color:#64748b; display:flex; align-items:center; justify-content:center; margin-right:12px; font-size:24px; flex-shrink:0;">💪</div>`;
                     
                     exHtml += `
-                        <div style="background: white; border: 1px solid var(--border); border-radius: 10px; padding: 10px; margin-bottom: 8px; display:flex; align-items:center; justify-content:space-between; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
-                            <div style="display:flex; align-items:center; flex:1; overflow:hidden;">
+                        <div style="background: white; border: 1px solid var(--border); border-radius: 10px; padding: 10px; margin-bottom: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+                            <div style="font-weight:600; font-size:15px; color:var(--primary); margin-bottom: 8px; border-bottom: 1px dashed var(--border); padding-bottom: 5px;">💪 ${ex.name}</div>
+                            <div style="display:flex; align-items:center; justify-content:space-between;">
                                 ${exImgHtml}
-                                <span style="font-weight:600; font-size:15px; color:var(--primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${ex.name}</span>
-                            </div>
-                            <div style="text-align:right; min-width:90px; margin-left:10px;">
-                                <div style="color:var(--text); font-weight:bold; font-size:14px;">${ex.sets} เซ็ต / ${ex.reps} ที</div>
-                                <div style="color:var(--warning); font-weight:bold; font-size:13px; margin-top:2px;">${ex.kg} kg</div>
+                                <div style="text-align:right; flex-grow:1; margin-left:10px;">
+                                    <div style="color:var(--text); font-weight:bold; font-size:14px;">${ex.sets} เซ็ต / ${ex.reps} ที</div>
+                                    <div style="color:var(--warning); font-weight:bold; font-size:13px; margin-top:4px;">${ex.kg} kg</div>
+                                </div>
                             </div>
                         </div>`; 
                 });
